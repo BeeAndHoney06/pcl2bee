@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.IO.Compression;
 using System.Net.Http;
 using System.Text.Json.Serialization;
@@ -63,11 +63,12 @@ public class UpdatesMinioModel : IUpdateSource // 社区自己的更新系统格
             RefreshCache();
         var loaders = new List<ModLoader.LoaderBase>();
         var patchUpdate = true;
+        MinioUpdateAsset deJsonData = null;
         var tempPath = $@"{ModBase.pathTemp}Cache\Update\Download\";
         loaders.Add(new ModLoader.LoaderTask<int, List<DownloadFile>>(Lang.Text("Update.Task.GetVersionInfo"), load =>
         {
             var channelName = GetChannelName(channel, arch);
-            var deJsonData = GetRemoteInfoByName($"updates-{channelName}", "updates/")
+            deJsonData = GetRemoteInfoByName($"updates-{channelName}", "updates/")
                 ?.ToObject<MinioUpdateModel>()
                 ?.Assets
                 ?.FirstOrDefault();
@@ -125,6 +126,15 @@ public class UpdatesMinioModel : IUpdateSource // 社区自己的更新系统格
                     // 解压到指定文件（覆盖已存在文件）
                     entry.ExtractToFile(output, true);
                 }
+            }
+
+            // 校验更新结果，防止被篡改的更新包被替换并执行
+            var expectedSha = deJsonData?.Sha256;
+            if (!string.IsNullOrWhiteSpace(expectedSha))
+            {
+                var actualSha = ModBase.GetFileSHA256(output) ?? "";
+                if (!string.Equals(actualSha, expectedSha.Trim(), StringComparison.OrdinalIgnoreCase))
+                    throw new Exception("更新文件 SHA256 校验失败，更新包可能已被篡改，已中止更新");
             }
         }));
         return loaders;

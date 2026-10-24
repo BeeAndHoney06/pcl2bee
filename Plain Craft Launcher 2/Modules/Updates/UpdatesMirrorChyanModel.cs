@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+using System.Net.Http;
 using PCL.Core.App;
 using PCL.Core.App.Localization;
 using PCL.Core.Utils;
@@ -61,15 +61,27 @@ public class UpdatesMirrorChyanModel : IUpdateSource // Mirror 酱的更新格�
     public List<ModLoader.LoaderBase> GetDownloadLoader(UpdateChannel channel, UpdateArch arch, string output)
     {
         var loaders = new List<ModLoader.LoaderBase>();
+        string expectedSha = null;
         loaders.Add(new ModLoader.LoaderTask<int, List<DownloadFile>>(Lang.Text("Update.Task.GetDownloadInfo"), load =>
         {
             var ret = (JsonObject)Requester.FetchJson(GetUrl(channel, arch), RequestParam.WithRetry);
             var dlUrl = ret["data"]["url"]?.ToString();
             if (dlUrl is null)
                 throw new Exception("Mirror 酱下载源不可用");
+            expectedSha = ret["data"]["sha256"]?.ToString();
             load.output = new List<DownloadFile> { new(new[] { dlUrl }, output) };
         }));
         loaders.Add(new LoaderDownload(Lang.Text("Update.Task.DownloadUpdateFile"), new List<DownloadFile>()));
+        loaders.Add(new ModLoader.LoaderTask<string, int>("校验更新文件", _ =>
+        {
+            // 校验更新文件，防止被篡改的更新包被替换并执行
+            if (!string.IsNullOrWhiteSpace(expectedSha))
+            {
+                var actualSha = ModBase.GetFileSHA256(output) ?? "";
+                if (!string.Equals(actualSha, expectedSha.Trim(), StringComparison.OrdinalIgnoreCase))
+                    throw new Exception("更新文件 SHA256 校验失败，更新包可能已被篡改，已中止更新");
+            }
+        }));
         return loaders;
     }
 

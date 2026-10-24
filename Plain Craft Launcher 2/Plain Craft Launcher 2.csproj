@@ -9,6 +9,8 @@
         <StartupObject>PCL.Program</StartupObject>
         <PublishUrl>publish\</PublishUrl>
         <PublishSingleFile>true</PublishSingleFile>
+        <!-- 单文件压缩仅在自包含发布时受 .NET SDK 支持（否则报 NETSDK1176），框架依赖发布保持不压缩 -->
+        <EnableCompressionInSingleFile Condition="'$(SelfContained)' == 'true'">true</EnableCompressionInSingleFile>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <RuntimeIdentifier Condition="'$(Platform)' == 'x64'">win-x64</RuntimeIdentifier>
         <RuntimeIdentifier Condition="'$(Platform)' == 'ARM64'">win-arm64</RuntimeIdentifier>
