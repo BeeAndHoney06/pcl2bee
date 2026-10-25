@@ -30,8 +30,8 @@
         <Description>Minecraft 启动器 (作者: 龙腾猫跃; PCL2 Bee Edition)</Description>
         <Product>PCL2 Bee Edition</Product>
         <Copyright>Copyright © 龙腾猫跃 2016. All Rights Reserved.</Copyright>
-        <AssemblyVersion>1.0.2.0</AssemblyVersion>
-        <FileVersion>1.0.2.0</FileVersion>
+        <AssemblyVersion>0.0.1.1.0</AssemblyVersion>
+        <FileVersion>0.0.1.1.0</FileVersion>
         <NoWarn>
             41999;42016;42017;42018;42019;42020;42021;42022;42032;42036;42314;
             VSTHRD002;VSTHRD003;VSTHRD110;VSTHRD200
