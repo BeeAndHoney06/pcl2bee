@@ -57,6 +57,7 @@ public static class ModServerDownload
         var mirror = ToBmclapiMirror(url);
         var primary = mirror ?? url; // 有镜像：镜像为主；无镜像（Paper/Purpur/Spigot）：官方直连
         var fallback = mirror is not null ? url : null;
+        // PaperMC Fill v3 要求携带可识别的 UA，使用浏览器 UA（含产品标识已在 RequestSigning 中附加）
         return ModBase.GetJson(Requester.Fetch(primary, new FetchParam
         {
             Method = "GET",
@@ -143,29 +144,16 @@ public static class ModServerDownload
         var json = FetchJson("https://fill.papermc.io/v3/projects/paper");
         var versions = json["versions"]?.AsObject();
         var result = new List<ServerVersionEntry>();
-        // versions 按大版本分组（"1.21": [...]），展平各组内最新稳定版
+        // versions 按大版本分组（"1.21": ["1.21.11", ...]），组内首项为最新；展平并跳过 pre/rc 快照
         foreach (var group in versions ?? new JsonObject())
         foreach (var ver in (JsonArray)group.Value ?? new JsonArray())
         {
-            // 跳过 pre/rc 快照（含 '-' 的为非稳定版）
-            if (ver.ToString().Contains('-')) continue;
-            result.Add(new ServerVersionEntry { Version = ver.ToString() });
-            break; // 每组只取最新稳定版（数组首项为最新）
+            var text = ver?.ToString() ?? "";
+            if (string.IsNullOrWhiteSpace(text) || text.Contains('-')) continue; // 跳过 -pre/-rc
+            result.Add(new ServerVersionEntry { Version = text });
         }
 
         return result;
-    }
-
-    /// <summary>解析 Paper 指定版本最新构建的下载信息（下载时调用）。</summary>
-    private static (string Url, string Sha256) ResolvePaper(string version)
-    {
-        var build = FetchJson($"https://fill.papermc.io/v3/projects/paper/versions/{version}/builds/latest");
-        var download = build["downloads"]?["server:default"];
-        var url = download?["url"]?.ToString();
-        if (string.IsNullOrWhiteSpace(url))
-            throw new Exception(Lang.Text("Download.Server.Error.NoServerJar"));
-        var sha256 = download?["checksums"]?["sha256"]?.ToString();
-        return (url, sha256);
     }
 
     // ---------- Purpur（api.purpurmc.org v2，官方 API） ----------
@@ -274,84 +262,181 @@ public static class ModServerDownload
         return (url, loaderVer);
     }
 
-    #region 下载
+    #region 构建列表
 
     /// <summary>
-    ///     下载服务端文件到指定目录。Vanilla/Paper 在此时解析真实 URL。
-    ///     返回启动的任务加载器。
+    ///     获取指定服务端类型与游戏版本的构建列表（仅 Paper / Purpur 有构建概念）。
+    ///     返回的构建号为从新到旧的字符串列表；其他类型返回空列表。必须在工作线程执行。
     /// </summary>
-    public static ModLoader.LoaderCombo<int> Download(ServerType type, ServerVersionEntry entry, string targetFolder)
+    public static List<string> GetBuilds(ServerType type, string version)
     {
-        Directory.CreateDirectory(targetFolder);
-        string url = entry.Url;
-        string sha256 = entry.Sha256;
-
-        // 需要二次解析的源
-        if (type == ServerType.Vanilla && !string.IsNullOrEmpty(url) && url.StartsWithF("http") &&
-            url.Contains("piston-meta"))
-            url = ResolveVanillaUrl(url);
-        else if (type == ServerType.Paper)
+        var result = new List<string>();
+        if (string.IsNullOrWhiteSpace(version)) return result;
+        switch (type)
         {
-            var (u, s) = ResolvePaper(entry.Version);
-            url = u;
-            sha256 = s;
-        }
-        else if (type == ServerType.Purpur)
-        {
-            // Purpur：取该版本最新构建
-            var info = FetchJson($"https://api.purpurmc.org/v2/purpur/{entry.Version}");
-            var latestBuild = info["builds"]?["latest"]?.ToString() ?? "";
-            url = $"https://api.purpurmc.org/v2/purpur/{entry.Version}/{latestBuild}/download";
-        }
-        else if (type == ServerType.Forge)
-        {
-            // Forge：按 MC 版本取最新构建的安装器（BMCLAPI maven 直链，hash 按长度自动识别 sha1）
-            var (forgeUrl, forgeSha1) = ResolveForge(entry.Version);
-            url = forgeUrl;
-            sha256 = forgeSha1; // FileChecker 按哈希长度自动识别类型（40 位 = SHA1）
-            // 文件名中的构建号从 URL 提取（forge-{mc}-{build}-installer.jar）
-            var marker = "forge-";
-            if (url.Contains(marker))
+            case ServerType.Paper:
             {
-                var part = url[(url.IndexOf(marker) + marker.Length)..];
-                entry.Detail = part.Contains("-installer") ? part.Split("-installer")[0] : part;
-                if (entry.Detail.StartsWithF(entry.Version + "-"))
-                    entry.Detail = entry.Detail[(entry.Version.Length + 1)..]; // 去掉 mc 版本前缀，留构建号
+                // Paper v3：/versions/{v}/builds → [{id, channel, downloads}]
+                var builds = FetchJsonArray(
+                    $"https://fill.papermc.io/v3/projects/paper/versions/{version}/builds");
+                foreach (var build in builds)
+                {
+                    var id = build?["id"]?.ToString();
+                    if (!string.IsNullOrWhiteSpace(id)) result.Add(id);
+                }
+
+                result.Reverse(); // 从新到旧
+                break;
+            }
+            case ServerType.Purpur:
+            {
+                var info = FetchJson($"https://api.purpurmc.org/v2/purpur/{version}");
+                foreach (var build in (JsonArray)info["builds"]?["all"] ?? new JsonArray())
+                {
+                    var id = build?.ToString();
+                    if (!string.IsNullOrWhiteSpace(id)) result.Add(id);
+                }
+
+                result.Reverse();
+                break;
             }
         }
-        else if (type == ServerType.Fabric)
+
+        return result;
+    }
+
+    #endregion
+
+    #region 下载
+
+    /// <summary>一次服务端下载的解析结果。</summary>
+    public class DownloadSpec
+    {
+        /// <summary>下载地址列表（镜像优先，官方回退）。</summary>
+        public List<string> Urls = [];
+
+        /// <summary>期望哈希（按长度自动识别 MD5/SHA1/SHA256），未知为 null。</summary>
+        public string? Hash;
+
+        /// <summary>建议文件名。</summary>
+        public string FileName = "server.jar";
+
+        /// <summary>附加说明（如 Spigot 的编译指引），无则为空。</summary>
+        public string? Note;
+
+        /// <summary>是否使用浏览器 UA 下载（镜像不需要产品 UA）。</summary>
+        public bool UseBrowserUserAgent;
+
+        /// <summary>自定义 UA（直连 PaperMC Fill v3 时必须携带可识别标识）。</summary>
+        public string CustomUserAgent = "";
+    }
+
+    /// <summary>
+    ///     解析某类型/版本/构建对应的下载信息（不发起下载）。必须在工作线程执行。
+    /// </summary>
+    public static DownloadSpec Resolve(ServerType type, string version, string? build = null)
+    {
+        var spec = new DownloadSpec();
+        string url;
+        switch (type)
         {
-            var (installerUrl, _) = ResolveFabric(entry.Version);
-            url = installerUrl;
+            case ServerType.Vanilla:
+            {
+                // Mojang 版本清单需二次解析出 server jar 地址
+                var manifest = FetchJson("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json");
+                var entry = (JsonArray)manifest["versions"] ?? new JsonArray();
+                var target = entry.FirstOrDefault(e => e?["id"]?.ToString() == version);
+                var metaUrl = target?["url"]?.ToString();
+                if (string.IsNullOrWhiteSpace(metaUrl))
+                    throw new Exception(Lang.Text("Download.Server.Error.NoServerJar"));
+                url = ResolveVanillaUrl(metaUrl);
+                spec.FileName = $"server-{version}.jar";
+                break;
+            }
+            case ServerType.Paper:
+            {
+                // Paper v3：指定构建或最新构建
+                var api = string.IsNullOrWhiteSpace(build)
+                    ? $"https://fill.papermc.io/v3/projects/paper/versions/{version}/builds/latest"
+                    : $"https://fill.papermc.io/v3/projects/paper/versions/{version}/builds/{build}";
+                var info = FetchJson(api);
+                var download = info["downloads"]?["server:default"];
+                url = download?["url"]?.ToString() ?? "";
+                spec.Hash = download?["checksums"]?["sha256"]?.ToString();
+                spec.FileName = download?["name"]?.ToString() ?? $"paper-{version}.jar";
+                break;
+            }
+            case ServerType.Purpur:
+            {
+                // Purpur：指定构建，缺省取 latest
+                var buildId = build;
+                if (string.IsNullOrWhiteSpace(buildId))
+                {
+                    var info = FetchJson($"https://api.purpurmc.org/v2/purpur/{version}");
+                    buildId = info["builds"]?["latest"]?.ToString();
+                }
+
+                url = $"https://api.purpurmc.org/v2/purpur/{version}/{buildId}/download";
+                spec.FileName = $"purpur-{version}-{buildId}.jar";
+                break;
+            }
+            case ServerType.Spigot:
+            {
+                // Spigot 无官方直链：提供官方 BuildTools 与编译指引
+                url = "https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar";
+                spec.FileName = "BuildTools.jar";
+                spec.Note = Lang.Text("Download.Server.Spigot.Note", version);
+                break;
+            }
+            case ServerType.Forge:
+            {
+                var (forgeUrl, forgeSha1) = ResolveForge(version);
+                url = forgeUrl;
+                spec.Hash = forgeSha1;
+                var marker = "forge-";
+                var part = url.Contains(marker) ? url[(url.IndexOf(marker) + marker.Length)..] : "installer";
+                var full = part.Contains("-installer") ? part.Split("-installer")[0] : part;
+                spec.FileName = $"forge-{full}-installer.jar";
+                break;
+            }
+            case ServerType.Fabric:
+            {
+                var (installerUrl, _) = ResolveFabric(version);
+                url = installerUrl;
+                spec.FileName = installerUrl[(installerUrl.LastIndexOf('/') + 1)..];
+                break;
+            }
+            default:
+                throw new NotSupportedException("Unknown server type: " + type);
         }
 
         if (string.IsNullOrWhiteSpace(url))
             throw new Exception(Lang.Text("Download.Server.Error.NoServerJar"));
 
-        // 下载 URL 双源：镜像优先 + 官方回退（DownloadFile 支持多 URL 自动换源）
+        // 镜像优先 + 官方回退（DownloadFile 支持多 URL 自动换源）
         var mirrorUrl = ToBmclapiMirror(url);
-        var urls = mirrorUrl is not null
-            ? new List<string> { mirrorUrl, url }
-            : new List<string> { url };
+        spec.Urls = mirrorUrl is not null ? [mirrorUrl, url] : [url];
+        // PaperMC Fill v3 要求可识别的 UA：下载产物时以产品 UA 直连（镜像无此要求）
+        spec.UseBrowserUserAgent = mirrorUrl is not null;
+        if (mirrorUrl is null) spec.CustomUserAgent = $"PCL2-BeeEdition/{ModBase.versionBaseName}";
+        return spec;
+    }
 
-        // 文件名：按类型与版本生成
-        var fileName = type switch
-        {
-            ServerType.Vanilla => $"server-{entry.Version}.jar",
-            ServerType.Paper => $"paper-{entry.Version}.jar",
-            ServerType.Purpur => $"purpur-{entry.Version}.jar",
-            ServerType.Spigot => $"spigot-{entry.Version}.jar",
-            ServerType.Forge => $"forge-{entry.Version}-{entry.Detail}-installer.jar",
-            ServerType.Fabric => $"fabric-installer-{entry.Version}.jar",
-            _ => $"server-{entry.Version}.jar"
-        };
-        var targetPath = Path.Combine(targetFolder, fileName);
-
+    /// <summary>
+    ///     按解析结果启动下载任务，返回已启动的加载器（进度可轮询 <c>loader.Progress</c>）。
+    /// </summary>
+    public static LoaderCombo<int> StartDownload(DownloadSpec spec, string targetPath)
+    {
+        var dir = Path.GetDirectoryName(targetPath);
+        if (!string.IsNullOrWhiteSpace(dir)) Directory.CreateDirectory(dir);
         var loaders = new List<LoaderBase>
         {
             new LoaderDownload(Lang.Text("Download.Server.Task.Download"),
-                [new DownloadFile(urls, targetPath,
-                    string.IsNullOrEmpty(sha256) ? null : new ModBase.FileChecker(hash: sha256))])
+            [
+                new DownloadFile(spec.Urls, targetPath,
+                    string.IsNullOrEmpty(spec.Hash) ? null : new ModBase.FileChecker(hash: spec.Hash),
+                    spec.UseBrowserUserAgent, spec.CustomUserAgent)
+            ])
         };
         var loader = new LoaderCombo<int>(Lang.Text("Download.Server.Task.Download"), loaders)
         {
@@ -359,6 +444,17 @@ public static class ModServerDownload
         };
         loader.Start(0);
         return loader;
+    }
+
+    /// <summary>
+    ///     下载服务端文件到指定目录（列表点选式入口，自动命名为官方文件名）。
+    ///     返回已启动的加载器。
+    /// </summary>
+    public static LoaderCombo<int> Download(ServerType type, ServerVersionEntry entry, string targetFolder)
+    {
+        Directory.CreateDirectory(targetFolder);
+        var spec = Resolve(type, entry.Version);
+        return StartDownload(spec, Path.Combine(targetFolder, spec.FileName));
     }
 
     #endregion
