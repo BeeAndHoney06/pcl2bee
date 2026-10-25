@@ -125,7 +125,7 @@ public static class ModLaunch
                                 Lang.Text("Minecraft.Launch.Donate.Support"),
                                 Lang.Text("Minecraft.Launch.Donate.Decline")) == 1)
                         {
-                            ModBase.OpenWebsite("https://afdian.com/a/LTCat");
+                            ModBase.OpenWebsite("https://github.com/BeeAndHoney06/pcl2bee");
                         }
                         break;
                 }

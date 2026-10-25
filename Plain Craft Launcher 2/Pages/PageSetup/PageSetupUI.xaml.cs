@@ -686,7 +686,7 @@ public partial class PageSetupUI
 
     private void BtnCustomTutorial_Click(object sender, MouseButtonEventArgs e)
     {
-        ModBase.OpenWebsite("https://docs.pclc.cc/ce/customization/xaml-format");
+        ModBase.OpenWebsite("https://github.com/BeeAndHoney06/pcl2bee/wiki");
     }
 
     // 主题

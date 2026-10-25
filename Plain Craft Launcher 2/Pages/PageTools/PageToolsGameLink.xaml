@@ -83,7 +83,7 @@
                             <local:MyListItem Title="{DynamicResource Tools.GameLink.Agreement.PrivacyPolicy}"
                                               Info="{DynamicResource Tools.GameLink.Agreement.PrivacyPolicyInfo}"
                                               Type="Clickable" local:CustomEventService.EventType="OpenUrl"
-                                              local:CustomEventService.EventData="https://www.pclc.cc/privacy/personal-info-brief.html"
+                                              local:CustomEventService.EventData="https://github.com/BeeAndHoney06/pcl2bee/wiki/Privacy"
                                               Logo="pack://application:,,,/images/Blocks/Grass.png" />
                             <local:MyListItem Title="{DynamicResource Tools.GameLink.Agreement.NatayarkTerms}"
                                               Info="{DynamicResource Tools.GameLink.Agreement.NatayarkTermsInfo}"
@@ -198,7 +198,7 @@
                             <TextBlock Text=" | " />
                             <local:MyTextButton Text="{DynamicResource Tools.GameLink.Link.Privacy}"
                                                 local:CustomEventService.EventType="OpenUrl"
-                                                local:CustomEventService.EventData="https://www.pclc.cc/privacy/personal-info-brief.html" />
+                                                local:CustomEventService.EventData="https://github.com/BeeAndHoney06/pcl2bee/wiki/Privacy" />
                             <TextBlock Text=" | " />
                             <local:MyTextButton Text="{DynamicResource Tools.GameLink.Link.Disable}"
                                                 x:Name="BtnEulaStop" Click="BtnEulaStop_Click" />

@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:sys="clr-namespace:System;assembly=mscorlib"
       xmlns:local="clr-namespace:PCL"
-      xmlns:val="https://ce.pclc.cc/core/utils/validate"
+      xmlns:val="https://github.com/BeeAndHoney06/pcl2bee/core/utils/validate"
       mc:Ignorable="d"
       d:DesignHeight="450" d:DesignWidth="800">
     <Grid.RowDefinitions>

@@ -13,12 +13,8 @@ public static class UpdateManager
     public static UpdatesWrapperModel remoteServer = new(new List<IUpdateSource>
     {
         new UpdatesMirrorChyanModel(),
-        new UpdatesRandomModel(new[]
-        {
-            new UpdatesMinioModel("https://s3.pysio.online/pcl2-ce/", "Pysio"),
-            new UpdatesMinioModel("https://staticassets.naids.com/resources/pclce/", "Naids")
-        }),
-        new UpdatesMinioModel("https://github.com/PCL-Community/PCL2Bee_Server/raw/main/", "GitHub")
+        // Bee Edition 更新分发于 GitHub Release；上游 Minio 源（Pysio/Naids）不再为 Bee 发版，已移除
+        new UpdatesMinioModel("https://github.com/BeeAndHoney06/pcl2bee/raw/web/", "GitHub")
     });
 
     /// <summary>

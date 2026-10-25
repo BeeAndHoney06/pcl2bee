@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using PCL.Core.App;
 using PCL.Core.App.Configuration;
 using PCL.Core.App.Localization;
@@ -328,7 +328,7 @@ namespace PCL
             if (!Uri.TryCreate(args[0], UriKind.Absolute, out var uri) ||
                 (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
             {
-                ModBase.OpenWebsite("https://docs.pclc.cc/ce");
+                ModBase.OpenWebsite("https://github.com/BeeAndHoney06/pcl2bee/wiki");
                 return;
             }
 

@@ -7,8 +7,8 @@ contact_links:
     url: https://github.com/Meloong-Git/PCL/discussions/categories/自定义主页
     about: "提交与预设的主页（设置 → 个性化 → 主页预设）中的具体内容相关的反馈 / Submit feedback about specific content in homepage presets (Settings → Personalization → Homepage Presets)."
   - name: "帮助文档反馈 / Help Documentation Feedback"
-    url: https://github.com/PCL-Community/docs.pclc.cc/issues
+    url: https://github.com/BeeAndHoney06/pcl2bee/issues
     about: "提交与 PCL2 Bee 帮助文档（独立文档站）中的具体内容相关的反馈 / Submit feedback about specific content in the PCL2 Bee help documentation on the standalone documentation site."
   - name: "提问 / 讨论 / Questions / Discussions"
-    url: https://github.com/PCL-Community/PCL-CE/discussions/new
+    url: https://github.com/BeeAndHoney06/pcl2bee/discussions/new
     about: "想问问或谈谈关于社区版的事情 / Ask questions or discuss topics about the Community Edition."

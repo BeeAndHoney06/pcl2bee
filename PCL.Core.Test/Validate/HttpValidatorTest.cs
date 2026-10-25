@@ -11,7 +11,7 @@ public class HttpValidatorTest
     
     [TestMethod]
     [DataRow("https://suki.ink", true)]
-    [DataRow("http://ce.pclc.cc", true)]
+    [DataRow("https://github.com/BeeAndHoney06/pcl2bee", true)]
     [DataRow("-10", false)]
     [DataRow("ftp://www.example.com", false)]
     [DataRow(@"\\server\share", false)]
