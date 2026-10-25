@@ -1,4 +1,4 @@
-<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. --><ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib" xml:space="preserve">
+﻿<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. --><ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib" xml:space="preserve">
 
     <!-- Meta -->
 
@@ -287,4 +287,22 @@ Ce que vous pouvez essayer
     <sys:String x:Key="Download.Comp.Category.Energy">Énergie</sys:String>
     <sys:String x:Key="Download.Comp.Category.Entities">Entités</sys:String>
     <sys:String x:Key="Download.Comp.Category.Equipment">Équipement</sys:String>
+    <sys:String x:Key="Main.Tab.About">À propos</sys:String>
+    <sys:String x:Key="About.Left.Category">À propos</sys:String>
+    <sys:String x:Key="About.Left.Info">Informations</sys:String>
+    <sys:String x:Key="About.Left.Update">Mises à jour</sys:String>
+    <sys:String x:Key="About.Left.License">Mentions légales</sys:String>
+    <sys:String x:Key="About.Info.Version">Version : {0} (build {1})</sys:String>
+    <sys:String x:Key="About.Info.Copy">Copier la version</sys:String>
+    <sys:String x:Key="About.Info.Copied">Version copiée</sys:String>
+    <sys:String x:Key="About.Info.Website">Site officiel</sys:String>
+    <sys:String x:Key="About.Info.Source">Dépôt source</sys:String>
+    <sys:String x:Key="About.Update.Current">Version : {0} (build {1})</sys:String>
+    <sys:String x:Key="About.Update.Check">Rechercher des mises à jour</sys:String>
+    <sys:String x:Key="About.Update.Checking">Recherche en cours…</sys:String>
+    <sys:String x:Key="About.Update.Latest">Vous avez la dernière version</sys:String>
+    <sys:String x:Key="About.Update.Found">Nouvelle version disponible : {0}</sys:String>
+    <sys:String x:Key="About.Update.Open">Télécharger</sys:String>
+    <sys:String x:Key="About.Update.Failed">Échec de la recherche de mise à jour, réessayez plus tard</sys:String>
+    <sys:String x:Key="About.License.Text">MIT License&#xA;&#xA;Copyright (c) 2026 YukitaRiko雪田梨子&#xA;&#xA;Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:&#xA;&#xA;The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.&#xA;&#xA;THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</sys:String>
 </ResourceDictionary>

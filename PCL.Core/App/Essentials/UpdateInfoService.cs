@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using PCL.Core.Logging;
@@ -30,7 +30,7 @@ public static class UpdateInfoService
     /// <summary>
     ///     update.json 的投放地址（GitHub Pages 占位符，部署后替换）。
     /// </summary>
-    public const string UpdateInfoUrl = "https://beeandhoney06.github.io/pcl2bee/update.json";
+    public const string UpdateInfoUrl = "https://pcl2bee.pages.dev/update.json";
 
     /// <summary>缓存最近一次成功获取的更新信息与获取时间。</summary>
     public static UpdateInfoModel? LastInfo { get; private set; }

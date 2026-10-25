@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -88,6 +88,12 @@ public partial class FormMain
         {
             Height = States.UI.WindowHeight;
             Width = States.UI.WindowWidth;
+            // 避免恢复出比屏幕还大的窗口（否则标题栏右侧会被挤出屏幕）
+            var workArea = SystemParameters.WorkArea;
+            if (Width > workArea.Width - 60)
+                Width = Math.Max(MinWidth, workArea.Width - 60);
+            if (Height > workArea.Height - 60)
+                Height = Math.Max(MinHeight, workArea.Height - 60);
         }
         catch (Exception ex) // 修复 #2019
         {
@@ -543,7 +549,7 @@ public partial class FormMain
             if (!isLogShown)
             {
                 ModBase.FeedbackInfo();
-                ModBase.Log("请在 https://github.com/BeeAndHoney06/pcl2bee/issues 提交错误报告，以便于社区解决此问题！（这也有可能是原版 PCL 的问题）");
+                ModBase.Log("请在 https://github.com/PCL-Community/PCL2-CE/issues 提交错误报告，以便于社区解决此问题！（这也有可能是原版 PCL 的问题）");
                 isLogShown = true;
                 ModBase.ShellOnly(LogWrapper.CurrentLogger.CurrentLogFiles.Last());
             }
@@ -611,10 +617,8 @@ public partial class FormMain
     // 标题栏改变大小
     private void PanTitle_SizeChanged(object sender, EventArgs e)
     {
-        if (PanTitleMain.ColumnDefinitions[0].ActualWidth - 30 <= 0)
-            PanTitleLeft.ColumnDefinitions[0].MaxWidth = 0;
-        else
-            PanTitleLeft.ColumnDefinitions[0].MaxWidth = PanTitleMain.ColumnDefinitions[0].ActualWidth - 30;
+        // 标题区已固定在标题栏右侧，不再按左侧列宽裁剪
+        PanTitleLeft.ColumnDefinitions[0].MaxWidth = double.PositiveInfinity;
     }
 
     // 最小化
@@ -1330,12 +1334,16 @@ public partial class FormMain
         /// <summary>
         ///     联机。
         /// </summary>
-        Tools = 3,
 
         /// <summary>
         ///     设置。
         /// </summary>
         Setup = 2,
+
+        /// <summary>
+        ///     关于。
+        /// </summary>
+        About = 3,
 
         /// <summary>
         ///     实例选择。这是一个副页面。
@@ -1396,7 +1404,9 @@ public partial class FormMain
         DownloadLiteLoader = 16,
         DownloadLabyMod = 17,
         DownloadLegacyFabric = 18,
-        DownloadServer = 19,
+        DownloadServerPaper = 19,
+        DownloadServerPurpur = 20,
+        DownloadServerSpigot = 21,
 
         SetupLaunch = 0,
         SetupUI = 1,
@@ -1411,8 +1421,10 @@ public partial class FormMain
         SetupLauncherMisc = 10,
         SetupLauncherLanguage = 11,
 
-        ToolsGameLink = 1,
-        ToolsTest = 3,
+        AboutInfo = 0,
+        AboutUpdate = 1,
+        AboutLicense = 2,
+
 
         VersionOverall = 0,
         VersionSetup = 1,
@@ -1522,6 +1534,12 @@ public partial class FormMain
                     if (ModMain.frmSetupLeft is null)
                         ModMain.frmSetupLeft = new PageSetupLeft();
                     return ModMain.frmSetupLeft.pageID;
+                }
+                case PageType.About:
+                {
+                    if (ModMain.frmAboutLeft is null)
+                        ModMain.frmAboutLeft = new PageAboutLeft();
+                    return ModMain.frmAboutLeft.pageID;
                 }
 
                 case PageType.InstanceSetup:
@@ -1817,18 +1835,19 @@ public partial class FormMain
                         PageChangeAnim(ModMain.frmDownloadLeft, (FrameworkElement)ModMain.frmDownloadLeft.PageGet(subType));
                         break;
                     }
-                case PageType.Tools: // 联机
-                    {
-                        ModMain.frmToolsLeft ??= new PageToolsLeft();
-                        subType = ModMain.frmToolsLeft.pageID;
-                        PageChangeAnim(ModMain.frmToolsLeft, (FrameworkElement)ModMain.frmToolsLeft.PageGet(subType));
-                        break;
-                    }
+
                 case PageType.Setup: // 设置
                     {
                         ModMain.frmSetupLeft ??= new PageSetupLeft();
                         subType = ModMain.frmSetupLeft.pageID;
                         PageChangeAnim(ModMain.frmSetupLeft, (FrameworkElement)ModMain.frmSetupLeft.PageGet(subType));
+                        break;
+                    }
+                case PageType.About: // 关于
+                    {
+                        ModMain.frmAboutLeft ??= new PageAboutLeft();
+                        subType = ModMain.frmAboutLeft.pageID;
+                        PageChangeAnim(ModMain.frmAboutLeft, (FrameworkElement)ModMain.frmAboutLeft.PageGet(subType));
                         break;
                     }
                 case PageType.GameLog: // 实时日志

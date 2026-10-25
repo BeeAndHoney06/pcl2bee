@@ -149,7 +149,7 @@ public partial class PageSetupUI
             // 主页面
             CheckHiddenPageDownload.Checked = uiHidden.PageDownload;
             CheckHiddenPageSetup.Checked = uiHidden.PageSetup;
-            CheckHiddenPageTools.Checked = uiHidden.PageTools;
+
 
             // 子页面 设置
             CheckHiddenSetupLaunch.Checked = uiHidden.SetupLaunch;
@@ -164,9 +164,6 @@ public partial class PageSetupUI
             CheckHiddenSetupFeedback.Checked = uiHidden.SetupFeedback;
             CheckHiddenSetupLog.Checked = uiHidden.SetupLog;
 
-            // 子页面 工具
-            CheckHiddenToolsGameLink.Checked = uiHidden.ToolsGameLink;
-            CheckHiddenToolsTest.Checked = uiHidden.ToolsTest;
 
             // 子页面 实例设置
             CheckHiddenVersionEdit.Checked = uiHidden.InstanceEdit;
@@ -762,8 +759,8 @@ public partial class PageSetupUI
             // 获取配置组引用以缩短代码
             var conf = Config.Preference.Hide;
 
-            // 顶部栏：下载、设置、工具
-            var isAllTitleHidden = !HiddenForceShow && conf.PageDownload && conf.PageSetup && conf.PageTools;
+            // 顶部栏：下载、设置
+            var isAllTitleHidden = !HiddenForceShow && conf.PageDownload && conf.PageSetup;
 
             if (isAllTitleHidden)
             {
@@ -777,8 +774,7 @@ public partial class PageSetupUI
                     : Visibility.Visible;
                 ModMain.frmMain.BtnTitleSelect2.Visibility =
                     !HiddenForceShow && conf.PageSetup ? Visibility.Collapsed : Visibility.Visible;
-                ModMain.frmMain.BtnTitleSelect3.Visibility =
-                    !HiddenForceShow && conf.PageTools ? Visibility.Collapsed : Visibility.Visible;
+
             }
 
             // 功能隐藏设置卡片
@@ -859,33 +855,6 @@ public partial class PageSetupUI
                     setupCount < 2 && !HiddenForceShow ? Visibility.Collapsed : Visibility.Visible;
             }
 
-            // 工具子页面 (FrmToolsLeft)
-            if (ModMain.frmToolsLeft is not null)
-            {
-                ModMain.frmToolsLeft.ItemGameLink.Visibility = !HiddenForceShow && conf.ToolsGameLink
-                    ? Visibility.Collapsed
-                    : Visibility.Visible;
-                ModMain.frmToolsLeft.ItemTest.Visibility =
-                    !HiddenForceShow && conf.ToolsTest ? Visibility.Collapsed : Visibility.Visible;
-                
-                // 处理分类标题
-                var isGameLinkVisible = (!HiddenForceShow && !conf.ToolsGameLink) || HiddenForceShow;
-                ModMain.frmToolsLeft.TextGameLinkCategory.Visibility = isGameLinkVisible ? Visibility.Visible : Visibility.Collapsed;
-                if (isGameLinkVisible) ModMain.frmToolsLeft.TextGameLinkCategory.Opacity = 0.6;
-
-                var isToolsVisible = (!HiddenForceShow && !conf.ToolsTest) || HiddenForceShow;
-                ModMain.frmToolsLeft.TextToolsCategory.Visibility = isToolsVisible ? Visibility.Visible : Visibility.Collapsed;
-                if (isToolsVisible) ModMain.frmToolsLeft.TextToolsCategory.Opacity = 0.6;
-                
-                // 统计工具页可用项数量
-                var toolsCount = 0;
-                if (!conf.ToolsGameLink)
-                    toolsCount += 1;
-                if (!conf.ToolsTest)
-                    toolsCount += 1;
-                ModMain.frmToolsLeft.PanItem.Visibility =
-                    toolsCount < 2 && !HiddenForceShow ? Visibility.Collapsed : Visibility.Visible;
-            }
 
             // 其他入口刷新
             if (ModMain.frmMain.pageCurrent == FormMain.PageType.InstanceSelect)
@@ -951,24 +920,6 @@ public partial class PageSetupUI
         CheckHiddenPageSetup.Checked = allChecked;
     }
 
-    // ================= 工具页面协同 =================
-    private void HiddenToolsMain(object sender, bool user)
-    {
-        if (!user)
-            return;
-        var isChecked = (bool)CheckHiddenPageTools.Checked;
-        CheckHiddenToolsGameLink.Checked = isChecked;
-        CheckHiddenToolsTest.Checked = isChecked;
-    }
-
-    private void HiddenToolsSub(object sender, bool user)
-    {
-        if (!user)
-            return;
-        var conf = Config.Preference.Hide;
-        var allChecked = conf.ToolsGameLink && conf.ToolsTest;
-        CheckHiddenPageTools.Checked = allChecked;
-    }
 
     // 警告提示
     private void HiddenHint(object sender, bool user)

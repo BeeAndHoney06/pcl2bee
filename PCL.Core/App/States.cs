@@ -184,12 +184,12 @@ public static partial class States
         /// <summary>
         /// 窗口高度。
         /// </summary>
-        [ConfigItem<double>("WindowHeight", 550, ConfigSource.Local)] public partial double WindowHeight { get; set; }
+        [ConfigItem<double>("WindowHeight", 520, ConfigSource.Local)] public partial double WindowHeight { get; set; }
 
         /// <summary>
         /// 窗口宽度。
         /// </summary>
-        [ConfigItem<double>("WindowWidth", 900, ConfigSource.Local)] public partial double WindowWidth { get; set; }
+        [ConfigItem<double>("WindowWidth", 820, ConfigSource.Local)] public partial double WindowWidth { get; set; }
 
     }
 

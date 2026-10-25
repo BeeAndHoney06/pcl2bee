@@ -1,4 +1,4 @@
-<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. -->
+﻿<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -3638,4 +3638,22 @@
     <sys:String x:Key="Watcher.WindowLoaded">Minecraft window loaded: {0} ({1})</sys:String>
     <sys:String x:Key="Watcher.WindowMaximized">Minecraft window maximised: {0}</sys:String>
 
+    <sys:String x:Key="Main.Tab.About">About</sys:String>
+    <sys:String x:Key="About.Left.Category">About</sys:String>
+    <sys:String x:Key="About.Left.Info">Software info</sys:String>
+    <sys:String x:Key="About.Left.Update">Software update</sys:String>
+    <sys:String x:Key="About.Left.License">Copyright notice</sys:String>
+    <sys:String x:Key="About.Info.Version">Version: {0} (build {1})</sys:String>
+    <sys:String x:Key="About.Info.Copy">Copy version</sys:String>
+    <sys:String x:Key="About.Info.Copied">Version copied</sys:String>
+    <sys:String x:Key="About.Info.Website">Visit website</sys:String>
+    <sys:String x:Key="About.Info.Source">Source repository</sys:String>
+    <sys:String x:Key="About.Update.Current">Version: {0} (build {1})</sys:String>
+    <sys:String x:Key="About.Update.Check">Check for updates</sys:String>
+    <sys:String x:Key="About.Update.Checking">Checking for updates…</sys:String>
+    <sys:String x:Key="About.Update.Latest">You are on the latest version</sys:String>
+    <sys:String x:Key="About.Update.Found">New version available: {0}</sys:String>
+    <sys:String x:Key="About.Update.Open">Go to download</sys:String>
+    <sys:String x:Key="About.Update.Failed">Update check failed, please try again later</sys:String>
+    <sys:String x:Key="About.License.Text">MIT License&#xA;&#xA;Copyright (c) 2026 YukitaRiko雪田梨子&#xA;&#xA;Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:&#xA;&#xA;The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.&#xA;&#xA;THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</sys:String>
 </ResourceDictionary>

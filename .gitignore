@@ -349,3 +349,4 @@ MaskFiles/
 
 # Local security audit notes (do not upload)
 .security/
+/publish/arm64/Plain Craft Launcher 2.exe

@@ -1,4 +1,4 @@
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
 using PCL.Core.App.Localization;
 
@@ -176,10 +176,19 @@ public partial class PageDownloadLeft : IRefreshable
                 ItemLegacyFabric.Checked = true;
                 break;
             }
-            case FormMain.PageSubType.DownloadServer:
+            case FormMain.PageSubType.DownloadServerPaper:
             {
-                if (ModMain.frmDownloadServer is not null) ModMain.frmDownloadServer.Reload();
-                ItemServer.Checked = true;
+                ItemPaper.Checked = true;
+                break;
+            }
+            case FormMain.PageSubType.DownloadServerPurpur:
+            {
+                ItemPurpur.Checked = true;
+                break;
+            }
+            case FormMain.PageSubType.DownloadServerSpigot:
+            {
+                ItemSpigot.Checked = true;
                 break;
             }
             case FormMain.PageSubType.DownloadCompFavorites:
@@ -228,7 +237,6 @@ public partial class PageDownloadLeft : IRefreshable
         ItemFabric.Check += PageCheck;
         ItemLegacyFabric.Check += PageCheck;
         ItemLabyMod.Check += PageCheck;
-        ItemServer.Check += PageCheck;
 
         AnimatedControl = PanItem;
     }
@@ -350,10 +358,22 @@ public partial class PageDownloadLeft : IRefreshable
                     ModMain.frmDownloadLegacyFabric = new PageDownloadLegacyFabric();
                 return ModMain.frmDownloadLegacyFabric;
             }
-            case FormMain.PageSubType.DownloadServer:
+            case FormMain.PageSubType.DownloadServerPaper:
             {
-                if (ModMain.frmDownloadServer is null)
-                    ModMain.frmDownloadServer = new PageDownloadServer();
+                ModMain.frmDownloadServer ??= new PageDownloadServer();
+                ModMain.frmDownloadServer.SetServerType("Paper");
+                return ModMain.frmDownloadServer;
+            }
+            case FormMain.PageSubType.DownloadServerPurpur:
+            {
+                ModMain.frmDownloadServer ??= new PageDownloadServer();
+                ModMain.frmDownloadServer.SetServerType("Purpur");
+                return ModMain.frmDownloadServer;
+            }
+            case FormMain.PageSubType.DownloadServerSpigot:
+            {
+                ModMain.frmDownloadServer ??= new PageDownloadServer();
+                ModMain.frmDownloadServer.SetServerType("Spigot");
                 return ModMain.frmDownloadServer;
             }
 

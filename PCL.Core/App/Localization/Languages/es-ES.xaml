@@ -1,4 +1,4 @@
-<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. -->
+﻿<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,4 +10,22 @@
     <sys:String x:Key="Meta.Code">es-ES</sys:String>
     <sys:String x:Key="Meta.Name">Español (España)</sys:String>
 
+    <sys:String x:Key="Main.Tab.About">Acerca de</sys:String>
+    <sys:String x:Key="About.Left.Category">Acerca de</sys:String>
+    <sys:String x:Key="About.Left.Info">Información del software</sys:String>
+    <sys:String x:Key="About.Left.Update">Actualizaciones</sys:String>
+    <sys:String x:Key="About.Left.License">Aviso de copyright</sys:String>
+    <sys:String x:Key="About.Info.Version">Versión: {0} (compilación {1})</sys:String>
+    <sys:String x:Key="About.Info.Copy">Copiar versión</sys:String>
+    <sys:String x:Key="About.Info.Copied">Versión copiada</sys:String>
+    <sys:String x:Key="About.Info.Website">Sitio web</sys:String>
+    <sys:String x:Key="About.Info.Source">Repositorio</sys:String>
+    <sys:String x:Key="About.Update.Current">Versión: {0} (compilación {1})</sys:String>
+    <sys:String x:Key="About.Update.Check">Buscar actualizaciones</sys:String>
+    <sys:String x:Key="About.Update.Checking">Buscando actualizaciones…</sys:String>
+    <sys:String x:Key="About.Update.Latest">Ya tienes la última versión</sys:String>
+    <sys:String x:Key="About.Update.Found">Nueva versión disponible: {0}</sys:String>
+    <sys:String x:Key="About.Update.Open">Ir a la descarga</sys:String>
+    <sys:String x:Key="About.Update.Failed">No se pudo comprobar la actualización, inténtalo más tarde</sys:String>
+    <sys:String x:Key="About.License.Text">MIT License&#xA;&#xA;Copyright (c) 2026 YukitaRiko雪田梨子&#xA;&#xA;Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:&#xA;&#xA;The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.&#xA;&#xA;THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</sys:String>
 </ResourceDictionary>

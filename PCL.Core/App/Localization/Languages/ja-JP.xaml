@@ -1,4 +1,4 @@
-<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. --><ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib" xml:space="preserve">
+﻿<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. --><ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib" xml:space="preserve">
 
     <!-- Meta -->
 
@@ -22,4 +22,22 @@
     <sys:String x:Key="Application.EnvironmentWarning.TempFolder">- PCL2 Bee は一時ディレクトリで実行中です。PCL2 Bee をアーカイブから展開してからご使用ください。そうしないと、ゲームのセーブデータや設定が失われる可能性があります</sys:String>
     <sys:String x:Key="Application.EnvironmentWarning.Title">環境警報</sys:String>
     <sys:String x:Key="Application.EnvironmentWarning.WindowsVersion">- Windows 版本は推奨要件を満たしておらず、少なくともWindows 10 1809が推奨されており、Windowsシステムのアップグレードを検討することをお勧めします</sys:String>
+    <sys:String x:Key="Main.Tab.About">このソフトについて</sys:String>
+    <sys:String x:Key="About.Left.Category">このソフトについて</sys:String>
+    <sys:String x:Key="About.Left.Info">ソフト情報</sys:String>
+    <sys:String x:Key="About.Left.Update">ソフト更新</sys:String>
+    <sys:String x:Key="About.Left.License">著作権表示</sys:String>
+    <sys:String x:Key="About.Info.Version">バージョン：{0}（ビルド {1}）</sys:String>
+    <sys:String x:Key="About.Info.Copy">バージョンをコピー</sys:String>
+    <sys:String x:Key="About.Info.Copied">バージョンをコピーしました</sys:String>
+    <sys:String x:Key="About.Info.Website">公式サイト</sys:String>
+    <sys:String x:Key="About.Info.Source">ソースリポジトリ</sys:String>
+    <sys:String x:Key="About.Update.Current">バージョン：{0}（ビルド {1}）</sys:String>
+    <sys:String x:Key="About.Update.Check">更新を確認</sys:String>
+    <sys:String x:Key="About.Update.Checking">更新を確認しています…</sys:String>
+    <sys:String x:Key="About.Update.Latest">最新バージョンです</sys:String>
+    <sys:String x:Key="About.Update.Found">新しいバージョンがあります：{0}</sys:String>
+    <sys:String x:Key="About.Update.Open">ダウンロードへ</sys:String>
+    <sys:String x:Key="About.Update.Failed">更新の確認に失敗しました。後でもう一度お試しください</sys:String>
+    <sys:String x:Key="About.License.Text">MIT License&#xA;&#xA;Copyright (c) 2026 YukitaRiko雪田梨子&#xA;&#xA;Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:&#xA;&#xA;The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.&#xA;&#xA;THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</sys:String>
 </ResourceDictionary>

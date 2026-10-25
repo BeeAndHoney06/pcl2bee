@@ -34,8 +34,7 @@ public static class ModMain
     public static PageSelectRight? frmSelectRight;
     public static PageSpeedLeft? frmSpeedLeft;
     public static PageSpeedRight? frmSpeedRight;
-    public static PageToolsLeft? frmToolsLeft;
-    public static PageToolsGameLink? frmToolsGameLink;
+
     public static PageToolsTest? frmToolsTest;
     public static PageDownloadLeft? frmDownloadLeft;
     public static PageDownloadInstall? frmDownloadInstall;
@@ -49,6 +48,11 @@ public static class ModMain
     public static PageDownloadFabric? frmDownloadFabric;
     public static PageDownloadLabyMod? frmDownloadLabyMod;
     public static PageDownloadLegacyFabric? frmDownloadLegacyFabric;
+    public static PageDownloadServer? frmDownloadServer;
+    public static PageAboutLeft? frmAboutLeft;
+    public static PageAboutInfo? frmAboutInfo;
+    public static PageAboutUpdate? frmAboutUpdate;
+    public static PageAboutLicense? frmAboutLicense;
     public static PageDownloadMod? frmDownloadMod;
     public static PageDownloadPack? frmDownloadPack;
     public static PageDownloadDataPack? frmDownloadDataPack;

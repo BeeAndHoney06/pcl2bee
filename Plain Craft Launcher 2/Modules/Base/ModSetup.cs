@@ -592,9 +592,8 @@ public class ModSetup
 
     public static void UiLogoLeft(bool value)
     {
-        ModMain.frmMain.PanTitleMain.ColumnDefinitions[0].Width = new GridLength(
-            value && Config.Preference.WindowTitleType == LauncherTitleType.None ? 0 : 1,
-            GridUnitType.Star);
+        // 标题固定显示在标题栏右侧，左侧始终为红绿灯预留固定宽度
+        ModMain.frmMain.PanTitleMain.ColumnDefinitions[0].Width = new GridLength(96, GridUnitType.Pixel);
     }
 
     #endregion
