@@ -206,7 +206,13 @@ public partial class PageDownloadServer
 
     private void ItemDownload_Click(object sender, MouseButtonEventArgs e)
     {
-        var entry = (ModServerDownload.ServerVersionEntry)((MyListItem)sender).Tag;
+        // 防御：Tag 非预期类型时不崩溃（例如控件被复用或结构被改动）
+        if (sender is not MyListItem { Tag: ModServerDownload.ServerVersionEntry entry })
+        {
+            ModBase.Log("[Server] 下载入口的条目数据异常，已忽略本次点击", ModBase.LogLevel.Developer);
+            return;
+        }
+
         var folder = SystemDialogs.SelectFolder(Lang.Text("Download.Server.SelectFolder"));
         if (string.IsNullOrEmpty(folder)) return;
         ModBase.RunInThread(() =>

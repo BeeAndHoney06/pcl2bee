@@ -134,9 +134,11 @@
                                         SvgIcon="lucide/circle-help" />
                     <Grid x:Name="PanTitleMain" HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*" />
+                            <!-- 不变量：左右两列必须始终等宽（均为 1*），中部导航才能保持居中。
+                                 若需为窗口按钮预留空间，必须两侧同时预留，禁止单边改成固定像素。 -->
+                            <ColumnDefinition x:Name="ColTitleLeft" Width="1*" />
                             <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition x:Name="ColTitleRight" Width="1*" />
                         </Grid.ColumnDefinitions>
                         <Grid x:Name="PanTitleLeft" SizeChanged="PanTitle_SizeChanged">
                             <Grid.ColumnDefinitions>

@@ -207,6 +207,51 @@ public partial class FormMain
                     $"[System] DPI：{ModBase.dpi}，系统版本：{Environment.OSVersion.VersionString}，PCL 位置：{Basics.ExecutablePath}");
             }, after: true)
         }, "Form Show");
+        // 兜底：入场动画若因异常被打断，窗口会停留在旋转/位移状态（表现为整窗歪斜）。
+        // 此处独立于动画序列延时校验并复位，保证界面不会永久处于异常姿态。
+        ModBase.RunInNewThread(() =>
+        {
+            Thread.Sleep(1500);
+            try
+            {
+                ModBase.RunInUi(() =>
+                {
+                    if (Math.Abs(TransformRotate.Angle) > 0.05d || Math.Abs(TransformPos.Y) > 0.5d)
+                    {
+                        ModBase.Log(
+                            $"[System] 检测到入场动画残留（旋转 {TransformRotate.Angle:0.##}°，位移 {TransformPos.Y:0.#}），已强制复位");
+                        TransformRotate.Angle = 0d;
+                        TransformPos.Y = 0d;
+                        RenderTransform = null;
+                        isWindowLoadFinished = true;
+                    }
+                });
+                // 布局自检：中部导航必须与窗口中心对齐（仅调试模式记录，避免正常用户日志噪音）
+                if (!ModBase.modeDebug) return;
+                ModBase.RunInUi(() =>
+                {
+                    try
+                    {
+                        if (PanTitleSelect is null || PanTitleMain is null) return;
+                        var navCenter = PanTitleSelect
+                            .TranslatePoint(new Point(PanTitleSelect.ActualWidth / 2d, 0d), this).X;
+                        var delta = Math.Abs(navCenter - ActualWidth / 2d);
+                        if (delta > 2d)
+                            ModBase.Log(
+                                $"[UI] 标题导航未居中（偏移 {delta:0.#}px）：请检查 PanTitleMain 的左右列是否均为 1*",
+                                ModBase.LogLevel.Developer);
+                    }
+                    catch (Exception ex)
+                    {
+                        ModBase.Log(ex, "[UI] 标题导航居中自检失败", ModBase.LogLevel.Developer);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                ModBase.Log(ex, "[System] 入场动画兜底检查失败", ModBase.LogLevel.Developer);
+            }
+        }, "Form Show Guard");
         // Timer 启动
         ModAnimation.AniStart();
         ModMain.TimerMainStart();
@@ -617,11 +662,11 @@ public partial class FormMain
     // 标题栏改变大小
     private void PanTitle_SizeChanged(object sender, EventArgs e)
     {
-        // 限制标题区最大宽度，避免挤出标题栏
-        if (PanTitleMain.ColumnDefinitions[0].ActualWidth - 30 <= 0)
-            PanTitleLeft.ColumnDefinitions[0].MaxWidth = 0;
-        else
-            PanTitleLeft.ColumnDefinitions[0].MaxWidth = PanTitleMain.ColumnDefinitions[0].ActualWidth - 30;
+        // 仅裁剪 Logo 区宽度，避免与中部导航重叠；列结构被改动时安全跳过而非抛异常
+        if (PanTitleMain?.ColumnDefinitions is not { Count: >= 1 } mainColumns) return;
+        if (PanTitleLeft?.ColumnDefinitions is not { Count: >= 1 } leftColumns) return;
+        var available = mainColumns[0].ActualWidth - 30d;
+        leftColumns[0].MaxWidth = available <= 0d ? 0d : available;
     }
 
     // 最小化

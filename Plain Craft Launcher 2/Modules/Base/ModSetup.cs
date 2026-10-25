@@ -592,10 +592,24 @@ public class ModSetup
 
     public static void UiLogoLeft(bool value)
     {
-        // 左侧为 Logo 预留的列：标题类型为「无」且启用左对齐时收窄为 0，否则与右侧等宽（保证中部导航居中）
-        ModMain.frmMain.PanTitleMain.ColumnDefinitions[0].Width = new GridLength(
-            value && Config.Preference.WindowTitleType == LauncherTitleType.None ? 0 : 1,
-            GridUnitType.Star);
+        var main = ModMain.frmMain;
+        if (main is null) return;
+        // 优先使用命名列，避免依赖列索引（列顺序被调整时不会静默改错列）
+        var left = main.ColTitleLeft;
+        var right = main.ColTitleRight;
+        if (left is null || right is null)
+        {
+            // 退化路径：结构不含命名列时按索引处理，且做边界检查
+            if (main.PanTitleMain?.ColumnDefinitions is not { Count: >= 3 } fallback) return;
+            left = fallback[0];
+            right = fallback[fallback.Count - 1];
+        }
+
+        // 左侧 Logo 列：标题类型为「无」且启用左对齐时收窄为 0，否则与右侧等宽
+        var collapse = value && Config.Preference.WindowTitleType == LauncherTitleType.None;
+        left.Width = new GridLength(collapse ? 0d : 1d, GridUnitType.Star);
+        // 强制右列与左列对称（同为 1*）：即便此前被外部改成固定像素，也能自动恢复居中
+        right.Width = new GridLength(1d, GridUnitType.Star);
     }
 
     #endregion
