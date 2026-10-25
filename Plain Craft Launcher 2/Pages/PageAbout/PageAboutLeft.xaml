@@ -8,7 +8,7 @@
     x:Class="PCL.PageAboutLeft">
     <local:MyScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
                           Style="{StaticResource ScrollViewerFullMargin}">
-        <StackPanel x:Name="PanItem" Margin="0,12,0,0" MinWidth="176">
+        <StackPanel x:Name="PanItem" Margin="0,12,0,0">
             <TextBlock Text="{DynamicResource About.Left.Category}" Margin="13,5,5,3" Opacity="0.6" FontSize="12" />
             <local:MyListItem x:Name="ItemInfo" IsScaleAnimationEnabled="False" Type="RadioBox" Tag="0"
                               Check="PageCheck" Height="36" VerticalAlignment="Top"
