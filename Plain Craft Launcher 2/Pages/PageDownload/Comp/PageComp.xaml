@@ -115,6 +115,34 @@
                     </StackPanel>
                 </Grid>
             </local:MyCard>
+            <!-- 第三方平台整合包（仅 ModPack 页显示，代码控制） -->
+            <local:MyCard x:Name="CardThirdParty" Margin="0,0,0,15" Visibility="Collapsed"
+                          Title="{DynamicResource Download.Comp.ThirdParty.Title}" UseAnimation="False">
+                <StackPanel Margin="12,4,12,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="1.0*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center" Text="{DynamicResource Download.Comp.Filter.Source}"
+                                   Margin="5,0,10,0" />
+                        <local:MyComboBox x:Name="ComboThirdPartySource" Grid.Column="1" MaxDropDownHeight="200">
+                            <local:MyComboBoxItem Content="FTB" Tag="1" IsSelected="True" />
+                            <local:MyComboBoxItem Content="Technic" Tag="2" />
+                            <local:MyComboBoxItem Content="ATLauncher" Tag="3" />
+                        </local:MyComboBox>
+                        <local:MyIconTextButton x:Name="BtnThirdPartySearch" Grid.Column="2" Margin="10,0,0,0"
+                                                Text="{DynamicResource Download.Comp.ThirdParty.Search}"
+                                                SvgIcon="lucide/search" />
+                    </Grid>
+                    <local:MyHint x:Name="HintThirdParty" Visibility="Collapsed" HasBorder="True" Theme="Yellow"
+                                  Margin="0,10,0,0" />
+                    <StackPanel x:Name="PanThirdPartyResults" Margin="0,8,0,0" />
+                    <local:MyLoading x:Name="LoadThirdParty" Visibility="Collapsed" HorizontalAlignment="Center"
+                                     Margin="0,10,0,0" />
+                </StackPanel>
+            </local:MyCard>
         </StackPanel>
         <StackPanel x:Name="PanContent">
             <local:MyHint x:Name="HintError" HasBorder="True"

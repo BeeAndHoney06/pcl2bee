@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
@@ -235,7 +235,92 @@ public partial class PageComp
         TextSearchVersion.KeyDown += EnterTrigger;
         BtnSearchReset.Click += (_, _) => ResetFilter();
         BtnSearchInstallModPack.Click += BtnSearchInstallModPack_Click;
+        BtnThirdPartySearch.Click += BtnThirdPartySearch_Click;
     }
+
+    #region 第三方平台整合包（FTB / Technic / ATLauncher）
+
+    private void BtnThirdPartySearch_Click(object sender, EventArgs e)
+    {
+        var keyword = PanSearchBox.Text.Trim();
+        var source = (ModPackThirdParty.ThirdPartySource)ModBase.Val(
+            ((MyComboBoxItem)ComboThirdPartySource.SelectedItem).Tag);
+        HintThirdParty.Visibility = Visibility.Collapsed;
+        PanThirdPartyResults.Children.Clear();
+        LoadThirdParty.Visibility = Visibility.Visible;
+        ModBase.RunInThread(() =>
+        {
+            List<ModPackThirdParty.ThirdPartyPackInfo> results;
+            try
+            {
+                results = ModPackThirdParty.Search(source, keyword);
+            }
+            catch (Exception ex)
+            {
+                ModBase.Log(ex, $"[ThirdPartyPack] 搜索{source}整合包失败");
+                ModBase.RunInUi(() =>
+                {
+                    LoadThirdParty.Visibility = Visibility.Collapsed;
+                    HintThirdParty.Visibility = Visibility.Visible;
+                    HintThirdParty.Text = Lang.Text("Download.Comp.ThirdParty.Error.SearchFailed", ex.Message);
+                });
+                return;
+            }
+
+            ModBase.RunInUi(() =>
+            {
+                LoadThirdParty.Visibility = Visibility.Collapsed;
+                if (results.Count == 0)
+                {
+                    HintThirdParty.Visibility = Visibility.Visible;
+                    HintThirdParty.Text = Lang.Text("Download.Comp.ThirdParty.NoResult");
+                    return;
+                }
+
+                foreach (var pack in results)
+                {
+                    var item = new MyListItem
+                    {
+                        Title = pack.Name,
+                        Info = string.IsNullOrEmpty(pack.Author) ? pack.Id : $"{pack.Author} · {pack.Id}",
+                        Height = 40d,
+                        Tag = pack
+                    };
+                    item.Click += ThirdPartyItem_Click;
+                    PanThirdPartyResults.Children.Add(item);
+                }
+            });
+        });
+    }
+
+    private void ThirdPartyItem_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        var pack = (ModPackThirdParty.ThirdPartyPackInfo)((MyListItem)sender).Tag;
+        // 二次确认
+        if (ModMain.MyMsgBox(
+                Lang.Text("Download.Comp.ThirdParty.ConfirmInstall.Message", pack.Name),
+                Lang.Text("Download.Comp.ThirdParty.ConfirmInstall.Title", pack.Name),
+                Lang.Text("Download.Comp.ThirdParty.ConfirmInstall.Ok"),
+                Lang.Text("Common.Action.Cancel")) != 1)
+            return;
+        ModBase.RunInThread(() =>
+        {
+            try
+            {
+                ModPackThirdParty.Install(pack);
+            }
+            catch (ModBase.CancelledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                ModBase.Log(ex, $"安装第三方整合包失败（{pack.Source}）", ModBase.LogLevel.Msgbox,
+                    userSummary: Lang.Text("Download.Comp.ThirdParty.Error.InstallFailed", pack.Name));
+            }
+        });
+    }
+
+    #endregion
 
     private void PageCompControls_Inited(object sender, EventArgs e)
     {
@@ -303,6 +388,10 @@ public partial class PageComp
             ComboSearchLoader.Visibility = Visibility.Collapsed;
             ComboSearchShaderLoader.Visibility = Visibility.Collapsed;
         }
+
+        // 第三方平台整合包入口仅在整合包页显示
+        CardThirdParty.Visibility =
+            PageType == ModComp.CompType.ModPack ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void PageComp_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)

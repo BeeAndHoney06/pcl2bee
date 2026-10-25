@@ -283,6 +283,21 @@
     <sys:String x:Key="Download.Comp.Sort.Relevance">相關性</sys:String>
     <sys:String x:Key="Download.Comp.Sort.Updated">最近更新</sys:String>
 
+    <!-- Download.Comp.ThirdParty（FTB / Technic / ATLauncher 整合包） -->
+
+    <sys:String x:Key="Download.Comp.ThirdParty.Title">其他平台整合包（FTB / Technic / ATLauncher）</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Search">搜尋</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.NoResult">沒有找到符合條件的整合包，試試其他關鍵詞？</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.ConfirmInstall.Title">安裝 {0}</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.ConfirmInstall.Message">即將安裝 {0}，安裝內容以該平台提供的版本為準。&#xD;&#xA;注意：此類整合包由第三方平台分發，PCL 無法保證其內容安全性。</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.ConfirmInstall.Ok">安裝</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Stage.DownloadFiles">下載整合包文件</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Task.Install">安裝 {0} 整合包：{1}</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Error.SearchFailed">搜尋失敗，該平台服務可能暫時不可用：{0}</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Error.NoVersion">沒有找到 {0} 的可用版本</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Error.NoDownload">{0} 沒有提供可下載的內容</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Error.InstallFailed">安裝 {0} 失敗，請查看錯誤詳情</sys:String>
+
     <!-- Download.Comp.Category -->
 
     <sys:String x:Key="Download.Comp.Category.Adventure">冒險</sys:String>

@@ -283,6 +283,21 @@
     <sys:String x:Key="Download.Comp.Sort.Relevance">Relevance</sys:String>
     <sys:String x:Key="Download.Comp.Sort.Updated">Recently updated</sys:String>
 
+    <!-- Download.Comp.ThirdParty (FTB / Technic / ATLauncher modpacks) -->
+
+    <sys:String x:Key="Download.Comp.ThirdParty.Title">Other platforms (FTB / Technic / ATLauncher)</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Search">Search</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.NoResult">No modpacks found. Try another keyword?</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.ConfirmInstall.Title">Install {0}</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.ConfirmInstall.Message">You are about to install {0}. The contents are provided by the third-party platform.&#xD;&#xA;Note: PCL cannot guarantee the safety of modpacks distributed by these platforms.</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.ConfirmInstall.Ok">Install</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Stage.DownloadFiles">Downloading modpack files</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Task.Install">Installing {0} modpack: {1}</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Error.SearchFailed">Search failed, the platform service may be unavailable: {0}</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Error.NoVersion">No available version found for {0}</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Error.NoDownload">{0} provides no downloadable content</sys:String>
+    <sys:String x:Key="Download.Comp.ThirdParty.Error.InstallFailed">Failed to install {0}. See error details</sys:String>
+
     <!-- Download.Comp.Category -->
 
     <sys:String x:Key="Download.Comp.Category.Adventure">Adventure</sys:String>
