@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using PCL.Core.App;
 using PCL.Core.App.Localization;
@@ -29,10 +29,15 @@ public partial class PageSetupLeft
             isHiddenPage = false;
         // 若页面错误，或尚未加载，则继续
         if (isLoad && !isHiddenPage)
+        {
+            RefreshUpdateBadge();
             return;
+        }
+
         isLoad = true;
         // 刷新子页面隐藏情况
         PageSetupUI.HiddenRefresh();
+        RefreshUpdateBadge();
         // 选择第一个未被禁用的子页面
         if (isPageSwitched)
             return;
@@ -357,6 +362,40 @@ public partial class PageSetupLeft
                 ModMain.frmMain.pageRight.PageOnEnter();
             }, 30, true)
         }, "PageLeft PageChange");
+    }
+
+    #endregion
+
+    #region 更新提示标记
+
+    /// <summary>杂项设置项的原始标题（用于还原标记）。</summary>
+    private string? _miscItemTitleOriginal;
+
+    /// <summary>
+    ///     按静默更新检查结果刷新“其他”设置项的标题标记（发现新版本且未查看时追加 “ •”）。
+    ///     必须在 UI 线程调用。
+    /// </summary>
+    public void RefreshUpdateBadge()
+    {
+        if (!CheckAccess())
+        {
+            Dispatcher.Invoke(RefreshUpdateBadge);
+            return;
+        }
+
+        try
+        {
+            _miscItemTitleOriginal ??= ItemLauncherMisc.Title;
+            var showBadge = PageSetupLauncherMisc.SilentUpdateAvailable &&
+                            !PageSetupLauncherMisc.UpdateHintAcknowledged;
+            var target = showBadge ? _miscItemTitleOriginal + " •" : _miscItemTitleOriginal;
+            if (ItemLauncherMisc.Title != target)
+                ItemLauncherMisc.Title = target;
+        }
+        catch (Exception ex)
+        {
+            ModBase.Log(ex, "刷新更新提示标记失败", ModBase.LogLevel.Debug);
+        }
     }
 
     #endregion

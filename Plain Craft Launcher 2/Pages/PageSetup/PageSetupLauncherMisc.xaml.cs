@@ -40,6 +40,19 @@ public partial class PageSetupLauncherMisc
         SliderLoad();
         Reload();
         ModAnimation.AniControlEnabled -= 1;
+
+        // 静默检查已发现新版本：直接展示结果（用户进入本页即视为已查看）
+        if (SilentUpdateAvailable)
+        {
+            AcknowledgeUpdateHint();
+            var info = PCL.Core.App.Essentials.UpdateInfoService.LastInfo;
+            if (info is not null)
+            {
+                LabUpdateStatus.Text = Lang.Text("Setup.Misc.Update.NewVersion", info.Version);
+                LabUpdateDetail.Text = string.IsNullOrEmpty(info.Notes) ? info.Date : $"{info.Date}\n{info.Notes}";
+                BtnUpdateOpen.Visibility = Visibility.Visible;
+            }
+        }
     }
 
     public void Reload()
@@ -309,6 +322,9 @@ public partial class PageSetupLauncherMisc
     /// <summary>静默检查发现新版本时置 true，供设置页首次加载时展示。</summary>
     public static bool SilentUpdateAvailable { get; private set; }
 
+    /// <summary>用户已查看更新提示（点开杂项页或手动检查后），左侧栏标记清除。</summary>
+    public static bool UpdateHintAcknowledged { get; private set; }
+
     internal static void RunSilentUpdateCheck()
     {
         if (silentCheckDone) return;
@@ -317,10 +333,17 @@ public partial class PageSetupLauncherMisc
         {
             try
             {
-                var (_, hasUpdate, _) = PCL.Core.App.Essentials.UpdateInfoService.Check();
+                var (info, hasUpdate, _) = PCL.Core.App.Essentials.UpdateInfoService.Check();
                 SilentUpdateAvailable = hasUpdate;
-                if (hasUpdate)
+                if (hasUpdate && info is not null)
+                {
                     ModBase.Log("[System] 检测到启动器有新版本（详见 设置 → 其他 → 启动器更新）");
+                    // 一次性 Toast 提示（不阻塞、自动消失）
+                    ModBase.RunInUi(() => HintService.Hint(
+                        Lang.Text("Setup.Misc.Update.SilentFound", info.Version), HintType.Info));
+                    // 通知设置左侧栏刷新标记
+                    ModMain.frmSetupLeft?.RefreshUpdateBadge();
+                }
             }
             catch
             {
@@ -329,8 +352,17 @@ public partial class PageSetupLauncherMisc
         });
     }
 
+    /// <summary>进入杂项页/手动检查后调用：清除待查看标记。</summary>
+    private static void AcknowledgeUpdateHint()
+    {
+        if (UpdateHintAcknowledged) return;
+        UpdateHintAcknowledged = true;
+        ModMain.frmSetupLeft?.RefreshUpdateBadge();
+    }
+
     private void BtnUpdateCheck_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
+        AcknowledgeUpdateHint();
         LabUpdateStatus.Text = Lang.Text("Setup.Misc.Update.Checking");
         LabUpdateDetail.Text = "";
         BtnUpdateCheck.IsEnabled = false;

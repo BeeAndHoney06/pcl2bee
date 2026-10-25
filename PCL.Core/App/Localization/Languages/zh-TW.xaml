@@ -2940,6 +2940,7 @@
     <sys:String x:Key="Setup.Misc.Update.UpToDate">已是最新版本（{0}，內部版本 {1}）</sys:String>
     <sys:String x:Key="Setup.Misc.Update.NewVersion">發現新版本：{0}</sys:String>
     <sys:String x:Key="Setup.Misc.Update.OpenRelease">前往下載</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.SilentFound">\u767c\u73fe\u65b0\u7248\u672c {0}\uff0c\u53ef\u5728 \u8a2d\u5b9a \u2192 \u5176\u4ed6 \u2192 \u555f\u52d5\u5668\u66f4\u65b0 \u4e2d\u67e5\u770b</sys:String>
 
     <!-- Setup.Misc.Network -->
 

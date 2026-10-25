@@ -2996,6 +2996,7 @@
     <sys:String x:Key="Setup.Misc.Update.UpToDate">You are on the latest version ({0}, code {1})</sys:String>
     <sys:String x:Key="Setup.Misc.Update.NewVersion">New version available: {0}</sys:String>
     <sys:String x:Key="Setup.Misc.Update.OpenRelease">Get update</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.SilentFound">New version {0} available. See Settings \u2192 Misc \u2192 Launcher updates</sys:String>
 
     <!-- Setup.Misc.Network -->
 
