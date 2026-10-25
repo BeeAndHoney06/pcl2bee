@@ -1396,6 +1396,7 @@ public partial class FormMain
         DownloadLiteLoader = 16,
         DownloadLabyMod = 17,
         DownloadLegacyFabric = 18,
+        DownloadServer = 19,
 
         SetupLaunch = 0,
         SetupUI = 1,

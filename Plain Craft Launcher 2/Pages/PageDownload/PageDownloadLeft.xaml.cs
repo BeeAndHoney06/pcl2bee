@@ -1,4 +1,4 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 using System.Windows.Input;
 using PCL.Core.App.Localization;
 
@@ -176,6 +176,12 @@ public partial class PageDownloadLeft : IRefreshable
                 ItemLegacyFabric.Checked = true;
                 break;
             }
+            case FormMain.PageSubType.DownloadServer:
+            {
+                if (ModMain.frmDownloadServer is not null) ModMain.frmDownloadServer.Reload();
+                ItemServer.Checked = true;
+                break;
+            }
             case FormMain.PageSubType.DownloadCompFavorites:
             {
                 if (ModMain.frmDownloadCompFavorites is not null)
@@ -222,6 +228,7 @@ public partial class PageDownloadLeft : IRefreshable
         ItemFabric.Check += PageCheck;
         ItemLegacyFabric.Check += PageCheck;
         ItemLabyMod.Check += PageCheck;
+        ItemServer.Check += PageCheck;
 
         AnimatedControl = PanItem;
     }
@@ -342,6 +349,12 @@ public partial class PageDownloadLeft : IRefreshable
                 if (ModMain.frmDownloadLegacyFabric is null)
                     ModMain.frmDownloadLegacyFabric = new PageDownloadLegacyFabric();
                 return ModMain.frmDownloadLegacyFabric;
+            }
+            case FormMain.PageSubType.DownloadServer:
+            {
+                if (ModMain.frmDownloadServer is null)
+                    ModMain.frmDownloadServer = new PageDownloadServer();
+                return ModMain.frmDownloadServer;
             }
 
             default:
