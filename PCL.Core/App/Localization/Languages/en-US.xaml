@@ -1882,6 +1882,7 @@
     <sys:String x:Key="Link.Mod.DownloadComplete">Multiplayer components downloaded!</sys:String>
     <sys:String x:Key="Link.Mod.DownloadEasyTierFailed">Failed to download EasyTier dependencies. Please check your network.</sys:String>
     <sys:String x:Key="Link.Mod.DownloadingDeps">Downloading multiplayer dependencies. Please wait...</sys:String>
+    <sys:String x:Key="Link.Mod.EasyTierIntegrityFailed">Link component integrity check failed, launch blocked (the file may have been tampered with; please re-download the link component)</sys:String>
     <sys:String x:Key="Link.Mod.DownloadingEasyTier">Downloading EasyTier. Please wait...</sys:String>
     <sys:String x:Key="Link.Mod.EasyTierNotReady">EasyTier has not finished downloading. Please wait and try again!</sys:String>
     <sys:String x:Key="Link.Mod.InvalidPlayerId">Minecraft player ID cannot contain separators (|)!</sys:String>
@@ -1891,6 +1892,7 @@
     <sys:String x:Key="Link.Mod.ReLoginRequired">Please log in to your Natayark Network account again and try again!</sys:String>
     <sys:String x:Key="Link.Mod.RealNameRequired">Please complete real-name verification at the Natayark Account Center first!</sys:String>
     <sys:String x:Key="Link.Mod.Task.CleanCache">Clean caches and redundant components</sys:String>
+    <sys:String x:Key="Link.Mod.Task.VerifyEasyTier">Verifying file integrity</sys:String>
     <sys:String x:Key="Link.Mod.Task.DownloadEasyTier">Download EasyTier</sys:String>
     <sys:String x:Key="Link.Mod.Task.ExtractFiles">Extract files</sys:String>
     <sys:String x:Key="Link.Mod.Task.FetchAnnouncement">Fetch lobby announcement</sys:String>

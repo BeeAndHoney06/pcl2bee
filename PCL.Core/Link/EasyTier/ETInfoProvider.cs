@@ -61,6 +61,7 @@ public static class ETInfoProvider
     public static readonly string ETPath = Path.Combine(Paths.SharedLocalData, "EasyTier", ETVersion,
         "easytier-windows-" + (RuntimeInformation.OSArchitecture == Architecture.Arm64 ? "arm64" : "x86_64"));
 
+
     private static ETConnectionType _GetConnectionType(string cost)
     {
         if (IsContains("p2p")) return ETConnectionType.P2P;

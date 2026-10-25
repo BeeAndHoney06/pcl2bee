@@ -1882,6 +1882,7 @@
     <sys:String x:Key="Link.Mod.DownloadComplete">联机组件下载完成！</sys:String>
     <sys:String x:Key="Link.Mod.DownloadEasyTierFailed">下载 EasyTier 依赖文件失败，请检查网络连接</sys:String>
     <sys:String x:Key="Link.Mod.DownloadingDeps">正在下载联机依赖组件，请稍后...</sys:String>
+    <sys:String x:Key="Link.Mod.EasyTierIntegrityFailed">联机组件完整性校验失败，已阻止启动（文件可能已被篡改，请重新下载联机组件）</sys:String>
     <sys:String x:Key="Link.Mod.DownloadingEasyTier">正在下载 EasyTier，请稍后...</sys:String>
     <sys:String x:Key="Link.Mod.EasyTierNotReady">EasyTier 尚未下载完成，请等待其下载完成后再试！</sys:String>
     <sys:String x:Key="Link.Mod.InvalidPlayerId">MC 玩家 ID 不可包含分隔符 (|) ！</sys:String>
@@ -1891,6 +1892,7 @@
     <sys:String x:Key="Link.Mod.ReLoginRequired">请重新登录 Natayark Network 账号再试！</sys:String>
     <sys:String x:Key="Link.Mod.RealNameRequired">请先前往 Natayark 账户中心进行实名验证再尝试操作！</sys:String>
     <sys:String x:Key="Link.Mod.Task.CleanCache">清理缓存与冗余组件</sys:String>
+    <sys:String x:Key="Link.Mod.Task.VerifyEasyTier">校验文件完整性</sys:String>
     <sys:String x:Key="Link.Mod.Task.DownloadEasyTier">下载 EasyTier</sys:String>
     <sys:String x:Key="Link.Mod.Task.ExtractFiles">解压文件</sys:String>
     <sys:String x:Key="Link.Mod.Task.FetchAnnouncement">大厅公告获取</sys:String>

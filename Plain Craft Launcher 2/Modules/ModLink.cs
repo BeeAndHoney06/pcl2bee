@@ -9,6 +9,7 @@ using PCL.Core.Link.Lobby;
 using PCL.Core.Link.McPing;
 using PCL.Core.Link.McPing.Model;
 using PCL.Core.Link.Natayark;
+using PCL.Core.Link.Scaffolding.EasyTier;
 using PCL.Core.Logging;
 using PCL.Core.UI;
 using PCL.Core.Utils.OS;
@@ -90,10 +91,18 @@ public static class ModLink
             return false;
         }
 
-        if (ETController.Precheck() == 1)
+        var easyTierPrecheck = ETController.Precheck();
+        if (easyTierPrecheck == 1)
         {
             HintService.Hint(Lang.Text("Link.Mod.DownloadingDeps"));
             DownloadEasyTier();
+            return false;
+        }
+
+        if (easyTierPrecheck == 2)
+        {
+            // 完整性校验失败：文件可能被篡改，禁止继续联机
+            HintService.Hint(Lang.Text("Link.Mod.EasyTierIntegrityFailed"), HintType.Error);
             return false;
         }
 
@@ -344,14 +353,38 @@ public static class ModLink
                         Path.Combine(Paths.SharedLocalData, "EasyTier", ETInfoProvider.ETVersion))
                 ) { block = true });
 
-                // 3. Cleanup
+                // 3. 完整性校验：解压出的 easytier-core.exe 必须与官方哈希基线一致，
+                //    不一致说明分发链路被篡改 —— 立即删除已解压文件并终止流程，绝不执行
+                loaders.Add(new ModLoader.LoaderTask<int, int>(Lang.Text("Link.Mod.Task.VerifyEasyTier"), _ =>
+                {
+                    var integrityError = EasyTierMetadata.VerifyCoreIntegrity();
+                    if (integrityError is not null)
+                    {
+                        LogWrapper.Error("Link", "EasyTier 完整性校验失败：" + integrityError);
+                        // 删除本次解压出的（可能已被篡改的）文件，避免留下可执行载荷
+                        try
+                        {
+                            var tamperedDir = Path.Combine(Paths.SharedLocalData, "EasyTier",
+                                ETInfoProvider.ETVersion);
+                            if (Directory.Exists(tamperedDir)) Directory.Delete(tamperedDir, true);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogWrapper.Warn(ex, "Link", "清理被篡改的 EasyTier 文件失败");
+                        }
+
+                        throw new InvalidOperationException("EasyTier 完整性校验失败：" + integrityError);
+                    }
+                }) { block = true });
+
+                // 4. Cleanup
                 loaders.Add(new ModLoader.LoaderTask<int, int>(Lang.Text("Link.Mod.Task.CleanCache"), _ =>
                 {
                     File.Delete(dlTargetPath);
                     CleanupEasyTierCache();
                 }));
 
-                // 4. Update UI hint
+                // 5. Update UI hint
             loaders.Add(new ModLoader.LoaderTask<int, int>(Lang.Text("Link.Mod.Task.RefreshUi"), _ =>
                 HintWrapper.Show(Lang.Text("Link.Mod.DownloadComplete"), HintTheme.Success)
                 ) { show = false });

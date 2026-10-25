@@ -78,6 +78,16 @@ public class EasyTierEntity
             throw new FileNotFoundException("EasyTier was broken.");
         }
 
+        // 完整性校验：easytier-core.exe 必须与 EasyTier 官方发布版本的哈希基线一致，
+        // 防止分发链路被篡改后执行任意二进制；校验不通过则绝不创建/启动进程
+        var integrityError = EasyTierMetadata.VerifyCoreIntegrity();
+        if (integrityError is not null)
+        {
+            LogWrapper.Error("EasyTier", "EasyTier 完整性校验失败：" + integrityError);
+
+            throw new InvalidOperationException("EasyTier 完整性校验失败：" + integrityError);
+        }
+
         State = EtState.Ready;
 
         _rpcPort = NetworkHelper.NewTcpPort();

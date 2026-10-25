@@ -45,6 +45,15 @@ public static class ETController
             return 1;
         }
 
+        // 完整性校验：easytier-core.exe 必须与官方 GitHub 发布的哈希基线一致，
+        // 防止 CDN 分发链路被篡改后执行任意二进制
+        var integrityError = Scaffolding.EasyTier.EasyTierMetadata.VerifyCoreIntegrity();
+        if (integrityError is not null)
+        {
+            LogWrapper.Error("Link", "EasyTier 完整性校验失败：" + integrityError);
+            return 2;
+        }
+
         return 0;
     }
 

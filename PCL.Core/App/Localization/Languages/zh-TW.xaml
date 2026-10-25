@@ -1835,6 +1835,7 @@
     <sys:String x:Key="Link.Mod.DownloadComplete">連線元件下載完成！</sys:String>
     <sys:String x:Key="Link.Mod.DownloadEasyTierFailed">下載 EasyTier 依賴檔案失敗，請檢查網路連線</sys:String>
     <sys:String x:Key="Link.Mod.DownloadingDeps">正在下載連線依賴元件，請稍後...</sys:String>
+    <sys:String x:Key="Link.Mod.EasyTierIntegrityFailed">聯機元件完整性校驗失敗，已阻止啟動（檔案可能已被竄改，請重新下載聯機元件）</sys:String>
     <sys:String x:Key="Link.Mod.DownloadingEasyTier">正在下載 EasyTier，請稍後...</sys:String>
     <sys:String x:Key="Link.Mod.EasyTierNotReady">EasyTier 尚未下載完成，請等待其下載完成後再試！</sys:String>
     <sys:String x:Key="Link.Mod.InvalidPlayerId">Minecraft 玩家 ID 不可包含分隔符號 (|) ！</sys:String>
@@ -1844,6 +1845,7 @@
     <sys:String x:Key="Link.Mod.ReLoginRequired">請重新登入 Natayark Network 帳戶再試！</sys:String>
     <sys:String x:Key="Link.Mod.RealNameRequired">請先前往 Natayark 帳戶中心進行實名驗證再嘗試操作！</sys:String>
     <sys:String x:Key="Link.Mod.Task.CleanCache">清理快取與冗餘元件</sys:String>
+    <sys:String x:Key="Link.Mod.Task.VerifyEasyTier">校驗檔案完整性</sys:String>
     <sys:String x:Key="Link.Mod.Task.DownloadEasyTier">下載 EasyTier</sys:String>
     <sys:String x:Key="Link.Mod.Task.ExtractFiles">解壓縮檔</sys:String>
     <sys:String x:Key="Link.Mod.Task.FetchAnnouncement">大廳公告取得</sys:String>
