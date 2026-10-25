@@ -132,6 +132,13 @@ public sealed partial class PromoteService
         var pipeName = _GetPromotePipeName(process.Id);
         var pipe = new NamedPipeClientStream(".", pipeName, PipeDirection.InOut);
         pipe.Connect(10000);
+        // 验证管道服务端归属：确保对端进程确实是目标主进程，防止管道名被抢注（squatting）后接收伪造命令
+        var serverProcessId = KernelInterop.GetNamedPipeServerProcessId(pipe.SafePipeHandle.DangerousGetHandle());
+        if (serverProcessId != process.Id)
+        {
+            Context.Error($"管道服务端验证失败（服务端 PID {serverProcessId} != 预期 {process.Id}），正在退出");
+            return;
+        }
         Context.Info("已连接，开始通信");
         var reader = new StreamReader(pipe);
         var writer = new StreamWriter(pipe);

@@ -346,3 +346,6 @@ MaskFiles/
 # macOS
 
 **/.DS_Store
+
+# Local security audit notes (do not upload)
+.security/

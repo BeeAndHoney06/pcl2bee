@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using PCL.Core.App;
 using PCL.Core.Logging;
@@ -36,7 +38,17 @@ public static class PipeComm
     /// <param name="allowedProcessId">允许连接的客户端进程 ID，如为 Nothing 则允许所有</param>
     public static NamedPipeServerStream StartPipeServer(string identifier, string pipeName, Func<StreamReader, StreamWriter, Process?, bool> loopCallback, Action? stopCallback = null, bool stopWhenException = false, int[]? allowedProcessId = null)
     {
-        var pipe = new NamedPipeServerStream(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.None, 1024, 1024);
+        // 显式设置安全描述符：仅允许当前用户与 SYSTEM/管理员访问，防止同机其他账户或低权限进程连接，
+        // 不再依赖 .NET 默认 DACL（默认可能被继承的宽泛 ACE 放宽）
+        var pipeSecurity = new PipeSecurity();
+        var currentUser = WindowsIdentity.GetCurrent().User;
+        if (currentUser is not null)
+            pipeSecurity.AddAccessRule(new PipeAccessRule(currentUser, PipeAccessRights.FullControl, AccessControlType.Allow));
+        pipeSecurity.AddAccessRule(new PipeAccessRule(
+            new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null), PipeAccessRights.FullControl, AccessControlType.Allow));
+        pipeSecurity.AddAccessRule(new PipeAccessRule(
+            new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null), PipeAccessRights.FullControl, AccessControlType.Allow));
+        var pipe = NamedPipeServerStreamAcl.Create(pipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.None, 1024, 1024, pipeSecurity);
         var threadName = $"PipeServer/{identifier}";
 
         Basics.RunInNewThread(() =>
