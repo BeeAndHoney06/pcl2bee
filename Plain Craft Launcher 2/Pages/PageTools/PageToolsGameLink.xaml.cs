@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Input;
@@ -393,11 +393,17 @@ public partial class PageToolsGameLink
 
                 #region 多服务器轮询获取公告
 
-                while (serverNumber < Secrets.LinkServers.Length)
+                // 过滤空服务器地址（构建时未注入 LINK_SERVER_ROOT 时 Secrets.LinkServers 为 [""]，
+                // 直接请求会产生 "An invalid request URI was provided" 异常并污染日志）
+                var linkServers = Secrets.LinkServers.Where(s => !string.IsNullOrWhiteSpace(s)).ToArray();
+                if (linkServers.Length == 0)
+                    throw new Exception("No lobby announcement server configured");
+
+                while (serverNumber < linkServers.Length)
                     try
                     {
                         // 获取缓存版本号
-                        var cacheRes = Requester.Fetch($"{Secrets.LinkServers[serverNumber]}/api/link/v2/cache.ini",
+                        var cacheRes = Requester.Fetch($"{linkServers[serverNumber]}/api/link/v2/cache.ini",
                             new FetchParam
                             {
                                 Method = "GET",
@@ -415,7 +421,7 @@ public partial class PageToolsGameLink
                         {
                             LogWrapper.Info("[Link] Fetching new announcement data");
                             var received = Requester.Fetch(
-                                $"{Secrets.LinkServers[serverNumber]}/api/link/v2/announce.json",
+                                $"{linkServers[serverNumber]}/api/link/v2/announce.json",
                                 new FetchParam
                                 {
                                     Method = "GET",

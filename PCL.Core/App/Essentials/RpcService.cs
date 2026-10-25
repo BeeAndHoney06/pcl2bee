@@ -60,20 +60,9 @@ public sealed partial class RpcService
             AddFunction(name, func);
         }
     }
-
-    [LifecycleDependencyInjection("rpc-property", AttributeTargets.Property)]
-    private static void _CollectRpcPropertyRegistry(ImmutableList<(PropertyAccessor<string> prop, string name)> items)
-    {
-        foreach (var (prop, name) in items)
-        {
-            AddProperty(new RpcProperty(
-                name,
-                () => prop.Value,
-                value => prop.Value = value ?? "",
-                prop.CanSet
-            ));
-        }
-    }
+    // 注：rpc-property 注入点已移除——代码库中不存在 [RegisterRpc] 标记的属性，
+    // 该组永远不会被收集器创建，导致每次启动都产生 "Dependency injection failed: rpc-property@128" 警告。
+    // 若未来引入 RPC 属性，再恢复 _CollectRpcPropertyRegistry 与该注入点。
 
     public const string PipePrefix = "PCLCE_RPC";
     
