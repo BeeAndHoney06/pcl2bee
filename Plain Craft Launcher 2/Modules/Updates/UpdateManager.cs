@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using PCL.Core.App;
@@ -18,7 +18,7 @@ public static class UpdateManager
             new UpdatesMinioModel("https://s3.pysio.online/pcl2-ce/", "Pysio"),
             new UpdatesMinioModel("https://staticassets.naids.com/resources/pclce/", "Naids")
         }),
-        new UpdatesMinioModel("https://github.com/PCL-Community/PCL2_CE_Server/raw/main/", "GitHub")
+        new UpdatesMinioModel("https://github.com/PCL-Community/PCL2Bee_Server/raw/main/", "GitHub")
     });
 
     /// <summary>

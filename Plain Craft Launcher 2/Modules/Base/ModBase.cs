@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -110,7 +110,7 @@ public static class ModBase
     public static string pathAppdata = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PCL") + @"\";
 
     /// <summary>
-    ///     AppData 中的 PCLCE 配置文件夹路径，以 \ 结尾。
+    ///     AppData 中的 PCL2Bee 配置文件夹路径，以 \ 结尾。
     /// </summary>
     public static string pathAppdataConfig = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) +
                                              (versionBranchName == "Debug" ? @"\.pclcedebug\" : @"\.pclce\");

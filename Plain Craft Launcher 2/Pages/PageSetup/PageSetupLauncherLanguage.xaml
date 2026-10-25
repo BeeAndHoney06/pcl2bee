@@ -115,7 +115,7 @@
                                         FontSize="42"
                                         FontWeight="Bold"
                                         Foreground="{DynamicResource ColorBrush1}"
-                                        Text="PCL CE"
+                                        Text="PCL2 Bee"
                                         TextWrapping="Wrap" />
 
                                     <TextBlock

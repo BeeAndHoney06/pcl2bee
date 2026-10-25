@@ -220,7 +220,7 @@ public partial class PageSetupLauncherMisc
 
     #endregion
 
-    #region 停止使用 PCL CE
+    #region 停止使用 PCL2 Bee
 
     private void BtnSystemStopUsingPclCe_Click(object sender, MouseButtonEventArgs e)
     {
@@ -248,7 +248,7 @@ public partial class PageSetupLauncherMisc
 
     private void StopUsingPClCeCore(bool removeMcResources)
     {
-        // 删除 MC 文件夹内的 PCL CE 配置
+        // 删除 MC 文件夹内的 PCL2 Bee 配置
         if (removeMcResources && States.Game.Folders != "")
         {
             foreach (var path in States.Game.Folders.Split('|'))

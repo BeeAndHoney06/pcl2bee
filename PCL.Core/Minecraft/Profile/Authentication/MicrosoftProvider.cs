@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
@@ -30,7 +30,7 @@ public sealed class MicrosoftProvider : IAuthenticateProvider
     private const string LiveScope = "service::user.auth.xboxlive.com::MBI_SSL";
 
     /// <summary>
-    ///     PCL CE 使用的 Azure 公共客户端 ID（公开标识，不是机密），用于 Entra 设备代码流。
+    ///     沿用自 PCL CE 的 Azure 公共客户端 ID（公开标识，不是机密），用于 Entra 设备代码流。
     /// </summary>
     public const string PclCeClientId = "c14b0370-8d75-42f8-b329-5b60d39e319f";
 

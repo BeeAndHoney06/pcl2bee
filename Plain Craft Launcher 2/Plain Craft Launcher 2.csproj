@@ -26,9 +26,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>Images\icon.ico</ApplicationIcon>
-        <AssemblyTitle>Plain Craft Launcher Community Edition</AssemblyTitle>
-        <Description>Minecraft 启动器 (作者: 龙腾猫跃; 经社区二次开发版本)</Description>
-        <Product>Plain Craft Launcher Community Edition</Product>
+        <AssemblyTitle>PCL2 Bee Edition</AssemblyTitle>
+        <Description>Minecraft 启动器 (作者: 龙腾猫跃; PCL2 Bee Edition)</Description>
+        <Product>PCL2 Bee Edition</Product>
         <Copyright>Copyright © 龙腾猫跃 2016. All Rights Reserved.</Copyright>
         <AssemblyVersion>1.0.2.0</AssemblyVersion>
         <FileVersion>1.0.2.0</FileVersion>
