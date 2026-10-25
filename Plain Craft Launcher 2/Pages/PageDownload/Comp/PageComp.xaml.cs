@@ -235,16 +235,48 @@ public partial class PageComp
         TextSearchVersion.KeyDown += EnterTrigger;
         BtnSearchReset.Click += (_, _) => ResetFilter();
         BtnSearchInstallModPack.Click += BtnSearchInstallModPack_Click;
-        BtnThirdPartySearch.Click += BtnThirdPartySearch_Click;
+        ComboSearchSource.SelectionChanged += ComboSearchSource_SelectionChanged;
     }
 
-    #region 第三方平台整合包（FTB / Technic / ATLauncher）
+    #region 第三方平台整合包（FTB / Technic / ATLauncher，经来源下拉触发）
 
-    private void BtnThirdPartySearch_Click(object sender, EventArgs e)
+    /// <summary>当前来源下拉是否指向第三方平台。</summary>
+    private ModPackThirdParty.ThirdPartySource? CurrentThirdPartySource()
     {
-        var keyword = PanSearchBox.Text.Trim();
-        var source = (ModPackThirdParty.ThirdPartySource)ModBase.Val(
-            ((MyComboBoxItem)ComboThirdPartySource.SelectedItem).Tag);
+        if (PageType != ModComp.CompType.ModPack) return null;
+        var tag = ((MyComboBoxItem)ComboSearchSource.SelectedItem)?.Tag?.ToString();
+        return tag switch
+        {
+            "4" => ModPackThirdParty.ThirdPartySource.Ftb,
+            "5" => ModPackThirdParty.ThirdPartySource.Technic,
+            "6" => ModPackThirdParty.ThirdPartySource.AtLauncher,
+            _ => null
+        };
+    }
+
+    private void ComboSearchSource_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!isLoaderInited) return;
+        RefreshThirdPartyVisibility();
+        if (CurrentThirdPartySource() is not null)
+            StartNewSearch();
+    }
+
+    /// <summary>第三方模式下隐藏主结果区、显示第三方卡片（反向恢复）。</summary>
+    private void RefreshThirdPartyVisibility()
+    {
+        var isThirdParty = CurrentThirdPartySource() is not null;
+        CardThirdParty.Visibility = isThirdParty ? Visibility.Visible : Visibility.Collapsed;
+        CardProjects.Visibility = isThirdParty ? Visibility.Collapsed : Visibility.Visible;
+        CardPages.Visibility = isThirdParty ? Visibility.Collapsed : CardPages.Visibility;
+        // 第三方模式下标签/排序/版本/加载器筛选无意义
+        var filterVisibility = isThirdParty ? Visibility.Collapsed : Visibility.Visible;
+        LabTag.Visibility = ComboSearchTag.Visibility = filterVisibility;
+        LabSort.Visibility = ComboSearchSort.Visibility = filterVisibility;
+    }
+
+    private void SearchThirdParty(ModPackThirdParty.ThirdPartySource source, string keyword)
+    {
         HintThirdParty.Visibility = Visibility.Collapsed;
         PanThirdPartyResults.Children.Clear();
         LoadThirdParty.Visibility = Visibility.Visible;
@@ -389,9 +421,14 @@ public partial class PageComp
             ComboSearchShaderLoader.Visibility = Visibility.Collapsed;
         }
 
-        // 第三方平台整合包入口仅在整合包页显示
-        CardThirdParty.Visibility =
-            PageType == ModComp.CompType.ModPack ? Visibility.Visible : Visibility.Collapsed;
+        // 第三方平台整合包：仅整合包页开放来源下拉项（结果卡片按需显示）
+        var isModPackPage = PageType == ModComp.CompType.ModPack;
+        ItemSourceFtb.Visibility = isModPackPage ? Visibility.Visible : Visibility.Collapsed;
+        ItemSourceTechnic.Visibility = isModPackPage ? Visibility.Visible : Visibility.Collapsed;
+        ItemSourceAtLauncher.Visibility = isModPackPage ? Visibility.Visible : Visibility.Collapsed;
+        if (!isModPackPage && CurrentThirdPartySource() is not null)
+            ComboSearchSource.SelectedIndex = 0; // 非整合包页回到“全部”
+        RefreshThirdPartyVisibility();
     }
 
     private void PageComp_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
@@ -443,6 +480,15 @@ public partial class PageComp
     private void StartNewSearch()
     {
         page = 0;
+        // 第三方平台走独立搜索管线
+        if (CurrentThirdPartySource() is { } thirdParty)
+        {
+            RefreshThirdPartyVisibility();
+            SearchThirdParty(thirdParty, PanSearchBox.Text.Trim());
+            return;
+        }
+
+        RefreshThirdPartyVisibility();
         object argInput = LoaderInput();
         if (loader.ShouldStart(ref argInput))
             storage = new ModComp.CompProjectStorage(); // 避免连续搜索两次使得 CompProjectStorage 引用丢失（#1311）

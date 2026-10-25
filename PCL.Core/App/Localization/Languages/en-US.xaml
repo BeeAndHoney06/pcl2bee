@@ -2986,6 +2986,17 @@
     <sys:String x:Key="Setup.Misc.Debug.SkipCopy.ToolTip">When downloading, do not copy identical files that already exist in other Minecraft folders; re-download them instead.&#xA;Only recommended for testing download speed.</sys:String>
     <sys:String x:Key="Setup.Misc.Debug.Title">Debug options</sys:String>
 
+    <!-- Setup.Misc.Update -->
+
+    <sys:String x:Key="Setup.Misc.Update.Title">Launcher updates</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.NotChecked">The launcher checks for updates from GitHub Pages</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.Check">Check for updates</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.Checking">Checking for updates…</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.CheckFailed">Update check failed, please try again later</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.UpToDate">You are on the latest version ({0}, code {1})</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.NewVersion">New version available: {0}</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.OpenRelease">Get update</sys:String>
+
     <!-- Setup.Misc.Network -->
 
     <sys:String x:Key="Setup.Misc.Network.DoH">Use DoH for address resolution</sys:String>

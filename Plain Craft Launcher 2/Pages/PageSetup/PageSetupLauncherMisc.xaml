@@ -1,4 +1,4 @@
-﻿<local:MyPageRight
+<local:MyPageRight
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:PCL" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -72,6 +72,30 @@
                                         ColorType="Red" Click="BtnSystemStopUsingPclCe_Click" />
                     </Grid>
                 </Grid>
+            </local:MyCard>
+
+            <local:MyCard Margin="0,0,0,15" Title="{DynamicResource Setup.Misc.Update.Title}">
+                <StackPanel Margin="25,40,25,15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock x:Name="LabUpdateStatus" Text="{DynamicResource Setup.Misc.Update.NotChecked}"
+                                       FontSize="14" TextWrapping="Wrap" />
+                            <TextBlock x:Name="LabUpdateDetail" Text="" Opacity="0.6" FontSize="12" Margin="0,3,0,0"
+                                       TextWrapping="Wrap" />
+                        </StackPanel>
+                        <local:MyButton x:Name="BtnUpdateCheck" Grid.Column="1" MinWidth="130"
+                                        Text="{DynamicResource Setup.Misc.Update.Check}" Padding="13,0" Margin="0,0,15,0"
+                                        Click="BtnUpdateCheck_Click" />
+                        <local:MyButton x:Name="BtnUpdateOpen" Grid.Column="2" MinWidth="130" Visibility="Collapsed"
+                                        Text="{DynamicResource Setup.Misc.Update.OpenRelease}" Padding="13,0"
+                                        ColorType="Highlight" Click="BtnUpdateOpen_Click" />
+                    </Grid>
+                </StackPanel>
             </local:MyCard>
 
             <local:MyCard Margin="0,0,0,15" Title="{DynamicResource Setup.Misc.Network.Title}">

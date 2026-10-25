@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -297,6 +297,81 @@ public partial class PageSetupLauncherMisc
                 }
             }
         }
+    }
+
+    #endregion
+
+    #region 启动器更新检查
+
+    /// <summary>启动后的静默检查是否已执行（本次进程内只查一次）。</summary>
+    private static bool silentCheckDone;
+
+    /// <summary>静默检查发现新版本时置 true，供设置页首次加载时展示。</summary>
+    public static bool SilentUpdateAvailable { get; private set; }
+
+    internal static void RunSilentUpdateCheck()
+    {
+        if (silentCheckDone) return;
+        silentCheckDone = true;
+        ModBase.RunInThread(() =>
+        {
+            try
+            {
+                var (_, hasUpdate, _) = PCL.Core.App.Essentials.UpdateInfoService.Check();
+                SilentUpdateAvailable = hasUpdate;
+                if (hasUpdate)
+                    ModBase.Log("[System] 检测到启动器有新版本（详见 设置 → 其他 → 启动器更新）");
+            }
+            catch
+            {
+                // 静默检查失败不打扰用户
+            }
+        });
+    }
+
+    private void BtnUpdateCheck_Click(object sender, EventArgs e)
+    {
+        LabUpdateStatus.Text = Lang.Text("Setup.Misc.Update.Checking");
+        LabUpdateDetail.Text = "";
+        BtnUpdateCheck.IsEnabled = false;
+        ModBase.RunInThread(() =>
+        {
+            var (info, hasUpdate, failed) = PCL.Core.App.Essentials.UpdateInfoService.Check(true);
+            ModBase.RunInUi(() =>
+            {
+                BtnUpdateCheck.IsEnabled = true;
+                if (failed)
+                {
+                    LabUpdateStatus.Text = Lang.Text("Setup.Misc.Update.CheckFailed");
+                    LabUpdateDetail.Text = PCL.Core.App.Essentials.UpdateInfoService.LastError?.Message ?? "";
+                    BtnUpdateOpen.Visibility = Visibility.Collapsed;
+                    return;
+                }
+
+                if (hasUpdate && info is not null)
+                {
+                    LabUpdateStatus.Text = Lang.Text("Setup.Misc.Update.NewVersion", info.Version);
+                    LabUpdateDetail.Text = string.IsNullOrEmpty(info.Notes)
+                        ? info.Date
+                        : $"{info.Date}\n{info.Notes}";
+                    BtnUpdateOpen.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    LabUpdateStatus.Text = Lang.Text("Setup.Misc.Update.UpToDate",
+                        ModBase.versionBaseName, ModBase.versionCode);
+                    LabUpdateDetail.Text = "";
+                    BtnUpdateOpen.Visibility = Visibility.Collapsed;
+                }
+            });
+        });
+    }
+
+    private void BtnUpdateOpen_Click(object sender, EventArgs e)
+    {
+        var info = PCL.Core.App.Essentials.UpdateInfoService.LastInfo;
+        if (info is null || string.IsNullOrWhiteSpace(info.ReleaseUrl)) return;
+        ModBase.OpenWebsite(info.ReleaseUrl);
     }
 
     #endregion

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -72,6 +72,8 @@ public partial class FormMain
             DowngradeSub(lastVersion);
 
         _ = Config.Preference.Theme.ThemeSelected;
+        // 启动器更新静默检查（结果仅打日志 + 设置页可见，不弹窗）
+        PageSetupLauncherMisc.RunSilentUpdateCheck();
         // 注册拖拽事件（不能直接加 Handles，否则没用；#6340）
         AddHandler(DragDrop.DragEnterEvent, new DragEventHandler(HandleDrag), true);
         AddHandler(DragDrop.DragOverEvent, new DragEventHandler(HandleDrag), true);

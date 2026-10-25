@@ -2986,6 +2986,17 @@
     <sys:String x:Key="Setup.Misc.Debug.SkipCopy.ToolTip">在下载时不直接复制其他 MC 文件夹中已经存在的相同文件，而是重新下载文件。&#xA;只建议在测试下载速度时开启。</sys:String>
     <sys:String x:Key="Setup.Misc.Debug.Title">调试选项</sys:String>
 
+    <!-- Setup.Misc.Update -->
+
+    <sys:String x:Key="Setup.Misc.Update.Title">启动器更新</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.NotChecked">启动器会从 GitHub Pages 检查更新信息</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.Check">检查更新</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.Checking">正在检查更新……</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.CheckFailed">检查更新失败，请稍后重试</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.UpToDate">已是最新版本（{0}，内部版本 {1}）</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.NewVersion">发现新版本：{0}</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.OpenRelease">前往下载</sys:String>
+
     <!-- Setup.Misc.Network -->
 
     <sys:String x:Key="Setup.Misc.Network.DoH">使用 DoH 解析地址</sys:String>

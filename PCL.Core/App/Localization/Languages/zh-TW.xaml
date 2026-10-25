@@ -2930,6 +2930,17 @@
     <sys:String x:Key="Setup.Misc.Debug.SkipCopy.ToolTip">在下載時不直接複製其他 Minecraft 資料夾中已經存在的相同檔案，而是重新下載檔案。&#xA;只建議在測試下載速度時開啟。</sys:String>
     <sys:String x:Key="Setup.Misc.Debug.Title">除錯選項</sys:String>
 
+    <!-- Setup.Misc.Update -->
+
+    <sys:String x:Key="Setup.Misc.Update.Title">啟動器更新</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.NotChecked">啟動器會從 GitHub Pages 檢查更新資訊</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.Check">檢查更新</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.Checking">正在檢查更新……</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.CheckFailed">檢查更新失敗，請稍後重試</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.UpToDate">已是最新版本（{0}，內部版本 {1}）</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.NewVersion">發現新版本：{0}</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.OpenRelease">前往下載</sys:String>
+
     <!-- Setup.Misc.Network -->
 
     <sys:String x:Key="Setup.Misc.Network.DoH">使用 DoH 解析位址</sys:String>
