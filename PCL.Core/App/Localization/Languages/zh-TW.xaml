@@ -1,4 +1,4 @@
-﻿<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. -->
+<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -2813,6 +2813,12 @@
     <sys:String x:Key="Setup.Launch.Options.WindowTitle.Label">遊戲視窗標題</sys:String>
     <sys:String x:Key="Setup.Launch.Options.WindowTitle.SampleFormat">{name} | 玩家 : {user} | 使用 {login} 登入</sys:String>
     <sys:String x:Key="Setup.Launch.Options.WindowTitle.ToolTip">自訂遊戲視窗的標題，若留空則不進行更改。&#xA;支援以下取代標記：&#xA; · {user}：玩家名字&#xA; · {login}：玩家的登入方式&#xA; · {name}：遊戲實例名&#xA; · {date}、{time}：目前的系統時間&#xA; · {version}：遊戲對應的原版版本號&#xA;注意：如果你的實例安裝了 Modern UI 模組，那麼這裡的設定將會失效</sys:String>
+
+    <!-- Setup.Launch.Options.GameLog -->
+
+    <sys:String x:Key="Setup.Launch.Options.GameLog.Label">遊戲日誌</sys:String>
+    <sys:String x:Key="Setup.Launch.Options.GameLog.Show">遊戲啟動後在啟動器中即時顯示遊戲日誌</sys:String>
+    <sys:String x:Key="Setup.Launch.Options.GameLog.Show.ToolTip">類似 HMCL 與 Modrinth App 的體驗：遊戲啟動後自動開啟日誌頁面，即時滾動顯示遊戲輸出。&#xA;關閉後僅保留原有的崩潰偵測能力，不再自動開啟日誌頁。</sys:String>
 
     <!-- Setup.Launch.Options.InstanceIsolation -->
 

@@ -1,4 +1,4 @@
-﻿<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. -->
+<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -2813,6 +2813,12 @@
     <sys:String x:Key="Setup.Launch.Options.WindowTitle.Label">Window title</sys:String>
     <sys:String x:Key="Setup.Launch.Options.WindowTitle.SampleFormat">{name} | Player: {user} | Logged in as {login}</sys:String>
     <sys:String x:Key="Setup.Launch.Options.WindowTitle.ToolTip">Customise the game window title. Leave it blank to keep the default.&#xA;The following alternate tags are supported:&#xA; · {user}: Username&#xA; · {login}: Login method&#xA; · {name}: Instance name&#xA; · {date}, {time}: System time&#xA; · {version}: Vanilla game version&#xA;Note: If your instance has the Modern UI mod installed, this setting will not take effect.</sys:String>
+
+    <!-- Setup.Launch.Options.GameLog -->
+
+    <sys:String x:Key="Setup.Launch.Options.GameLog.Label">Game log</sys:String>
+    <sys:String x:Key="Setup.Launch.Options.GameLog.Show">Show real-time game log in the launcher after game launch</sys:String>
+    <sys:String x:Key="Setup.Launch.Options.GameLog.Show.ToolTip">Similar to HMCL and the Modrinth App: the log page opens automatically after launch and streams the game output in real time.&#xA;When disabled, crash detection still works but the log page will not open automatically.</sys:String>
 
     <!-- Setup.Launch.Options.InstanceIsolation -->
 

@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -56,6 +56,7 @@ public partial class PageSetupLaunch
             ComboArgumentIndieV2.SelectedIndex = Config.Launch.IndieSolutionV2;
             ComboArgumentVisibie.SelectedIndex = (int)Config.Launch.LauncherVisibility;
             ComboArgumentPriority.SelectedValue = ((int)Config.Launch.ProcessPriority).ToString();
+            CheckShowGameLog.Checked = Config.Launch.ShowGameLog;
             ComboArgumentWindowType.SelectedIndex = (int)Config.Launch.GameWindowMode;
             TextArgumentWindowWidth.Text = Config.Launch.GameWindowWidth.ToString();
             TextArgumentWindowHeight.Text = Config.Launch.GameWindowHeight.ToString();

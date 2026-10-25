@@ -2691,11 +2691,11 @@ public static class ModLaunch
 
         // 初始化等待
         var watcher = new ModWatcher.Watcher(loader, ModInstanceList.McMcInstanceSelected, windowTitle,
-            File.Exists(jStackPath) ? jStackPath : "", currentLaunchOptions.IsTest);
+            File.Exists(jStackPath) ? jStackPath : "", currentLaunchOptions.IsTest || Config.Launch.ShowGameLog);
         mcLaunchWatcher = watcher;
 
         // 显示实时日志
-        if (currentLaunchOptions.IsTest)
+        if (watcher.RealTimeLog)
         {
             if (ModMain.frmLogLeft is null)
                 ModBase.RunInUiWait(() => ModMain.frmLogLeft = new PageLogLeft());
@@ -2708,6 +2708,9 @@ public static class ModLaunch
                 });
             ModMain.frmLogLeft.Add(watcher);
             McLaunchLog("已显示游戏实时日志");
+            // 非“版本测试”触发的启动也自动切到日志页，与 HMCL/Modrinth 启动器一致
+            if (!currentLaunchOptions.IsTest)
+                ModBase.RunInUi(() => ModMain.frmMain.PageChange(FormMain.PageType.GameLog));
         }
 
         // 等待

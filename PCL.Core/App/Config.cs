@@ -1,4 +1,4 @@
-﻿using PCL.Core.App.Configuration;
+using PCL.Core.App.Configuration;
 
 namespace PCL.Core.App;
 
@@ -560,6 +560,11 @@ public static partial class Config
         /// 游戏窗口标题。
         /// </summary>
         [ConfigItem<string>("LaunchArgumentTitle", "", ConfigSource.Local)] public partial string Title { get; set; }
+
+        /// <summary>
+        /// 游戏启动后是否显示实时游戏日志页面。
+        /// </summary>
+        [ConfigItem<bool>("LaunchShowGameLog", true)] public partial bool ShowGameLog { get; set; }
 
         /// <summary>
         /// 自定义左下角版本信息。
