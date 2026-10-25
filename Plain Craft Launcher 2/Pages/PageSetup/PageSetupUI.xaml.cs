@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -12,9 +12,35 @@ namespace PCL;
 
 public partial class PageSetupUI
 {
-    public string[] ThemeColors => Basics.IsAprilFool 
+    public string[] ThemeColors => Basics.IsAprilFool
         ? [Lang.Text("Setup.Ui.Theme.Color.SkyBlue"), Lang.Text("Setup.Ui.Theme.Color.CatBlue"), Lang.Text("Setup.Ui.Theme.Color.CrashBlue"), Lang.Text("Setup.Ui.Theme.Color.Hmcl")]
-        : [Lang.Text("Setup.Ui.Theme.Color.SkyBlue"), Lang.Text("Setup.Ui.Theme.Color.CatBlue"), Lang.Text("Setup.Ui.Theme.Color.CrashBlue")];
+        : [Lang.Text("Setup.Ui.Theme.Color.SkyBlue"), Lang.Text("Setup.Ui.Theme.Color.CatBlue"), Lang.Text("Setup.Ui.Theme.Color.CrashBlue"), Lang.Text("Setup.Ui.Theme.Color.Custom")];
+
+    /// <summary>主题下拉索引 ↔ ColorTheme 枚举转换（下拉第 4 项 = Custom(10)）。</summary>
+    private static ColorTheme IndexToTheme(int index) => index switch
+    {
+        0 => ColorTheme.SkyBlue,
+        1 => ColorTheme.CatBlue,
+        2 => ColorTheme.DeathBlue,
+        3 => ColorTheme.HmclBlue, // 愚人节隐藏项
+        _ => ColorTheme.Custom
+    };
+
+    private static int ThemeToIndex(ColorTheme theme) => theme switch
+    {
+        ColorTheme.SkyBlue => 0,
+        ColorTheme.CatBlue => 1,
+        ColorTheme.DeathBlue => 2,
+        ColorTheme.HmclBlue => 3,
+        _ => 4 // Custom（非愚人节下拉里索引 3）
+    };
+
+    private void RefreshCustomColorVisibility()
+    {
+        var isCustom = Config.Preference.Theme.LightColor == ColorTheme.Custom ||
+                       Config.Preference.Theme.DarkColor == ColorTheme.Custom;
+        PanCustomColor.Visibility = isCustom ? Visibility.Visible : Visibility.Collapsed;
+    }
     
     public new bool isLoaded;
 
@@ -52,9 +78,15 @@ public partial class PageSetupUI
             SliderLauncherOpacity.Value = Config.Preference.Theme.WindowOpacity;
             CheckLauncherLogo.Checked = Config.Preference.ShowStartupLogo;
             ComboDarkMode.SelectedIndex = (int)Config.Preference.Theme.ColorMode;
-            ComboDarkColor.SelectedIndex = (int)Config.Preference.Theme.DarkColor;
-            ComboLightColor.SelectedIndex = (int)Config.Preference.Theme.LightColor;
+            ComboDarkColor.SelectedIndex = ThemeToIndex(Config.Preference.Theme.DarkColor);
+            ComboLightColor.SelectedIndex = ThemeToIndex(Config.Preference.Theme.LightColor);
             CheckShowLaunchingHint.Checked = Config.Preference.ShowLaunchingHint;
+
+            // 自定义主题颜色
+            SliderCustomHue.Value = Config.Preference.Theme.CustomHue;
+            SliderCustomSat.Value = Config.Preference.Theme.CustomSaturation;
+            SliderCustomLight.Value = Config.Preference.Theme.CustomLightness;
+            RefreshCustomColorVisibility();
 
             // 字体设置
             ComboUiFont.SelectedFontTag = Config.Preference.Font;
@@ -663,8 +695,20 @@ public partial class PageSetupUI
     private void ThemeColor_Change(object senderRaw, SelectionChangedEventArgs e)
     {
         var sender = (MyComboBox)senderRaw;
-        SetByTag(sender.Tag?.ToString(), sender.SelectedIndex);
+        if (sender.SelectedIndex < 0) return;
+        SetByTag(sender.Tag?.ToString(), IndexToTheme(sender.SelectedIndex));
         ThemeManager.ThemeRefresh();
+        RefreshCustomColorVisibility();
+    }
+
+    // 自定义主题颜色滑条
+    private void CustomColor_Change(object senderRaw, bool user)
+    {
+        var sender = (MySlider)senderRaw;
+        SetByTag(sender.Tag?.ToString(), sender.Value);
+        // 仅在当前（深/浅色对应的）主题为自定义时实时刷新
+        if (PCL.Core.UI.Theme.ThemeService.CurrentTheme == ColorTheme.Custom)
+            ThemeManager.ThemeRefresh();
     }
 
     // 赞助

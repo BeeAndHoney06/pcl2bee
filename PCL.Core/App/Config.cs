@@ -281,19 +281,19 @@ public static partial class Config
             [ConfigItem<int>("UiLauncherTransparent", 600, ConfigSource.Local)] public partial int WindowOpacity { get; set; }
 
             /// <summary>
-            /// 自定义主题：色相 (H)。
+            /// 自定义主题：色相 (0-360)。
             /// </summary>
-            [ConfigItem<int>("UiLauncherHue", 180, ConfigSource.Local)] public partial int WindowHue { get; set; }
+            [ConfigItem<int>("UiCustomHue", 210, ConfigSource.Local)] public partial int CustomHue { get; set; }
 
             /// <summary>
-            /// 自定义主题：饱和度 (S)。
+            /// 自定义主题：饱和度 (0-100)。
             /// </summary>
-            [ConfigItem<int>("UiLauncherSat", 80, ConfigSource.Local)] public partial int WindowSat { get; set; }
+            [ConfigItem<int>("UiCustomSat", 70, ConfigSource.Local)] public partial int CustomSaturation { get; set; }
 
             /// <summary>
-            /// 自定义主题：明度 (L)。
+            /// 自定义主题：明度 (0-100)。
             /// </summary>
-            [ConfigItem<int>("UiLauncherLight", 20, ConfigSource.Local)] public partial int WindowLight { get; set; }
+            [ConfigItem<int>("UiCustomLight", 50, ConfigSource.Local)] public partial int CustomLightness { get; set; }
 
             /// <summary>
             /// 自定义主题：色相渐变。

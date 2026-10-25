@@ -3194,6 +3194,10 @@
     <!-- Setup.Ui.Theme -->
 
     <sys:String x:Key="Setup.Ui.Theme.Color.CatBlue">亮黃</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Custom">\u81ea\u8a02</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Custom.Hue">\u81ea\u8a02\u8272\u76f8</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Custom.Saturation">\u81ea\u8a02\u98fd\u548c\u5ea6</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Custom.Lightness">\u81ea\u8a02\u660e\u5ea6</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.CrashBlue">金黃</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.Hmcl">HMCL</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.SkyBlue">檸黃</sys:String>

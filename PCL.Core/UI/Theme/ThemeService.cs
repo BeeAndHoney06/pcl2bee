@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using PCL.Core.App;
 using PCL.Core.App.Configuration;
 using PCL.Core.App.IoC;
@@ -157,6 +157,13 @@ public sealed partial class ThemeService
             ColorTheme.CatBlue => (100, 0.50, 0.45),
             ColorTheme.DeathBlue => (105, 0.35, 0.30),
             ColorTheme.HmclBlue => (85, 0.45, 0.25),
+            // 自定义主题：色相直接取用户 HSL 的 H（角度制一致）；
+            // 饱和度/明度映射为亮度与彩度调整（与预设主题的参数范围对齐）
+            ColorTheme.Custom => (
+                ((Config.Preference.Theme.CustomHue % 360) + 360) % 360,
+                -0.4 + Config.Preference.Theme.CustomSaturation / 100d * 1.2, // S 0~100 → -0.4~0.8
+                -0.3 + Config.Preference.Theme.CustomLightness / 100d * 1.0 // L 0~100 → -0.3~0.7
+            ),
 #if DEBUG
             _ => ((int)theme, 0, 0)
 #else
