@@ -57,6 +57,7 @@ public static class ModServerDownload
         var mirror = ToBmclapiMirror(url);
         var primary = mirror ?? url; // 有镜像：镜像为主；无镜像（Paper/Purpur/Spigot）：官方直连
         var fallback = mirror is not null ? url : null;
+        // PaperMC Fill v3 要求携带可识别的 UA，使用浏览器 UA（含产品标识已在 RequestSigning 中附加）
         return ModBase.GetJson(Requester.Fetch(primary, new FetchParam
         {
             Method = "GET",
@@ -322,6 +323,12 @@ public static class ModServerDownload
 
         /// <summary>附加说明（如 Spigot 的编译指引），无则为空。</summary>
         public string? Note;
+
+        /// <summary>是否使用浏览器 UA 下载（镜像不需要产品 UA）。</summary>
+        public bool UseBrowserUserAgent;
+
+        /// <summary>自定义 UA（直连 PaperMC Fill v3 时必须携带可识别标识）。</summary>
+        public string CustomUserAgent = "";
     }
 
     /// <summary>
@@ -409,6 +416,9 @@ public static class ModServerDownload
         // 镜像优先 + 官方回退（DownloadFile 支持多 URL 自动换源）
         var mirrorUrl = ToBmclapiMirror(url);
         spec.Urls = mirrorUrl is not null ? [mirrorUrl, url] : [url];
+        // PaperMC Fill v3 要求可识别的 UA：下载产物时以产品 UA 直连（镜像无此要求）
+        spec.UseBrowserUserAgent = mirrorUrl is not null;
+        if (mirrorUrl is null) spec.CustomUserAgent = $"PCL2-BeeEdition/{ModBase.versionBaseName}";
         return spec;
     }
 
@@ -424,7 +434,8 @@ public static class ModServerDownload
             new LoaderDownload(Lang.Text("Download.Server.Task.Download"),
             [
                 new DownloadFile(spec.Urls, targetPath,
-                    string.IsNullOrEmpty(spec.Hash) ? null : new ModBase.FileChecker(hash: spec.Hash))
+                    string.IsNullOrEmpty(spec.Hash) ? null : new ModBase.FileChecker(hash: spec.Hash),
+                    spec.UseBrowserUserAgent, spec.CustomUserAgent)
             ])
         };
         var loader = new LoaderCombo<int>(Lang.Text("Download.Server.Task.Download"), loaders)
