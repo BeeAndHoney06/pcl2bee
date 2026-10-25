@@ -8,37 +8,49 @@
     x:Class="PCL.PageDownloadServer"
     PanScroll="{Binding ElementName=PanBack}">
     <local:MyScrollViewer x:Name="PanBack" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="25,10">
-            <local:MyCard Margin="0,15" Title="服务端核心下载">
-                <StackPanel Margin="25,42,25,20">
-                    <TextBlock Text="支持 Paper、Purpur、Spigot 服务端。选择游戏版本后即可下载对应的服务端 jar。"
+        <StackPanel Orientation="Vertical" Margin="0,10,0,10">
+            <local:MyCard Margin="25,15,25,15" Title="{DynamicResource Download.Server.Page.Title}">
+                <StackPanel Margin="25,40,25,20" HorizontalAlignment="Stretch">
+                    <TextBlock Text="{DynamicResource Download.Server.Page.Description}"
                                Opacity="0.7" TextWrapping="Wrap" />
                     <Grid Margin="0,18,0,0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="110" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="SrvLabel" />
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="36" />
-                            <RowDefinition Height="36" />
-                            <RowDefinition Height="36" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition x:Name="RowBuild" Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" VerticalAlignment="Center" Text="服务端类型" />
-                        <local:MyComboBox x:Name="ComboType" Grid.Row="0" Grid.Column="1" Margin="0,0,0,4"
+                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,15,8"
+                                   Text="{DynamicResource Download.Server.Label.Type}" />
+                        <local:MyComboBox x:Name="ComboType" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
+                                          Margin="0,0,0,8" HorizontalAlignment="Stretch"
                                           SelectionChanged="ComboType_SelectionChanged" />
-                        <TextBlock Grid.Row="1" VerticalAlignment="Center" Text="游戏版本" />
-                        <local:MyComboBox x:Name="ComboVersion" Grid.Row="1" Grid.Column="1" Margin="0,0,0,4"
+                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,15,8"
+                                   Text="{DynamicResource Download.Server.Label.Version}" />
+                        <local:MyComboBox x:Name="ComboVersion" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
+                                          Margin="0,0,0,8" HorizontalAlignment="Stretch"
                                           SelectionChanged="ComboVersion_SelectionChanged" />
-                        <TextBlock Grid.Row="2" VerticalAlignment="Center" Text="构建号" />
-                        <local:MyComboBox x:Name="ComboBuild" Grid.Row="2" Grid.Column="1" Margin="0,0,0,4" />
-                        <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,12,0,0" Orientation="Horizontal">
-                            <local:MyButton x:Name="BtnDownload" MinWidth="120" ColorType="Highlight" Text="下载" Click="BtnDownload_Click" />
-                            <local:MyButton x:Name="BtnRefresh" MinWidth="90" Margin="10,0,0,0" Text="刷新列表" Click="BtnRefresh_Click" />
-                        </StackPanel>
+                        <TextBlock x:Name="LabBuild" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
+                                   Margin="0,0,15,8" Text="{DynamicResource Download.Server.Label.Build}" />
+                        <local:MyComboBox x:Name="ComboBuild" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
+                                          Margin="0,0,0,8" HorizontalAlignment="Stretch" />
+                        <WrapPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" ItemHeight="35" Margin="0,6,0,0">
+                            <local:MyButton x:Name="BtnDownload" MinWidth="120" Margin="0,0,10,0"
+                                            ColorType="Highlight"
+                                            Text="{DynamicResource Download.Server.Button.Download}"
+                                            Click="BtnDownload_Click" />
+                            <local:MyButton x:Name="BtnRefresh" MinWidth="90"
+                                            Text="{DynamicResource Download.Server.Button.Refresh}"
+                                            Click="BtnRefresh_Click" />
+                        </WrapPanel>
                     </Grid>
                     <local:MyHint x:Name="HintInfo" Margin="0,18,0,0" Theme="Blue"
-                                  Text="正在加载版本列表…" />
+                                  Text="{DynamicResource Download.Server.Hint.Ready}" />
                 </StackPanel>
             </local:MyCard>
         </StackPanel>

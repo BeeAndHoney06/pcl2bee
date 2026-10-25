@@ -1,4 +1,4 @@
-﻿<local:MyPageRight
+<local:MyPageRight
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:PCL"
@@ -8,9 +8,9 @@
     x:Class="PCL.PageAboutLicense"
     PanScroll="{Binding ElementName=PanBack}">
     <local:MyScrollViewer x:Name="PanBack" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="25,10">
-            <local:MyCard Margin="0,15" Title="{DynamicResource About.Left.License}">
-                <TextBlock Margin="25,42,25,20" LineHeight="22" TextWrapping="Wrap"
+        <StackPanel Orientation="Vertical" Margin="0,10,0,10">
+            <local:MyCard Margin="25,15,25,15" Title="{DynamicResource About.Left.License}">
+                <TextBlock Margin="25,40,25,20" LineHeight="22" TextWrapping="Wrap" HorizontalAlignment="Stretch"
                            Text="{DynamicResource About.License.Text}" />
             </local:MyCard>
         </StackPanel>

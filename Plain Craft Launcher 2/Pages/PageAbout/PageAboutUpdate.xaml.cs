@@ -1,4 +1,4 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Input;
 using PCL.Core.App.Essentials;
 using PCL.Core.App.Localization;
@@ -22,8 +22,10 @@ public partial class PageAboutUpdate
     {
         BtnCheck.IsEnabled = false;
         BtnOpen.Visibility = Visibility.Collapsed;
+        LabNotes.Visibility = Visibility.Collapsed;
         HintResult.Theme = MyHint.Themes.Blue;
         HintResult.Text = Lang.Text("About.Update.Checking");
+        HintResult.Visibility = Visibility.Visible;
         ModBase.RunInNewThread(() =>
         {
             var info = UpdateInfoService.Fetch(true);
@@ -31,6 +33,7 @@ public partial class PageAboutUpdate
             {
                 BtnCheck.IsEnabled = true;
                 LabNotes.Visibility = Visibility.Collapsed;
+                HintResult.Visibility = Visibility.Visible;
                 if (info is null)
                 {
                     HintResult.Theme = MyHint.Themes.Red;
