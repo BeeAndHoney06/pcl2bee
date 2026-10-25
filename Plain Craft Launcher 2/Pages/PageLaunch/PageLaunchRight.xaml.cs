@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Globalization;
 using System.Reflection;
 using System.Windows;
@@ -34,31 +34,7 @@ public partial class PageLaunchRight : IRefreshable
         PanBack.ScrollToHome();
         PanScroll = PanBack; // 不知道为啥不能在 XAML 设置
         PanLog.Visibility = ModBase.modeDebug ? Visibility.Visible : Visibility.Collapsed;
-        // 社区版提示
-        PanHint.Visibility = States.Hint.CEMessage
-            ? Visibility.Visible
-            : Visibility.Collapsed;
-        LabHint1.Text = Lang.Text("Launch.Right.CommunityHint.Message");
-        LabHint2.Text = Lang.Text("Launch.Right.CommunityHint.HidePrompt");
         _EnsureHomepageLiveWatcher();
-    }
-
-    // 暂时关闭快照版提示
-    private void BtnHintClose_Click(object sender, EventArgs e)
-    {
-        var input = ModMain.MyMsgBoxInput(Lang.Text("Launch.Right.CommunityHint.InputTitle"));
-        if (string.IsNullOrWhiteSpace(input))
-            return;
-        input = new string(input.Where(char.IsAsciiLetter).ToArray()).ToLower();
-        if (input.Contains("pclcommunity"))
-        {
-            ModAnimation.AniDispose(PanHint, true);
-            States.Hint.CEMessage = false;
-        }
-        else
-        {
-            HintService.Hint(Lang.Text("Launch.Right.CommunityHint.WrongInput"));
-        }
     }
 
     #region 主页
