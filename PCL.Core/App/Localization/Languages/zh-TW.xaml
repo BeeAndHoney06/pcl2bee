@@ -704,6 +704,14 @@
     <sys:String x:Key="Download.Server.Loading">正在取得版本列表……</sys:String>
     <sys:String x:Key="Download.Server.NoResult">沒有找到符合條件的版本。</sys:String>
     <sys:String x:Key="Download.Server.SelectFolder">選擇儲存位置</sys:String>
+    <sys:String x:Key="Download.Left.Server">伺服器端</sys:String>
+    <sys:String x:Key="Download.Server.Type.Title">伺服器端下載</sys:String>
+    <sys:String x:Key="Download.Server.Type.Label">伺服器端類型</sys:String>
+    <sys:String x:Key="Download.Server.Search.Hint">搜尋版本</sys:String>
+    <sys:String x:Key="Download.Server.Versions.Title">版本列表</sys:String>
+    <sys:String x:Key="Download.Server.DownloadStarted">下載已開始，可在任務管理中查看進度</sys:String>
+    <sys:String x:Key="Download.Server.Latest.Title">最新版本</sys:String>
+    <sys:String x:Key="Download.Server.Group.Other">其他版本</sys:String>
     <sys:String x:Key="Download.Server.Task.Download">下載伺服器端檔案</sys:String>
     <sys:String x:Key="Download.Server.Error.ListFailed">取得版本列表失敗：{0}</sys:String>
     <sys:String x:Key="Download.Server.Error.DownloadFailed">下載失敗：{0}</sys:String>

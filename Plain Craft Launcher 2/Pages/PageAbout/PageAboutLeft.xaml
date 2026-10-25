@@ -1,4 +1,4 @@
-﻿<local:MyPageLeft
+<local:MyPageLeft
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:PCL"
@@ -8,16 +8,19 @@
     x:Class="PCL.PageAboutLeft">
     <local:MyScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
                           Style="{StaticResource ScrollViewerFullMargin}">
-        <StackPanel x:Name="PanItem" Margin="0,12,0,0">
+        <StackPanel x:Name="PanItem" Margin="0,12,0,0" MinWidth="176">
             <TextBlock Text="{DynamicResource About.Left.Category}" Margin="13,5,5,3" Opacity="0.6" FontSize="12" />
             <local:MyListItem x:Name="ItemInfo" IsScaleAnimationEnabled="False" Type="RadioBox" Tag="0"
                               Check="PageCheck" Height="36" VerticalAlignment="Top"
+                              MinPaddingRight="35"
                               Title="{DynamicResource About.Left.Info}" LogoScale="1" SvgIcon="lucide/info" />
             <local:MyListItem x:Name="ItemUpdate" IsScaleAnimationEnabled="False" Type="RadioBox" Tag="1"
                               Check="PageCheck" Height="36" VerticalAlignment="Top"
+                              MinPaddingRight="35"
                               Title="{DynamicResource About.Left.Update}" LogoScale="0.95" SvgIcon="lucide/refresh-cw" />
             <local:MyListItem x:Name="ItemLicense" IsScaleAnimationEnabled="False" Type="RadioBox" Tag="2"
                               Check="PageCheck" Height="36" VerticalAlignment="Top"
+                              MinPaddingRight="35"
                               Title="{DynamicResource About.Left.License}" LogoScale="0.95" SvgIcon="lucide/scroll-text" />
         </StackPanel>
     </local:MyScrollViewer>

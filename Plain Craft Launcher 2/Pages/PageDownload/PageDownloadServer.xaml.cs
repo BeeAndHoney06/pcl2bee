@@ -2,249 +2,226 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using PCL.Core.App.Localization;
+using PCL.Core.Minecraft;
 using PCL.Core.UI;
 
 namespace PCL;
 
 public partial class PageDownloadServer
 {
-    /// <summary>下拉项与枚举的固定顺序（不随语言变化）。</summary>
-    private static readonly ModServerDownload.ServerType[] TypeOrder =
-    [
-        ModServerDownload.ServerType.Vanilla,
-        ModServerDownload.ServerType.Paper,
-        ModServerDownload.ServerType.Purpur,
-        ModServerDownload.ServerType.Spigot,
-        ModServerDownload.ServerType.Forge,
-        ModServerDownload.ServerType.Fabric
-    ];
-
-    private bool _ready;
-    private bool _suppressEvents;
-    private string? _pendingType;
-    private ModServerDownload.ServerType CurrentType =>
-        ComboType.SelectedIndex >= 0 && ComboType.SelectedIndex < TypeOrder.Length
-            ? TypeOrder[ComboType.SelectedIndex]
-            : ModServerDownload.ServerType.Vanilla;
+    private ModServerDownload.ServerType currentType = ModServerDownload.ServerType.Vanilla;
+    private List<ModServerDownload.ServerVersionEntry> allVersions = [];
 
     public PageDownloadServer()
     {
         InitializeComponent();
         Loaded += (_, _) =>
         {
-            if (_ready) return;
-            _ready = true;
-            _suppressEvents = true;
-            foreach (var type in TypeOrder)
-                ComboType.Items.Add(Lang.Text($"Download.Server.Type.{type}"));
-            // 恢复由导航指定的类型；否则默认 Paper（插件服最常用）
-            var target = _pendingType ?? "Paper";
-            _pendingType = null;
-            ComboType.SelectedIndex = Math.Max(0, Array.IndexOf(TypeOrder,
-                Enum.TryParse<ModServerDownload.ServerType>(target, true, out var parsed)
-                    ? parsed
-                    : ModServerDownload.ServerType.Paper));
-            _suppressEvents = false;
-            _ = ReloadAsync();
+            PanBack.ScrollToHome();
+            if (allVersions.Count == 0) Reload();
+        };
+        // 类型单选按钮组
+        var typeNames = new[]
+        {
+            (ModServerDownload.ServerType.Vanilla, "Download.Server.Type.Vanilla"),
+            (ModServerDownload.ServerType.Paper, "Download.Server.Type.Paper"),
+            (ModServerDownload.ServerType.Purpur, "Download.Server.Type.Purpur"),
+            (ModServerDownload.ServerType.Spigot, "Download.Server.Type.Spigot"),
+            (ModServerDownload.ServerType.Forge, "Download.Server.Type.Forge"),
+            (ModServerDownload.ServerType.Fabric, "Download.Server.Type.Fabric")
+        };
+        foreach (var (type, key) in typeNames)
+        {
+            var radio = new MyRadioBox
+            {
+                Text = Lang.Text(key), Height = 24d, Margin = new Thickness(0, 0, 18, 8),
+                Tag = type, Checked = type == ModServerDownload.ServerType.Vanilla
+            };
+            radio.Check += (_, _) => SwitchType(type);
+            PanTypeButtons.Children.Add(radio);
+        }
+
+        // 搜索过滤
+        SearchBox.Search += (_, _) => { if (allVersions.Count > 0) RenderVersions(); };
+        SearchBox.KeyDown += (_, e) =>
+        {
+            if (e.Key == Key.Enter && allVersions.Count > 0) RenderVersions();
         };
     }
 
-    /// <summary>由下载导航指定要显示的服务端类型。</summary>
-    public void SetServerType(string type)
+    /// <summary>切换服务端类型并刷新。</summary>
+    public void SwitchType(ModServerDownload.ServerType type)
     {
-        if (!_ready || ComboType.Items.Count == 0)
-        {
-            _pendingType = type;
-            return;
-        }
-
-        var index = Enum.TryParse<ModServerDownload.ServerType>(type, true, out var parsed)
-            ? Array.IndexOf(TypeOrder, parsed)
-            : -1;
-        if (index >= 0 && ComboType.SelectedIndex != index)
-            ComboType.SelectedIndex = index;
-        else
-            _ = ReloadAsync();
+        if (type == currentType && allVersions.Count > 0) return;
+        currentType = type;
+        Reload();
     }
 
-    private void BtnRefresh_Click(object sender, MouseButtonEventArgs e) => _ = ReloadAsync();
-
-    private async void ComboType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    public void Reload()
     {
-        if (_suppressEvents || !_ready) return;
-        await ReloadAsync();
-    }
-
-    private async void ComboVersion_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (_suppressEvents || !_ready) return;
-        await LoadBuildsAsync();
-    }
-
-    private void SetHint(string text, MyHint.Themes theme = MyHint.Themes.Blue)
-    {
-        HintInfo.Theme = theme;
-        HintInfo.Text = text;
-    }
-
-    /// <summary>加载版本列表。</summary>
-    private async Task ReloadAsync()
-    {
-        var type = CurrentType;
-        _suppressEvents = true;
-        ComboVersion.Items.Clear();
-        ComboBuild.Items.Clear();
-        _suppressEvents = false;
-        SetHint(Lang.Text("Download.Server.Hint.Loading"));
-        try
+        PanLoad.Visibility = Visibility.Visible;
+        ModBase.RunInThread(() =>
         {
-            var versions = await Task.Run(() => ModServerDownload.GetVersions(type));
-            _suppressEvents = true;
-            foreach (var entry in versions)
-                ComboVersion.Items.Add(entry.Version);
-            _suppressEvents = false;
-            if (versions.Count > 0)
-            {
-                ComboVersion.SelectedIndex = 0; // 触发构建列表加载
-            }
-            else
-            {
-                SetHint(Lang.Text("Download.Server.NoResult"), MyHint.Themes.Yellow);
-            }
-        }
-        catch (Exception ex)
-        {
-            ModBase.Log(ex, $"[Server] 获取 {type} 服务端版本列表失败");
-            SetHint(Lang.Text("Download.Server.Error.ListFailed", ex.Message), MyHint.Themes.Red);
-        }
-    }
-
-    /// <summary>加载构建列表（仅 Paper / Purpur 有构建概念）。</summary>
-    private async Task LoadBuildsAsync()
-    {
-        var type = CurrentType;
-        var version = ComboVersion.SelectedItem?.ToString() ?? "";
-        _suppressEvents = true;
-        ComboBuild.Items.Clear();
-        _suppressEvents = false;
-        var hasBuilds = type is ModServerDownload.ServerType.Paper or ModServerDownload.ServerType.Purpur;
-        LabBuild.Visibility = hasBuilds ? Visibility.Visible : Visibility.Collapsed;
-        ComboBuild.Visibility = hasBuilds ? Visibility.Visible : Visibility.Collapsed;
-        // 无构建概念时整行塌缩，避免留下空白行
-        RowBuild.Height = hasBuilds ? GridLength.Auto : new GridLength(0);
-        if (!hasBuilds)
-        {
-            SetHint(Lang.Text("Download.Server.Hint.ReadyType", Lang.Text($"Download.Server.Type.{type}")));
-            return;
-        }
-
-        SetHint(Lang.Text("Download.Server.Hint.LoadingBuilds"));
-        try
-        {
-            var builds = await Task.Run(() => ModServerDownload.GetBuilds(type, version));
-            _suppressEvents = true;
-            foreach (var build in builds)
-                ComboBuild.Items.Add(Lang.Text("Download.Server.BuildItem", build));
-            _suppressEvents = false;
-            if (builds.Count > 0)
-                ComboBuild.SelectedIndex = 0;
-            SetHint(Lang.Text("Download.Server.Hint.BuildsLoaded",
-                Lang.Text($"Download.Server.Type.{type}"), version, builds.Count));
-        }
-        catch (Exception ex)
-        {
-            ModBase.Log(ex, $"[Server] 获取 {type} {version} 构建列表失败");
-            SetHint(Lang.Text("Download.Server.Error.BuildsFailed", ex.Message), MyHint.Themes.Red);
-        }
-    }
-
-    private void BtnDownload_Click(object sender, MouseButtonEventArgs e)
-    {
-        var type = CurrentType;
-        var version = ComboVersion.SelectedItem?.ToString() ?? "";
-        if (string.IsNullOrWhiteSpace(version))
-        {
-            SetHint(Lang.Text("Download.Server.Error.SelectVersion"), MyHint.Themes.Red);
-            return;
-        }
-
-        var build = ComboBuild.SelectedIndex >= 0
-            ? ComboBuild.Items[ComboBuild.SelectedIndex]?.ToString()
-            : null;
-        // 构建项带本地化前缀，取原始构建号
-        if (build is not null)
-        {
-            var raw = ComboBuild.Items[ComboBuild.SelectedIndex]?.ToString() ?? "";
-            var idx = raw.LastIndexOf(' ');
-            build = idx >= 0 ? raw[(idx + 1)..] : raw;
-        }
-
-        ModBase.RunInNewThread(() =>
-        {
-            ModServerDownload.DownloadSpec spec;
+            List<ModServerDownload.ServerVersionEntry> versions;
             try
             {
-                spec = ModServerDownload.Resolve(type, version, build);
+                versions = ModServerDownload.GetVersions(currentType);
             }
             catch (Exception ex)
             {
-                ModBase.Log(ex, $"[Server] 解析 {type} {version} 下载信息失败");
-                ModBase.RunInUi(() => SetHint(
-                    Lang.Text("Download.Server.Error.ResolveFailed", ex.Message), MyHint.Themes.Red));
+                ModBase.Log(ex, $"[Server] 获取{currentType}服务端版本列表失败");
+                ModBase.RunInUi(() =>
+                {
+                    PanLoad.Visibility = Visibility.Collapsed;
+                    PanMain.Children.Clear();
+                    PanMain.Children.Add(new MyHint
+                    {
+                        Text = Lang.Text("Download.Server.Error.ListFailed", ex.Message), Theme = MyHint.Themes.Red,
+                        HasBorder = true, Margin = new Thickness(0, 0, 0, 15)
+                    });
+                });
                 return;
             }
 
-            // 保存位置：沿用原实现的「另存为」交互
-            var path = ModBase.RunInUiWait(() => SystemDialogs.SelectSaveFile(
-                Lang.Text("Download.Server.SelectFolder"), spec.FileName,
-                Lang.Text("Download.Server.FileFilter")));
-            if (string.IsNullOrWhiteSpace(path)) return;
-
-            ModBase.RunInUiWait(() =>
+            ModBase.RunInUi(() =>
             {
-                BtnDownload.IsEnabled = false;
-                SetHint(spec.Note ?? Lang.Text("Download.Server.Hint.Downloading", spec.FileName));
+                allVersions = versions;
+                RenderVersions();
             });
+        });
+    }
+
+    /// <summary>按原版游戏下载页的样式渲染：最新版卡片置顶 + 其余按主版本分组折叠。</summary>
+    private void RenderVersions()
+    {
+        PanLoad.Visibility = Visibility.Collapsed;
+        PanMain.Children.Clear();
+
+        // 搜索过滤
+        var keyword = SearchBox.Text.Trim();
+        var versions = allVersions;
+        if (!string.IsNullOrEmpty(keyword))
+        {
+            versions = allVersions.Where(v => v.Version.ContainsF(keyword, true)).ToList();
+            if (versions.Count == 0)
+            {
+                PanMain.Children.Add(new MyHint
+                {
+                    Text = Lang.Text("Download.Server.NoResult"), Theme = MyHint.Themes.Yellow, HasBorder = true
+                });
+                return;
+            }
+        }
+
+        if (versions.Count == 0) return;
+
+        // 按主版本号分组（1.21.4 → “1.21”；无点归“其他”）
+        var groups = new List<(string Key, List<ModServerDownload.ServerVersionEntry> Items)>();
+        foreach (var entry in allVersions)
+        {
+            var key = GetGroupKey(entry.Version);
+            var existing = groups.FirstOrDefault(g => g.Key == key);
+            if (existing.Key == key && existing.Items is not null)
+                existing.Items.Add(entry);
+            else
+                groups.Add((key, [entry]));
+        }
+
+        // 最新版卡片（不折叠，取前 3）
+        var latestCard = new MyCard
+            { Title = Lang.Text("Download.Server.Latest.Title"), Margin = new Thickness(0, 0, 0, 15) };
+        var latestPan = new StackPanel
+        {
+            Margin = new Thickness(20, MyCard.SwapedHeight, 18, 0), VerticalAlignment = VerticalAlignment.Top,
+            RenderTransform = new TranslateTransform(0d, 0d), Tag = versions.Take(3).ToList()
+        };
+        MyCard.StackInstall(ref latestPan, stack =>
+        {
+            foreach (var entry in (List<ModServerDownload.ServerVersionEntry>)stack.Tag)
+                stack.Children.Add(BuildListItem(entry));
+        });
+        latestCard.Children.Add(latestPan);
+        PanMain.Children.Add(latestCard);
+
+        // 分组折叠卡片
+        foreach (var (key, items) in groups)
+        {
+            var card = new MyCard { Title = $"{key} ({items.Count})", Margin = new Thickness(0, 0, 0, 15) };
+            var stack = new StackPanel
+            {
+                Margin = new Thickness(20, MyCard.SwapedHeight, 18, 0), VerticalAlignment = VerticalAlignment.Top,
+                RenderTransform = new TranslateTransform(0d, 0d), Tag = items
+            };
+            card.Children.Add(stack);
+            card.SwapControl = stack;
+            card.InstallMethod = s =>
+            {
+                foreach (var entry in (List<ModServerDownload.ServerVersionEntry>)s.Tag)
+                    s.Children.Add(BuildListItem(entry));
+            };
+            card.IsSwapped = true;
+            PanMain.Children.Add(card);
+        }
+    }
+
+    private static string GetGroupKey(string version)
+    {
+        var parts = version.Split('.');
+        if (parts.Length <= 2) return version.Contains('.') ? version : Lang.Text("Download.Server.Group.Other");
+        return $"{parts[0]}.{parts[1]}";
+    }
+
+    private MyListItem BuildListItem(ModServerDownload.ServerVersionEntry entry)
+    {
+        var item = new MyListItem
+        {
+            Logo = ServerTypeLogo(currentType),
+            SnapsToDevicePixels = true,
+            Title = McFormatter.FormatVersion(entry.Version).Replace("_", " "),
+            Height = 42d,
+            Type = MyListItem.CheckType.Clickable,
+            Info = string.IsNullOrEmpty(entry.Detail)
+                ? Lang.Text("Download.Server.Type." + currentType)
+                : $"{Lang.Text("Download.Server.Type." + currentType)} · {entry.Detail}",
+            Tag = entry
+        };
+        item.Click += ItemDownload_Click;
+        return item;
+    }
+
+    private static string ServerTypeLogo(ModServerDownload.ServerType type)
+    {
+        return type switch
+        {
+            ModServerDownload.ServerType.Paper => ModBase.pathImage + "Blocks/CobbleStone.png",
+            ModServerDownload.ServerType.Purpur => ModBase.pathImage + "Blocks/CommandBlock.png",
+            ModServerDownload.ServerType.Spigot => ModBase.pathImage + "Blocks/RedstoneBlock.png",
+            ModServerDownload.ServerType.Forge => ModBase.pathImage + "Blocks/Anvil.png",
+            ModServerDownload.ServerType.Fabric => ModBase.pathImage + "Blocks/Fabric.png",
+            _ => ModBase.pathImage + "Blocks/Grass.png"
+        };
+    }
+
+    private void ItemDownload_Click(object sender, MouseButtonEventArgs e)
+    {
+        var entry = (ModServerDownload.ServerVersionEntry)((MyListItem)sender).Tag;
+        var folder = SystemDialogs.SelectFolder(Lang.Text("Download.Server.SelectFolder"));
+        if (string.IsNullOrEmpty(folder)) return;
+        ModBase.RunInThread(() =>
+        {
             try
             {
-                var loader = ModServerDownload.StartDownload(spec, path);
-                // 按钮实时显示进度（保留原实现的交互）
-                while (loader.State is ModBase.LoadState.Loading or ModBase.LoadState.Waiting)
-                {
-                    var percent = (int)Math.Round(loader.Progress * 100);
-                    ModBase.RunInUi(() =>
-                        BtnDownload.Text = Lang.Text("Download.Server.Button.Downloading", percent));
-                    Thread.Sleep(120);
-                }
-
-                if (loader.State == ModBase.LoadState.Finished)
-                {
-                    ModBase.RunInUi(() => SetHint(
-                        Lang.Text("Download.Server.Hint.Downloaded", path)));
-                    ModBase.OpenExplorer(path);
-                }
-                else
-                {
-                    ModBase.RunInUi(() => SetHint(
-                        Lang.Text("Download.Server.Error.DownloadFailed",
-                            loader.Error?.Message ?? ""), MyHint.Themes.Red));
-                }
+                ModServerDownload.Download(currentType, entry, folder);
+                ModBase.RunInUi(() => HintService.Hint(
+                    Lang.Text("Download.Server.DownloadStarted"), HintType.Success));
             }
             catch (Exception ex)
             {
-                ModBase.Log(ex, $"[Server] 下载 {type} {version} 服务端失败");
-                ModBase.RunInUi(() => SetHint(
-                    Lang.Text("Download.Server.Error.DownloadFailed", ex.Message), MyHint.Themes.Red));
+                ModBase.Log(ex, $"下载{currentType}服务端失败（{entry.Version}）", ModBase.LogLevel.Msgbox,
+                    userSummary: Lang.Text("Download.Server.Error.DownloadFailed", entry.Version));
             }
-            finally
-            {
-                ModBase.RunInUi(() =>
-                {
-                    BtnDownload.IsEnabled = true;
-                    BtnDownload.Text = Lang.Text("Download.Server.Button.Download");
-                });
-            }
-        }, "Server Download");
+        });
     }
 }

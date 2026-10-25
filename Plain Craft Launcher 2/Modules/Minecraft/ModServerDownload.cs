@@ -435,5 +435,16 @@ public static class ModServerDownload
         return loader;
     }
 
+    /// <summary>
+    ///     下载服务端文件到指定目录（列表点选式入口，自动命名为官方文件名）。
+    ///     返回已启动的加载器。
+    /// </summary>
+    public static LoaderCombo<int> Download(ServerType type, ServerVersionEntry entry, string targetFolder)
+    {
+        Directory.CreateDirectory(targetFolder);
+        var spec = Resolve(type, entry.Version);
+        return StartDownload(spec, Path.Combine(targetFolder, spec.FileName));
+    }
+
     #endregion
 }

@@ -592,8 +592,10 @@ public class ModSetup
 
     public static void UiLogoLeft(bool value)
     {
-        // 标题固定显示在标题栏右侧，左侧始终为红绿灯预留固定宽度
-        ModMain.frmMain.PanTitleMain.ColumnDefinitions[0].Width = new GridLength(96, GridUnitType.Pixel);
+        // 左侧为 Logo 预留的列：标题类型为「无」且启用左对齐时收窄为 0，否则与右侧等宽（保证中部导航居中）
+        ModMain.frmMain.PanTitleMain.ColumnDefinitions[0].Width = new GridLength(
+            value && Config.Preference.WindowTitleType == LauncherTitleType.None ? 0 : 1,
+            GridUnitType.Star);
     }
 
     #endregion

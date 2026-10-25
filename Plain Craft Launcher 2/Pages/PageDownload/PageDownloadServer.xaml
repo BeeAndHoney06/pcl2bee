@@ -1,58 +1,31 @@
 <local:MyPageRight
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:PCL"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:PCL" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    x:Class="PCL.PageDownloadServer"
+    mc:Ignorable="d" x:Class="PCL.PageDownloadServer"
     PanScroll="{Binding ElementName=PanBack}">
-    <local:MyScrollViewer x:Name="PanBack" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <StackPanel Orientation="Vertical" Margin="0,10,0,10">
-            <local:MyCard Margin="25,15,25,15" Title="{DynamicResource Download.Server.Page.Title}">
-                <StackPanel Margin="25,40,25,20" HorizontalAlignment="Stretch">
-                    <TextBlock Text="{DynamicResource Download.Server.Page.Description}"
-                               Opacity="0.7" TextWrapping="Wrap" />
-                    <Grid Margin="0,18,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="SrvLabel" />
-                            <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition x:Name="RowBuild" Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,15,8"
-                                   Text="{DynamicResource Download.Server.Label.Type}" />
-                        <local:MyComboBox x:Name="ComboType" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2"
-                                          Margin="0,0,0,8" HorizontalAlignment="Stretch"
-                                          SelectionChanged="ComboType_SelectionChanged" />
-                        <TextBlock Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,15,8"
-                                   Text="{DynamicResource Download.Server.Label.Version}" />
-                        <local:MyComboBox x:Name="ComboVersion" Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2"
-                                          Margin="0,0,0,8" HorizontalAlignment="Stretch"
-                                          SelectionChanged="ComboVersion_SelectionChanged" />
-                        <TextBlock x:Name="LabBuild" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center"
-                                   Margin="0,0,15,8" Text="{DynamicResource Download.Server.Label.Build}" />
-                        <local:MyComboBox x:Name="ComboBuild" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2"
-                                          Margin="0,0,0,8" HorizontalAlignment="Stretch" />
-                        <WrapPanel Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" ItemHeight="35" Margin="0,6,0,0">
-                            <local:MyButton x:Name="BtnDownload" MinWidth="120" Margin="0,0,10,0"
-                                            ColorType="Highlight"
-                                            Text="{DynamicResource Download.Server.Button.Download}"
-                                            Click="BtnDownload_Click" />
-                            <local:MyButton x:Name="BtnRefresh" MinWidth="90"
-                                            Text="{DynamicResource Download.Server.Button.Refresh}"
-                                            Click="BtnRefresh_Click" />
-                        </WrapPanel>
-                    </Grid>
-                    <local:MyHint x:Name="HintInfo" Margin="0,18,0,0" Theme="Blue"
-                                  Text="{DynamicResource Download.Server.Hint.Ready}" />
-                </StackPanel>
-            </local:MyCard>
-        </StackPanel>
-    </local:MyScrollViewer>
+    <Grid>
+        <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                              x:Name="PanBack">
+            <StackPanel Orientation="Vertical" Margin="5">
+                <!-- 服务端类型选择（保持切换能力） -->
+                <local:MyCard Title="{DynamicResource Download.Server.Type.Title}" Margin="15,20,20,15"
+                              UseAnimation="False">
+                    <StackPanel Margin="20,40,18,15">
+                        <local:MySearchBox x:Name="SearchBox" Margin="0,0,0,10"
+                                           HintText="{DynamicResource Download.Server.Search.Hint}"
+                                           SearchButtonVisibility="Visible" />
+                        <WrapPanel x:Name="PanTypeButtons" />
+                    </StackPanel>
+                </local:MyCard>
+                <StackPanel Name="PanMain" Margin="0,0,5,5" Grid.IsSharedSizeScope="True" />
+            </StackPanel>
+        </local:MyScrollViewer>
+        <local:MyCard HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,0" SnapsToDevicePixels="True"
+                      x:Name="PanLoad" UseAnimation="False">
+            <local:MyLoading Text="{DynamicResource Download.Server.Loading}" Margin="20,20,20,17" x:Name="Load"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </local:MyCard>
+    </Grid>
 </local:MyPageRight>

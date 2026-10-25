@@ -617,8 +617,11 @@ public partial class FormMain
     // 标题栏改变大小
     private void PanTitle_SizeChanged(object sender, EventArgs e)
     {
-        // 标题区已固定在标题栏右侧，不再按左侧列宽裁剪
-        PanTitleLeft.ColumnDefinitions[0].MaxWidth = double.PositiveInfinity;
+        // 限制标题区最大宽度，避免挤出标题栏
+        if (PanTitleMain.ColumnDefinitions[0].ActualWidth - 30 <= 0)
+            PanTitleLeft.ColumnDefinitions[0].MaxWidth = 0;
+        else
+            PanTitleLeft.ColumnDefinitions[0].MaxWidth = PanTitleMain.ColumnDefinitions[0].ActualWidth - 30;
     }
 
     // 最小化
@@ -1404,9 +1407,7 @@ public partial class FormMain
         DownloadLiteLoader = 16,
         DownloadLabyMod = 17,
         DownloadLegacyFabric = 18,
-        DownloadServerPaper = 19,
-        DownloadServerPurpur = 20,
-        DownloadServerSpigot = 21,
+        DownloadServer = 19,
 
         SetupLaunch = 0,
         SetupUI = 1,
