@@ -9,7 +9,7 @@
         <StartupObject>PCL.Program</StartupObject>
         <PublishUrl>publish\</PublishUrl>
         <PublishSingleFile>true</PublishSingleFile>
-        <!-- 单文件压缩仅在自包含发布时受 .NET SDK 支持（否则报 NETSDK1176），框架依赖发布保持不压缩 -->
+        <!-- 鍗曟枃浠跺帇缂╀粎鍦ㄨ嚜鍖呭惈鍙戝竷鏃跺彈 .NET SDK 鏀寔锛堝惁鍒欐姤 NETSDK1176锛夛紝妗嗘灦渚濊禆鍙戝竷淇濇寔涓嶅帇缂?-->
         <EnableCompressionInSingleFile Condition="'$(SelfContained)' == 'true'">true</EnableCompressionInSingleFile>
         <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
         <RuntimeIdentifier Condition="'$(Platform)' == 'x64'">win-x64</RuntimeIdentifier>
@@ -27,11 +27,12 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>Images\icon.ico</ApplicationIcon>
         <AssemblyTitle>PCL2 Bee Edition</AssemblyTitle>
-        <Description>Minecraft 启动器 (作者: 龙腾猫跃; PCL2 Bee Edition)</Description>
+        <Description>Minecraft 鍚姩鍣?(浣滆€? 榫欒吘鐚穬; PCL2 Bee Edition)</Description>
         <Product>PCL2 Bee Edition</Product>
-        <Copyright>Copyright © 龙腾猫跃 2016. All Rights Reserved.</Copyright>
-        <AssemblyVersion>1.0.2.0</AssemblyVersion>
-        <FileVersion>1.0.2.0</FileVersion>
+        <Copyright>Copyright 漏 榫欒吘鐚穬 2016. All Rights Reserved.</Copyright>
+        <!-- 鐗堟湰鍙疯嚜鍔ㄥ彇鑷?metadata.json 鐨?version.base锛堣拷鍔?.0 浣滀负淇浣嶏級锛屽彂鐗堝彧闇€鏀?metadata.json -->
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <FileVersion>1.0.0.0</FileVersion>
         <NoWarn>
             41999;42016;42017;42018;42019;42020;42021;42022;42032;42036;42314;
             VSTHRD002;VSTHRD003;VSTHRD110;VSTHRD200
@@ -100,7 +101,7 @@
         <Import Include="System.Windows.Media" />
         <Import Include="System.Windows.Media.Imaging" />
     </ItemGroup>
-    <!-- 信不过巨硬的智障代码，手动包含需要的文件 -->
+    <!-- 淇′笉杩囧法纭殑鏅洪殰浠ｇ爜锛屾墜鍔ㄥ寘鍚渶瑕佺殑鏂囦欢 -->
     <PropertyGroup>
         <EnableDefaultItems>false</EnableDefaultItems>
         <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
@@ -121,4 +122,19 @@
     <ItemGroup>
         <Content Include="LICENCE" />
     </ItemGroup>
+  <!-- 从 metadata.json 读取版本号，自动生成 AssemblyVersion/FileVersion（发版只改 metadata.json） -->
+  <Target Name="ReadVersionFromMetadata" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <MetaBase>$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)\metadata.json")), '&quot;base&quot;\s*:\s*&quot;([^&quot;]+)&quot;').Groups[1].Value)</MetaBase>
+      <MetaCode>$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)\metadata.json")), '&quot;code&quot;\s*:\s*(\d+)').Groups[1].Value)</MetaCode>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(MetaBase)' != ''">
+      <AssemblyVersion>$(MetaBase).0</AssemblyVersion>
+      <FileVersion>$(MetaBase).0</FileVersion>
+      <InformationalVersion>$(MetaBase)+$(MetaCode)</InformationalVersion>
+      <Version>$(MetaBase)</Version>
+      <PackageVersion>$(MetaBase)</PackageVersion>
+    </PropertyGroup>
+    <Message Importance="high" Text="元数据版本: base=$(MetaBase) code=$(MetaCode) → AssemblyVersion=$(AssemblyVersion)" />
+  </Target>
 </Project>
