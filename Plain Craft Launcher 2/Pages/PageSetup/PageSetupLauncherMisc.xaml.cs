@@ -329,7 +329,7 @@ public partial class PageSetupLauncherMisc
         });
     }
 
-    private void BtnUpdateCheck_Click(object sender, EventArgs e)
+    private void BtnUpdateCheck_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         LabUpdateStatus.Text = Lang.Text("Setup.Misc.Update.Checking");
         LabUpdateDetail.Text = "";
@@ -367,7 +367,7 @@ public partial class PageSetupLauncherMisc
         });
     }
 
-    private void BtnUpdateOpen_Click(object sender, EventArgs e)
+    private void BtnUpdateOpen_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
         var info = PCL.Core.App.Essentials.UpdateInfoService.LastInfo;
         if (info is null || string.IsNullOrWhiteSpace(info.ReleaseUrl)) return;

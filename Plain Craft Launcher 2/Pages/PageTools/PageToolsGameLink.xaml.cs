@@ -576,7 +576,11 @@ public partial class PageToolsGameLink
                     HintAnnounce.Theme = MyHint.Themes.Red;
                     HintAnnounce.Text = Lang.Text("Tools.GameLink.Error.ConnectFailed");
                 });
-                LogWrapper.Error(ex, "[Link] Failed to get lobby announcement");
+                // 未配置服务器（本地构建无密钥）属预期情况，降为 Warn；真实网络失败仍保留 Error 级别
+                if (ex.Message.Contains("No lobby announcement server configured"))
+                    LogWrapper.Warn(ex, "[Link] Failed to get lobby announcement");
+                else
+                    LogWrapper.Error(ex, "[Link] Failed to get lobby announcement");
             }
         });
     }
