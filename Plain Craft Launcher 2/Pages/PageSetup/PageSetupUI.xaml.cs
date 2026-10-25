@@ -66,8 +66,6 @@ public partial class PageSetupUI
         isLoaded = true;
 
         SliderLoad();
-
-        PanLauncherHide.Visibility = Visibility.Visible;
     }
 
     public void Reload()
@@ -709,12 +707,6 @@ public partial class PageSetupUI
         // 仅在当前（深/浅色对应的）主题为自定义时实时刷新
         if (PCL.Core.UI.Theme.ThemeService.CurrentTheme == ColorTheme.Custom)
             ThemeManager.ThemeRefresh();
-    }
-
-    // 赞助
-    private void BtnLauncherDonate_Click(object sender, MouseButtonEventArgs e)
-    {
-        ModBase.OpenWebsite("https://afdian.com/a/LTCat");
     }
 
     // 滑动条
