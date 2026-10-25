@@ -5,39 +5,27 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" x:Class="PCL.PageDownloadServer"
     PanScroll="{Binding ElementName=PanBack}">
-    <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                          x:Name="PanBack">
-        <StackPanel Orientation="Vertical" Margin="25,20,25,10">
-            <!-- 服务端类型选择 -->
-            <local:MyCard Title="{DynamicResource Download.Server.Type.Title}" Margin="0,0,0,15" UseAnimation="False">
-                <StackPanel Margin="20,40,20,15">
-                    <local:MySearchBox x:Name="SearchBox" Margin="0,0,0,10"
-                                       HintText="{DynamicResource Download.Server.Search.Hint}"
-                                       SearchButtonVisibility="Visible" />
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock VerticalAlignment="Center" Text="{DynamicResource Download.Server.Type.Label}"
-                                   Margin="0,0,15,0" />
-                        <local:MyComboBox x:Name="ComboServerType" Grid.Column="1" MaxDropDownHeight="200">
-                            <local:MyComboBoxItem Content="Vanilla" Tag="0" IsSelected="True" />
-                            <local:MyComboBoxItem Content="Paper" Tag="1" />
-                            <local:MyComboBoxItem Content="Purpur" Tag="2" />
-                            <local:MyComboBoxItem Content="Spigot" Tag="3" />
-                            <local:MyComboBoxItem Content="Forge" Tag="4" />
-                            <local:MyComboBoxItem Content="Fabric" Tag="5" />
-                        </local:MyComboBox>
-                    </Grid>
-                </StackPanel>
-            </local:MyCard>
-            <local:MyHint x:Name="HintError" Visibility="Collapsed" HasBorder="True" Theme="Red" Margin="0,0,0,15" />
-            <!-- 版本列表 -->
-            <local:MyCard x:Name="CardVersions" Title="{DynamicResource Download.Server.Versions.Title}"
-                          UseAnimation="False">
-                <StackPanel x:Name="PanVersions" Margin="12" />
-            </local:MyCard>
-        </StackPanel>
-    </local:MyScrollViewer>
+    <Grid>
+        <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                              x:Name="PanBack">
+            <StackPanel Orientation="Vertical" Margin="5">
+                <!-- 服务端类型选择（保持切换能力） -->
+                <local:MyCard Title="{DynamicResource Download.Server.Type.Title}" Margin="15,20,20,15"
+                              UseAnimation="False">
+                    <StackPanel Margin="20,40,18,15">
+                        <local:MySearchBox x:Name="SearchBox" Margin="0,0,0,10"
+                                           HintText="{DynamicResource Download.Server.Search.Hint}"
+                                           SearchButtonVisibility="Visible" />
+                        <WrapPanel x:Name="PanTypeButtons" />
+                    </StackPanel>
+                </local:MyCard>
+                <StackPanel Name="PanMain" Margin="0,0,5,5" Grid.IsSharedSizeScope="True" />
+            </StackPanel>
+        </local:MyScrollViewer>
+        <local:MyCard HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,0" SnapsToDevicePixels="True"
+                      x:Name="PanLoad" UseAnimation="False">
+            <local:MyLoading Text="{DynamicResource Download.Server.Loading}" Margin="20,20,20,17" x:Name="Load"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+        </local:MyCard>
+    </Grid>
 </local:MyPageRight>

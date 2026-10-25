@@ -41,13 +41,39 @@ public static class ModServerDownload
 
     private static JsonObject FetchJson(string url)
     {
-        return (JsonObject)ModBase.GetJson(Requester.Fetch(url, new FetchParam
+        // 镜像优先（BMCLAPI 国内可达性远好于 Mojang/Fabric 官方源），官方源作为 FallbackUrl
+        // Requester.Fetch 内部对两个 URL 各重试 3 次，失败才抛出
+        var mirror = ToBmclapiMirror(url);
+        var primary = mirror ?? url; // 有镜像：镜像为主；无镜像（Paper/Purpur/Spigot）：官方直连
+        var fallback = mirror is not null ? url : null;
+        return (JsonObject)ModBase.GetJson(Requester.Fetch(primary, new FetchParam
         {
             Method = "GET",
             ContentType = "application/json",
-            Timeout = 15000,
-            UseBrowserUserAgent = true
+            Timeout = 12000,
+            UseBrowserUserAgent = true,
+            FallbackUrl = fallback
         }));
+    }
+
+    /// <summary>将官方源 URL 转换为 BMCLAPI 镜像 URL；无镜像映射的源返回 null。</summary>
+    private static string? ToBmclapiMirror(string url)
+    {
+        // 无映射的源（Paper/Purpur/Spigot 官方 API）直接返回 null
+        var mappings = new[]
+        {
+            ("https://piston-meta.mojang.com", "https://bmclapi2.bangbang93.com"),
+            ("https://launchermeta.mojang.com", "https://bmclapi2.bangbang93.com"),
+            ("https://piston-data.mojang.com", "https://bmclapi2.bangbang93.com/maven"),
+            ("https://meta.fabricmc.net", "https://bmclapi2.bangbang93.com/fabric-meta"),
+            ("https://maven.fabricmc.net", "https://bmclapi2.bangbang93.com/maven"),
+            ("https://maven.minecraftforge.net", "https://bmclapi2.bangbang93.com/maven"),
+            ("https://files.minecraftforge.net", "https://bmclapi2.bangbang93.com")
+        };
+        foreach (var (from, to) in mappings)
+            if (url.StartsWithF(from, true))
+                return to + url[from.Length..];
+        return null;
     }
 
     /// <summary>
@@ -163,54 +189,44 @@ public static class ModServerDownload
         return result.Take(80).ToList();
     }
 
-    // ---------- Forge（官方 promotions，取推荐/最新安装器） ----------
+    // ---------- Forge（BMCLAPI 列表接口，取每个 MC 版本最新的安装器） ----------
 
     private static List<ServerVersionEntry> GetForgeVersions()
     {
-        // 复用 PCL 已缓存的 Forge 版本列表（dlForgeListLoader 的结构太重，这里直接用 promotions + maven 索引）
-        var promos = FetchJson("https://files.minecraftforge.net/net/minecraftforge/forge/promotions_slim.json");
-        var promo = promos["promos"] as JsonObject;
-        var recommended = new Dictionary<string, string>();
-        var latest = new Dictionary<string, string>();
-        foreach (var kv in promo ?? new JsonObject())
-        {
-            if (kv.Key.EndsWithF("-recommended", true)) recommended[kv.Key.Split('-')[0]] = kv.Value.ToString();
-            if (kv.Key.EndsWithF("-latest", true)) latest[kv.Key.Split('-')[0]] = kv.Value.ToString();
-        }
-
+        // BMCLAPI 的 /forge/minecraft 返回支持的 MC 版本列表（国内快，PCL 原生同款源）
+        var list = FetchJson("https://bmclapi2.bangbang93.com/forge/minecraft");
         var result = new List<ServerVersionEntry>();
-        foreach (var mc in recommended.Keys.OrderByDescending(v => v, Comparer<string>.Create((a, b) => McVersionComparer.CompareVersion(a, b))))
+        foreach (var mcNode in list.AsArray())
         {
-            var forgeVer = recommended[mc];
+            var mc = mcNode?.ToString();
+            if (string.IsNullOrWhiteSpace(mc)) continue;
             result.Add(new ServerVersionEntry
             {
                 Version = mc,
-                Detail = forgeVer,
-                Url = ForgeInstallerUrl(mc, forgeVer)
+                // 具体安装器版本在下载时按该 MC 版本取最新构建（避免列表阶段 N 次请求）
+                Url = ""
             });
         }
 
-        foreach (var mc in latest.Keys.Where(k => !recommended.ContainsKey(k))
-                     .OrderByDescending(v => v, Comparer<string>.Create((a, b) => McVersionComparer.CompareVersion(a, b))))
-        {
-            var forgeVer = latest[mc];
-            result.Add(new ServerVersionEntry
-            {
-                Version = mc,
-                Detail = forgeVer,
-                Url = ForgeInstallerUrl(mc, forgeVer)
-            });
-        }
-
+        // 按版本号降序
+        result.Sort((a, b) => McVersionComparer.CompareVersion(b.Version, a.Version));
         return result;
     }
 
-    /// <summary>构造 Forge 安装器 jar 下载地址（maven 结构）。</summary>
-    private static string ForgeInstallerUrl(string mcVersion, string forgeVersion)
+    /// <summary>解析 Forge 指定 MC 版本最新构建的安装器下载地址（下载时调用，BMCLAPI maven 直链）。</summary>
+    private static (string Url, string? Sha1) ResolveForge(string mcVersion)
     {
-        var full = $"{mcVersion}-{forgeVersion}";
-        // 部分老版本带 -1.7.10 之类的后缀，直接拼接
-        return $"https://maven.minecraftforge.net/net/minecraftforge/forge/{full}/forge-{full}-installer.jar";
+        var builds = FetchJson($"https://bmclapi2.bangbang93.com/forge/minecraft/{mcVersion}");
+        var latest = (builds.AsArray().FirstOrDefault() as JsonObject) ??
+                     throw new Exception(Lang.Text("Download.Server.Error.NoServerJar"));
+        var forgeVer = latest["version"]?.ToString();
+        var full = $"{mcVersion}-{forgeVer}";
+        // 老版本（如 1.7.10）的构建名带 mc 版本后缀
+        if (builds.AsArray().Any(b => b?["version"]?.ToString() == $"{forgeVer}-{mcVersion}"))
+            full = $"{mcVersion}-{forgeVer}-{mcVersion}";
+        var sha1 = (latest["files"] as JsonArray)?.FirstOrDefault(f => f?["category"]?.ToString() == "installer")?["hash"]
+            ?.ToString();
+        return ($"https://bmclapi2.bangbang93.com/maven/net/minecraftforge/forge/{full}/forge-{full}-installer.jar", sha1);
     }
 
     // ---------- Fabric（meta.fabricmc.net，取最新稳定安装器） ----------
@@ -276,6 +292,22 @@ public static class ModServerDownload
             var latestBuild = info["builds"]?["latest"]?.ToString() ?? "";
             url = $"https://api.purpurmc.org/v2/purpur/{entry.Version}/{latestBuild}/download";
         }
+        else if (type == ServerType.Forge)
+        {
+            // Forge：按 MC 版本取最新构建的安装器（BMCLAPI maven 直链，hash 按长度自动识别 sha1）
+            var (forgeUrl, forgeSha1) = ResolveForge(entry.Version);
+            url = forgeUrl;
+            sha256 = forgeSha1; // FileChecker 按哈希长度自动识别类型（40 位 = SHA1）
+            // 文件名中的构建号从 URL 提取（forge-{mc}-{build}-installer.jar）
+            var marker = "forge-";
+            if (url.Contains(marker))
+            {
+                var part = url[(url.IndexOf(marker) + marker.Length)..];
+                entry.Detail = part.Contains("-installer") ? part.Split("-installer")[0] : part;
+                if (entry.Detail.StartsWithF(entry.Version + "-"))
+                    entry.Detail = entry.Detail[(entry.Version.Length + 1)..]; // 去掉 mc 版本前缀，留构建号
+            }
+        }
         else if (type == ServerType.Fabric)
         {
             var (installerUrl, _) = ResolveFabric(entry.Version);
@@ -284,6 +316,12 @@ public static class ModServerDownload
 
         if (string.IsNullOrWhiteSpace(url))
             throw new Exception(Lang.Text("Download.Server.Error.NoServerJar"));
+
+        // 下载 URL 双源：镜像优先 + 官方回退（DownloadFile 支持多 URL 自动换源）
+        var mirrorUrl = ToBmclapiMirror(url);
+        var urls = mirrorUrl is not null
+            ? new List<string> { mirrorUrl, url }
+            : new List<string> { url };
 
         // 文件名：按类型与版本生成
         var fileName = type switch
@@ -301,7 +339,7 @@ public static class ModServerDownload
         var loaders = new List<LoaderBase>
         {
             new LoaderDownload(Lang.Text("Download.Server.Task.Download"),
-                [new DownloadFile([url], targetPath,
+                [new DownloadFile(urls, targetPath,
                     string.IsNullOrEmpty(sha256) ? null : new ModBase.FileChecker(hash: sha256))])
         };
         var loader = new LoaderCombo<int>(Lang.Text("Download.Server.Task.Download"), loaders)

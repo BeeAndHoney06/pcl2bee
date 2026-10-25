@@ -19,13 +19,15 @@ public static class RequestSigning
     internal static void SecretHeadersSign(string url, ref HttpRequestMessage client, bool useBrowserUserAgent = false,
         string customUserAgent = "")
     {
-        client.Version = HttpVersion.Version20;
-        client.VersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
-        if (Uri.TryCreate(url, UriKind.Absolute, out var parsedUri) 
+        // 仅对 CurseForge 系强制 HTTP/2（其 API 需要）；
+        // 其余请求保持默认协商——经代理（如 Clash）访问部分源时，HTTP/2 隧道会导致连接被强制关闭
+        if (Uri.TryCreate(url, UriKind.Absolute, out var parsedUri)
             && (parsedUri.Host == "api.curseforge.com"
             || parsedUri.Host == "edge.forgecdn.net"
             || parsedUri.Host == "mediafilez.forgecdn.net"))
         {
+            client.Version = HttpVersion.Version20;
+            client.VersionPolicy = HttpVersionPolicy.RequestVersionOrLower;
             client.Headers.Add("x-api-key", Secrets.CurseForgeAPIKey);
         }
         var userAgent = !string.IsNullOrEmpty(customUserAgent)

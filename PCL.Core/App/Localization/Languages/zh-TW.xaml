@@ -695,25 +695,27 @@
     <sys:String x:Key="Download.Left.LabyMod">LabyMod</sys:String>
     <sys:String x:Key="Download.Left.LegacyFabric">Legacy Fabric</sys:String>
     <sys:String x:Key="Download.Left.LiteLoader">LiteLoader</sys:String>
-    <sys:String x:Key="Download.Type.Vanilla">\u539f\u7248\u4f3a\u670d\u5668</sys:String>
-    <sys:String x:Key="Download.SelectFolder">\u9078\u64c7\u4f3a\u670d\u5668\u7aef\u6a94\u6848\u5132\u5b58\u4f4d\u7f6e</sys:String>
-    <sys:String x:Key="Download.DownloadStarted">\u4f3a\u670d\u5668\u7aef\u4e0b\u8f09\u5df2\u958b\u59cb\uff0c\u53ef\u5728\u4efb\u52d9\u7ba1\u7406\u4e2d\u67e5\u770b\u9032\u5ea6</sys:String>
-    <sys:String x:Key="Download.Left.Server">\u4f3a\u670d\u5668\u7aef</sys:String>
-    <sys:String x:Key="Download.Type.Title">\u4f3a\u670d\u5668\u7aef\u4e0b\u8f09</sys:String>
-    <sys:String x:Key="Download.Type.Spigot">Spigot</sys:String>
-    <sys:String x:Key="Download.Error.NoServerJar">\u8a72\u7248\u672c\u6c92\u6709\u63d0\u4f9b\u4f3a\u670d\u5668\u7aef\u6a94\u6848</sys:String>
-    <sys:String x:Key="Download.NoResult">\u6c92\u6709\u627e\u5230\u7b26\u5408\u689d\u4ef6\u7684\u7248\u672c</sys:String>
-    <sys:String x:Key="Download.Type.Paper">Paper</sys:String>
-    <sys:String x:Key="Download.Type.Purpur">Purpur</sys:String>
-    <sys:String x:Key="Download.Error.ListFailed">\u53d6\u5f97\u7248\u672c\u5217\u8868\u5931\u6557\uff1a{0}</sys:String>
-    <sys:String x:Key="Download.Loading">\u6b63\u5728\u53d6\u5f97\u7248\u672c\u5217\u8868\u2026\u2026</sys:String>
-    <sys:String x:Key="Download.Task.Download">\u4e0b\u8f09\u4f3a\u670d\u5668\u7aef\u6a94\u6848</sys:String>
-    <sys:String x:Key="Download.Type.Label">\u4f3a\u670d\u5668\u7aef\u985e\u578b</sys:String>
-    <sys:String x:Key="Download.Type.Forge">Forge\uff08\u5b89\u88dd\u5668\uff09</sys:String>
-    <sys:String x:Key="Download.Versions.Title">\u7248\u672c\u5217\u8868</sys:String>
-    <sys:String x:Key="Download.Error.DownloadFailed">\u4e0b\u8f09 {0} \u4f3a\u670d\u5668\u7aef\u5931\u6557\uff0c\u8acb\u67e5\u770b\u932f\u8aa4\u8a73\u60c5</sys:String>
-    <sys:String x:Key="Download.Type.Fabric">Fabric\uff08\u5b89\u88dd\u5668\uff09</sys:String>
-    <sys:String x:Key="Download.Search.Hint">\u641c\u5c0b\u7248\u672c</sys:String>
+    <sys:String x:Key="Download.Server.Type.Vanilla">原版伺服器</sys:String>
+    <sys:String x:Key="Download.Server.SelectFolder">選擇伺服器端檔案儲存位置</sys:String>
+    <sys:String x:Key="Download.Server.DownloadStarted">伺服器端下載已開始，可在任務管理中查看進度</sys:String>
+    <sys:String x:Key="Download.Left.Server">伺服器端</sys:String>
+    <sys:String x:Key="Download.Server.Type.Title">伺服器端下載</sys:String>
+    <sys:String x:Key="Download.Server.Type.Spigot">Spigot</sys:String>
+    <sys:String x:Key="Download.Server.Error.NoServerJar">該版本沒有提供伺服器端檔案</sys:String>
+    <sys:String x:Key="Download.Server.NoResult">沒有找到符合條件的版本</sys:String>
+    <sys:String x:Key="Download.Server.Type.Paper">Paper</sys:String>
+    <sys:String x:Key="Download.Server.Type.Purpur">Purpur</sys:String>
+    <sys:String x:Key="Download.Server.Error.ListFailed">取得版本列表失敗：{0}</sys:String>
+    <sys:String x:Key="Download.Server.Loading">正在取得版本列表……</sys:String>
+    <sys:String x:Key="Download.Server.Latest.Title">最新版本</sys:String>
+    <sys:String x:Key="Download.Server.Group.Other">其他版本</sys:String>
+    <sys:String x:Key="Download.Server.Task.Download">下載伺服器端檔案</sys:String>
+    <sys:String x:Key="Download.Server.Type.Label">伺服器端類型</sys:String>
+    <sys:String x:Key="Download.Server.Type.Forge">Forge（安裝器）</sys:String>
+    <sys:String x:Key="Download.Server.Versions.Title">版本列表</sys:String>
+    <sys:String x:Key="Download.Server.Error.DownloadFailed">下載 {0} 伺服器端失敗，請查看錯誤詳情</sys:String>
+    <sys:String x:Key="Download.Server.Type.Fabric">Fabric（安裝器）</sys:String>
+    <sys:String x:Key="Download.Server.Search.Hint">搜尋版本</sys:String>
     <sys:String x:Key="Download.Left.Minecraft">Minecraft</sys:String>
     <sys:String x:Key="Download.Left.Mod">模組</sys:String>
     <sys:String x:Key="Download.Left.Modpack">模組包</sys:String>
@@ -2959,7 +2961,7 @@
     <sys:String x:Key="Setup.Misc.Update.UpToDate">已是最新版本（{0}，內部版本 {1}）</sys:String>
     <sys:String x:Key="Setup.Misc.Update.NewVersion">發現新版本：{0}</sys:String>
     <sys:String x:Key="Setup.Misc.Update.OpenRelease">前往下載</sys:String>
-    <sys:String x:Key="Setup.Misc.Update.SilentFound">\u767c\u73fe\u65b0\u7248\u672c {0}\uff0c\u53ef\u5728 \u8a2d\u5b9a \u2192 \u5176\u4ed6 \u2192 \u555f\u52d5\u5668\u66f4\u65b0 \u4e2d\u67e5\u770b</sys:String>
+    <sys:String x:Key="Setup.Misc.Update.SilentFound">發現新版本 {0}，可在 設定 → 其他 → 啟動器更新 中查看</sys:String>
 
     <!-- Setup.Misc.Network -->
 
@@ -3213,10 +3215,10 @@
     <!-- Setup.Ui.Theme -->
 
     <sys:String x:Key="Setup.Ui.Theme.Color.CatBlue">亮黃</sys:String>
-    <sys:String x:Key="Setup.Ui.Theme.Color.Custom">\u81ea\u8a02</sys:String>
-    <sys:String x:Key="Setup.Ui.Theme.Custom.Hue">\u81ea\u8a02\u8272\u76f8</sys:String>
-    <sys:String x:Key="Setup.Ui.Theme.Custom.Saturation">\u81ea\u8a02\u98fd\u548c\u5ea6</sys:String>
-    <sys:String x:Key="Setup.Ui.Theme.Custom.Lightness">\u81ea\u8a02\u660e\u5ea6</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Custom">自訂</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Custom.Hue">自訂色相</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Custom.Saturation">自訂飽和度</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Custom.Lightness">自訂明度</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.CrashBlue">金黃</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.Hmcl">HMCL</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.SkyBlue">檸黃</sys:String>
