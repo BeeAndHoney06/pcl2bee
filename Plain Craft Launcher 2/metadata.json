@@ -1,10 +1,10 @@
 {
   "name": "PCL2 Bee Edition",
   "version": {
-    "base": "1.1.0",
+    "base": "1.1.1",
     "upstream": "2.12.1",
     "suffix": "",
-    "code": 527
+    "code": 528
   },
   "licenses": [
     {
