@@ -41,12 +41,23 @@ public static class ModServerDownload
 
     private static JsonObject FetchJson(string url)
     {
+        return (JsonObject)FetchJsonNode(url);
+    }
+
+    /// <summary>获取顶层数组 JSON（部分接口如 BMCLAPI forge 列表、Fabric game 版本返回数组）。</summary>
+    private static JsonArray FetchJsonArray(string url)
+    {
+        return (JsonArray)FetchJsonNode(url);
+    }
+
+    private static JsonNode FetchJsonNode(string url)
+    {
         // 镜像优先（BMCLAPI 国内可达性远好于 Mojang/Fabric 官方源），官方源作为 FallbackUrl
         // Requester.Fetch 内部对两个 URL 各重试 3 次，失败才抛出
         var mirror = ToBmclapiMirror(url);
         var primary = mirror ?? url; // 有镜像：镜像为主；无镜像（Paper/Purpur/Spigot）：官方直连
         var fallback = mirror is not null ? url : null;
-        return (JsonObject)ModBase.GetJson(Requester.Fetch(primary, new FetchParam
+        return ModBase.GetJson(Requester.Fetch(primary, new FetchParam
         {
             Method = "GET",
             ContentType = "application/json",
@@ -194,7 +205,7 @@ public static class ModServerDownload
     private static List<ServerVersionEntry> GetForgeVersions()
     {
         // BMCLAPI 的 /forge/minecraft 返回支持的 MC 版本列表（国内快，PCL 原生同款源）
-        var list = FetchJson("https://bmclapi2.bangbang93.com/forge/minecraft");
+        var list = FetchJsonArray("https://bmclapi2.bangbang93.com/forge/minecraft");
         var result = new List<ServerVersionEntry>();
         foreach (var mcNode in list.AsArray())
         {
@@ -216,7 +227,7 @@ public static class ModServerDownload
     /// <summary>解析 Forge 指定 MC 版本最新构建的安装器下载地址（下载时调用，BMCLAPI maven 直链）。</summary>
     private static (string Url, string? Sha1) ResolveForge(string mcVersion)
     {
-        var builds = FetchJson($"https://bmclapi2.bangbang93.com/forge/minecraft/{mcVersion}");
+        var builds = FetchJsonArray($"https://bmclapi2.bangbang93.com/forge/minecraft/{mcVersion}");
         var latest = (builds.AsArray().FirstOrDefault() as JsonObject) ??
                      throw new Exception(Lang.Text("Download.Server.Error.NoServerJar"));
         var forgeVer = latest["version"]?.ToString();
@@ -233,11 +244,11 @@ public static class ModServerDownload
 
     private static List<ServerVersionEntry> GetFabricVersions()
     {
-        var game = FetchJson("https://meta.fabricmc.net/v2/versions/game").AsArray();
-        var installer = FetchJson("https://meta.fabricmc.net/v2/versions/installer");
+        var game = FetchJsonArray("https://meta.fabricmc.net/v2/versions/game");
+        var installer = FetchJsonArray("https://meta.fabricmc.net/v2/versions/installer");
         var installerVer = (installer[0] as JsonObject)?["version"]?.ToString() ?? "";
         var result = new List<ServerVersionEntry>();
-        foreach (var entry in (JsonArray)game ?? new JsonArray())
+        foreach (var entry in game)
         {
             if (entry["stable"] is JsonNode st && !st.GetValue<bool>()) continue;
             var ver = entry["version"]?.ToString() ?? "";
@@ -255,9 +266,9 @@ public static class ModServerDownload
 
     private static (string InstallerUrl, string LoaderVersion) ResolveFabric(string mcVersion)
     {
-        var loader = FetchJson("https://meta.fabricmc.net/v2/versions/loader");
+        var loader = FetchJsonArray("https://meta.fabricmc.net/v2/versions/loader");
         var loaderVer = (loader[0] as JsonObject)?["version"]?.ToString() ?? "";
-        var installer = FetchJson("https://meta.fabricmc.net/v2/versions/installer");
+        var installer = FetchJsonArray("https://meta.fabricmc.net/v2/versions/installer");
         var installerVer = (installer[0] as JsonObject)?["version"]?.ToString() ?? "";
         var url = $"https://maven.fabricmc.net/net/fabricmc/fabric-installer/{installerVer}/fabric-installer-{installerVer}.jar";
         return (url, loaderVer);
