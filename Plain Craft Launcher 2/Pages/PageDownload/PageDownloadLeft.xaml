@@ -1,4 +1,4 @@
-<local:MyPageLeft x:Class="PCL.PageDownloadLeft"
+﻿<local:MyPageLeft x:Class="PCL.PageDownloadLeft"
                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:local="clr-namespace:PCL">
@@ -138,6 +138,24 @@
             </local:MyListItem>
 
             <TextBlock Text="{DynamicResource Download.Left.Installation}" Margin="13,10,5,4" Opacity="0.6" FontSize="12" />
+            <local:MyListItem x:Name="ItemPaper" IsScaleAnimationEnabled="False" Type="RadioBox" Tag="19"
+                               Check="PageCheck"
+                               MinPaddingRight="35" Height="36" VerticalAlignment="Top"
+                               Title="Paper"
+                               LogoScale="0.95"
+                               SvgIcon="lucide/server" />
+            <local:MyListItem x:Name="ItemPurpur" IsScaleAnimationEnabled="False" Type="RadioBox" Tag="20"
+                               Check="PageCheck"
+                               MinPaddingRight="35" Height="36" VerticalAlignment="Top"
+                               Title="Purpur"
+                               LogoScale="0.95"
+                               SvgIcon="lucide/server" />
+            <local:MyListItem x:Name="ItemSpigot" IsScaleAnimationEnabled="False" Type="RadioBox" Tag="21"
+                               Check="PageCheck"
+                               MinPaddingRight="35" Height="36" VerticalAlignment="Top"
+                               Title="Spigot"
+                               LogoScale="0.95"
+                               SvgIcon="lucide/server" />
             <local:MyListItem x:Name="ItemClient" IsScaleAnimationEnabled="False" Type="RadioBox" Tag="9"
                               Check="PageCheck"
                               MinPaddingRight="35" Height="36" VerticalAlignment="Top"

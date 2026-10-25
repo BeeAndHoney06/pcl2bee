@@ -39,6 +39,7 @@ public static class ModMain
     public static PageDownloadLeft? frmDownloadLeft;
     public static PageDownloadInstall? frmDownloadInstall;
     public static PageDownloadClient? frmDownloadClient;
+    public static PageDownloadServer? frmDownloadServer;
     public static PageDownloadOptiFine? frmDownloadOptiFine;
     public static PageDownloadLiteLoader? frmDownloadLiteLoader;
     public static PageDownloadForge? frmDownloadForge;

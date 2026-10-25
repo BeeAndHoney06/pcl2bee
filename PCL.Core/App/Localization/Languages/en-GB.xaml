@@ -1,4 +1,4 @@
-<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. -->
+﻿<!-- Formatted by xaml-lang-formatter at 2026-06-28T17:16:52. -->
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -710,27 +710,6 @@
     <sys:String x:Key="Download.Server.Latest.Title">Latest versions</sys:String>
     <sys:String x:Key="Download.Server.Group.Other">Other versions</sys:String>
     <sys:String x:Key="Download.Server.Task.Download">Downloading server file</sys:String>
-    <sys:String x:Key="Download.Server.Page.Title">Server core downloads</sys:String>
-    <sys:String x:Key="Download.Server.Page.Description">Supports Vanilla, Paper, Purpur, Spigot, Forge and Fabric servers. Pick a game version (and a build number where available) to download.</sys:String>
-    <sys:String x:Key="Download.Server.Label.Type">Server type</sys:String>
-    <sys:String x:Key="Download.Server.Label.Version">Game version</sys:String>
-    <sys:String x:Key="Download.Server.Label.Build">Build</sys:String>
-    <sys:String x:Key="Download.Server.Button.Download">Download</sys:String>
-    <sys:String x:Key="Download.Server.Button.Refresh">Refresh</sys:String>
-    <sys:String x:Key="Download.Server.Button.Downloading">Downloading {0}%</sys:String>
-    <sys:String x:Key="Download.Server.Hint.Ready">Pick a server type and version, then click Download.</sys:String>
-    <sys:String x:Key="Download.Server.Hint.ReadyType">{0} selected. Click Download to continue.</sys:String>
-    <sys:String x:Key="Download.Server.Hint.Loading">Loading version list…</sys:String>
-    <sys:String x:Key="Download.Server.Hint.LoadingBuilds">Loading build list…</sys:String>
-    <sys:String x:Key="Download.Server.Hint.BuildsLoaded">{0} {1}: {2} builds available.</sys:String>
-    <sys:String x:Key="Download.Server.Hint.Downloading">Downloading {0} …</sys:String>
-    <sys:String x:Key="Download.Server.Hint.Downloaded">Downloaded: {0}</sys:String>
-    <sys:String x:Key="Download.Server.BuildItem">Build {0}</sys:String>
-    <sys:String x:Key="Download.Server.Spigot.Note">Spigot has no official direct download. BuildTools.jar has been selected: run java -jar BuildTools.jar --rev {0} with Java 17+ and Git installed to build the server.</sys:String>
-    <sys:String x:Key="Download.Server.FileFilter">Jar files (*.jar)|*.jar</sys:String>
-    <sys:String x:Key="Download.Server.Error.SelectVersion">Please select a game version first.</sys:String>
-    <sys:String x:Key="Download.Server.Error.BuildsFailed">Failed to load build list: {0}</sys:String>
-    <sys:String x:Key="Download.Server.Error.ResolveFailed">Failed to resolve download info: {0}</sys:String>
     <sys:String x:Key="Download.Server.Type.Label">Server type</sys:String>
     <sys:String x:Key="Download.Server.Type.Forge">Forge (installer)</sys:String>
     <sys:String x:Key="Download.Server.Versions.Title">Versions</sys:String>
