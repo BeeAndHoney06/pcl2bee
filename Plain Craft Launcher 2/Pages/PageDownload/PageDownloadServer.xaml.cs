@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Net.Http;
 using System.Text.Json;
 using System.Windows.Controls;
@@ -9,16 +9,21 @@ namespace PCL;
 
 public partial class PageDownloadServer
 {
-    private const string PaperApi = "https://api.papermc.io/v2/projects/paper";
+    private const string PaperApi = "https://fill.papermc.io/v3/projects/paper";
     private const string PurpurApi = "https://api.purpurmc.org/v2/purpur";
     private const string MojangManifest = "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
     private const string BuildToolsUrl =
         "https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar";
 
-    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(60) };
+    private static readonly HttpClient Http = new() { Timeout = TimeSpan.FromSeconds(120) };
+
+    static PageDownloadServer()
+    {
+        Http.DefaultRequestHeaders.UserAgent.ParseAdd("PCL2-BeeEdition/1.1.0");
+    }
     private static readonly string[] Types = ["Paper", "Purpur", "Spigot"];
 
-    private readonly List<(int Build, string Name)> _paperBuilds = [];
+    private readonly List<(int Build, string Url)> _paperBuilds = [];
     private readonly List<int> _purpurBuilds = [];
     private bool _ready;
 
@@ -85,9 +90,10 @@ public partial class PageDownloadServer
                 case "Paper":
                 {
                     using var doc = JsonDocument.Parse(await Http.GetStringAsync(PaperApi));
-                    versions.AddRange(doc.RootElement.GetProperty("versions").EnumerateArray()
-                        .Select(v => v.GetString() ?? "").Where(v => v.Length > 0));
-                    versions.Reverse();
+                    foreach (var prop in doc.RootElement.GetProperty("versions").EnumerateObject())
+                        foreach (var v in prop.Value.EnumerateArray())
+                            versions.Add(v.GetString() ?? "");
+                    versions = versions.Where(v => v.Length > 0).Distinct().OrderByDescending(v => v).ToList();
                     break;
                 }
                 case "Purpur":
@@ -144,16 +150,24 @@ public partial class PageDownloadServer
         {
             if (type == "Paper")
             {
+                // Fill API：/builds 返回数组，下载地址在 downloads["server:default"].url
                 using var doc = JsonDocument.Parse(
                     await Http.GetStringAsync($"{PaperApi}/versions/{version}/builds"));
-                foreach (var build in doc.RootElement.GetProperty("builds").EnumerateArray())
+                foreach (var item in doc.RootElement.EnumerateArray())
                 {
-                    var number = build.GetProperty("build").GetInt32();
-                    var name = build.GetProperty("downloads").GetProperty("application")
-                        .GetProperty("name").GetString() ?? $"paper-{version}-{number}.jar";
-                    _paperBuilds.Add((number, name));
+                    if (!item.TryGetProperty("id", out var idElement) || !idElement.TryGetInt32(out var number))
+                        continue;
+                    if (!item.TryGetProperty("downloads", out var downloads) ||
+                        !downloads.TryGetProperty("server:default", out var serverDownload))
+                        continue;
+                    var url = serverDownload.TryGetProperty("url", out var urlElement)
+                        ? urlElement.GetString() ?? ""
+                        : "";
+                    if (string.IsNullOrWhiteSpace(url)) continue;
+                    _paperBuilds.Add((number, url));
                 }
 
+                _paperBuilds.Reverse();
                 foreach (var build in Enumerable.Reverse(_paperBuilds))
                     ComboBuild.Items.Add($"Build {build.Build}");
             }
@@ -201,8 +215,8 @@ public partial class PageDownloadServer
             }
 
             var build = _paperBuilds[_paperBuilds.Count - 1 - buildIndex];
-            url = $"{PaperApi}/versions/{version}/builds/{build.Build}/downloads/{build.Name}";
-            fileName = build.Name;
+            url = build.Url;
+            fileName = $"paper-{version}-{build.Build}.jar";
         }
         else
         {
