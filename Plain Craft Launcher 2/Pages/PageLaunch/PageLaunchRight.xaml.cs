@@ -170,7 +170,8 @@ public partial class PageLaunchRight : IRefreshable
 
                 case 8:
                     LogWrapper.Info("[Page] 主页预设：PCL GitHub 仪表盘");
-                    url = "https://raw.githubusercontent.com/BeeAndHoney06/pcl2bee/web/Custom.xaml";
+                    // 第三方作者服务（Deep-Dark-Forest），保留原源
+                    url = "https://ddf.pcl-community.org/Custom.xaml";
                     content = LoadFromNetwork(url);
                     break;
 
