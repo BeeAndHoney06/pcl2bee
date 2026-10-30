@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualBasic.CompilerServices;
+using Microsoft.VisualBasic.CompilerServices;
 using PCL.Core.App;
 using PCL.Core.Utils;
 using System.Collections;
@@ -39,6 +39,14 @@ public static class ModLoader
     {
         try
         {
+            // 无任何任务时直接返回：绝大多数时候都没有下载任务，
+            // 每 50ms 切 UI 线程更新进度条会造成可观的空转占用
+            if (loaderTaskbar.Count == 0)
+            {
+                if (loaderTaskbarProgressLast != TaskbarItemProgressState.None) return; // 状态未变，无需处理
+                return;
+            }
+
             TaskbarItemProgressState newState;
             var newProgress = LoaderTaskbarProgressGet();
             // 若单个任务已中止，或全部任务已完成，则刷新并移除
@@ -52,11 +60,14 @@ public static class ModLoader
                 }
 
             // 更新平滑后的进度
+            var oldProgress = loaderTaskbarProgress;
             if (newProgress <= 0d || newProgress >= 1d || loaderTaskbarProgress > newProgress)
                 loaderTaskbarProgress = newProgress;
             else
                 loaderTaskbarProgress = loaderTaskbarProgress * 0.9d + newProgress * 0.1d;
-            ModBase.RunInUi(() => ModMain.frmMain.BtnExtraDownload.Progress = loaderTaskbarProgress);
+            // 仅在进度实际变化时才切 UI 线程刷新，避免无意义的跨线程调用
+            if (Math.Abs(oldProgress - loaderTaskbarProgress) > 0.001d)
+                ModBase.RunInUi(() => ModMain.frmMain.BtnExtraDownload.Progress = loaderTaskbarProgress);
             // 更新任务栏信息
             if (!loaderTaskbar.Any() || loaderTaskbarProgress == 1d)
             {

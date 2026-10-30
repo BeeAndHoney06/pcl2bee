@@ -100,6 +100,15 @@ public static class ModMain
     private static int timer4Count;
     private static int timer150Count;
 
+    /// <summary>上次执行低频任务的时间戳（Environment.TickCount64）。</summary>
+    private static long lastLongTaskTime;
+
+    /// <summary>
+    ///     最近一轮主时钟中是否存在需要立即响应的工作（拖拽、弹窗、下载任务）。
+    ///     用于主循环的空闲节流：无工作时降低轮询频率以减少空转占用。
+    /// </summary>
+    private static volatile bool TimerMainHasWork;
+
     /// <summary>
     ///     等待显示的弹窗。
     /// </summary>
@@ -107,6 +116,8 @@ public static class ModMain
 
     private static void TimerMain()
     {
+        // 本轮是否有需要立即响应的工作：用于主循环的空闲节流
+        var hasWork = false;
         try
         {
             #region 每 50ms 执行一次的代码
@@ -114,6 +125,10 @@ public static class ModMain
             HintService.Tick();
             MyMsgBoxTick();
             frmMain!.DragTick();
+            // 正在拖拽窗口 / 有弹窗 / 有下载任务时，需要保持 50ms 的高频率响应
+            hasWork = ModMain.dragControl is not null
+                      || WaitingMyMsgBox.Count > 0
+                      || ModLoader.loaderTaskbar.Count > 0;
             ModLoader.LoaderTaskbarProgressRefresh();
         }
 
@@ -126,6 +141,10 @@ public static class ModMain
                 "短程主时钟执行异常",
                 ModBase.LogLevel.Critical,
                 userSummary: Lang.Text("Main.Error.OperationFailed"));
+        }
+        finally
+        {
+            TimerMainHasWork = hasWork;
         }
 
         timer4Count += 1;
@@ -145,10 +164,12 @@ public static class ModMain
             }
         }
 
-        timer150Count += 1;
-        if (timer150Count == 150)
+        // 低频任务改为按真实时间触发：主循环空闲时轮询间隔会被拉长，
+        // 若继续用「次数」计数会让这类任务实际执行周期大幅变长。
+        var now = Environment.TickCount64;
+        if (now - lastLongTaskTime >= 7500)
         {
-            timer150Count = 0;
+            lastLongTaskTime = now;
             try
             {
                 #region 每 7.5s 执行一次的代码
@@ -185,10 +206,24 @@ public static class ModMain
         {
             try
             {
+                // 空闲时把轮询间隔拉长到 500ms：绝大多数时候没有任何事情需要做，
+                // 50ms 一次的跨线程 UI 调用会造成可观的空转占用（尤其在笔记本上影响续航）。
+                // 一旦出现交互需求（拖拽、弹窗、下载任务）会立刻恢复到 50ms。
+                var idleRounds = 0;
                 while (true)
                 {
                     ModBase.RunInUiWait(TimerMain);
-                    Thread.Sleep((int)Math.Round(50d * 0.98d));
+                    if (TimerMainHasWork)
+                    {
+                        idleRounds = 0;
+                        Thread.Sleep((int)Math.Round(50d * 0.98d));
+                    }
+                    else
+                    {
+                        idleRounds++;
+                        var sleep = idleRounds < 20 ? 50 : idleRounds < 60 ? 200 : 500;
+                        Thread.Sleep(sleep);
+                    }
                 }
             }
             catch (Exception ex)

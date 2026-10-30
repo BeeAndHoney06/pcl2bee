@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Text;
 using System.Windows;
@@ -42,6 +42,15 @@ public static partial class ModAnimation
                 ModBase.Log("[Animation] 动画线程开始");
                 while (true)
                 {
+                    // 没有动画时休眠等待，避免以 FPS 上限持续切换 UI 线程造成空转占用；
+                    // 有新动画时 AniStart 会通过信号立即唤醒本线程
+                    if (aniGroups.IsEmpty)
+                    {
+                        aniWakeSignal.WaitOne(200);
+                        aniLastTick = TimeUtils.GetTimeTick();
+                        continue;
+                    }
+
                     // 两帧之间的间隔时间
                     var deltaTime =
                         (long)Math.Round(ModBase.MathClamp(TimeUtils.GetTimeTick() - aniLastTick, 0, 100000));
@@ -442,6 +451,12 @@ public static partial class ModAnimation
     ///     动画组列表。
     /// </summary>
     public static ConcurrentDictionary<string, AniGroupEntry> aniGroups = new();
+
+    /// <summary>
+    ///     动画线程的唤醒信号：没有动画时线程会休眠等待，有新动画时立即唤醒。
+    ///     用于避免在完全空闲时仍按 FPS 上限持续切换 UI 线程造成空转占用。
+    /// </summary>
+    private static readonly AutoResetEvent aniWakeSignal = new(false);
 
     public class AniGroupEntry
     {
@@ -1486,6 +1501,8 @@ public static partial class ModAnimation
         else
             AniStop(name);
         aniGroups.TryAdd(name, newEntry);
+        // 唤醒动画线程：此前若因没有动画而休眠，需要立即恢复刷新
+        aniWakeSignal.Set();
     }
 
     /// <summary>

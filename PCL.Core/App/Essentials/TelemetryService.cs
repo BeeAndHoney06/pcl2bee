@@ -13,10 +13,11 @@ using PCL.Core.IO.Net;
 using PCL.Core.IO.Net.Dns;
 using PCL.Core.Logging;
 using PCL.Core.Utils.OS;
+#if DEBUG || CI || DEBUGCI
 using STUN.Client;
 using Sentry;
 using Sentry.Extensibility;
-
+#endif
 namespace PCL.Core.App.Essentials;
 
 [LifecycleScope("telemetry", "遥测")]
@@ -25,6 +26,7 @@ public sealed partial class TelemetryService
 {
     private static void _InitSentry()
     {
+#if DEBUG || CI || DEBUGCI
         Context.Info("开始初始化 Sentry SDK");
         var dsn = EnvironmentInterop.GetSecret("SENTRY_DSN");
         if (dsn is null)
@@ -79,11 +81,16 @@ public sealed partial class TelemetryService
         });
         
         Context.Info("Sentry SDK 初始化完成");
+#else
+        // 正式发布版本不包含 Sentry：崩溃上报需要 SENTRY_DSN 环境变量，普通用户永远不会启用
+        Context.Info("当前构建不包含 Sentry 崩溃上报组件");
+#endif
     }
 
     // 错误上报
     public static void ReportException(Exception ex, string plain, LogLevel level)
     {
+#if DEBUG || CI || DEBUGCI
         var sentryEvent = new SentryEvent(ex)
         {
             Level = level.RealLevel() switch
@@ -103,6 +110,7 @@ public sealed partial class TelemetryService
         }
         
         SentrySdk.CaptureEvent(sentryEvent);
+#endif
     }
 
     // 设备环境上报
@@ -110,6 +118,7 @@ public sealed partial class TelemetryService
     {
         Context.Info("正在上报设备环境调查数据");
         
+#if DEBUG || CI || DEBUGCI
         SentrySdk.ConfigureScope(scope =>
         {
             scope.Contexts["Telemetry"] = content;
@@ -124,6 +133,10 @@ public sealed partial class TelemetryService
         {
             Context.Error("设备环境调查数据发送失败，请检查网络连接以及使用的版本", ex);
         }
+#else
+        // 正式发布版本不含 Sentry，遥测数据无需上报
+        Context.Info("当前构建不包含遥测上报组件，已跳过");
+#endif
     }
 
     // ReSharper disable UnusedAutoPropertyAccessor.Local
@@ -154,6 +167,7 @@ public sealed partial class TelemetryService
     private static async Task _StartAsync()
     {
         if (!Config.System.Telemetry) return;
+#if DEBUG || CI || DEBUGCI
         _InitSentry();
         
         var appDataFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
@@ -200,9 +214,11 @@ public sealed partial class TelemetryService
         };
         
         _ReportDeviceEnvironment(telemetry);
+#endif
     }
     
     // 用来细分过滤 SocketException 的过滤器，我觉得应该除了遥测服务之外没有其他东西会用到这破玩意儿
+#if DEBUG || CI || DEBUGCI
     private sealed class SocketExceptionFilter : IExceptionFilter
     {
         public bool Filter(Exception ex)
@@ -219,10 +235,13 @@ public sealed partial class TelemetryService
             return false;
         }
     }
+#endif
     
     [LifecycleStop]
     private static void _StopAsync()
     {
+#if DEBUG || CI || DEBUGCI
         SentrySdk.Close();
+#endif
     }
 }
