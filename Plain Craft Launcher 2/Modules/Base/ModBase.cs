@@ -2238,9 +2238,24 @@ public static class ModBase
 
     #region 系统
 
+    [DllImport("kernel32", EntryPoint = "GetACP")]
+    private static extern int GetSystemAnsiCodePage();
+
+    /// <summary>
+    ///     系统 ANSI 代码页是否为 UTF-8。
+    ///     注意：.NET Core 起 <see cref="Encoding.Default" /> 恒为 UTF-8，无法反映系统代码页，
+    ///     必须调用 Win32 的 GetACP 获取真实值，否则所有非 ASCII 路径用户都会被误判。
+    /// </summary>
     public static bool IsUtf8CodePage()
     {
-        return Encoding.Default.CodePage == 65001;
+        try
+        {
+            return GetSystemAnsiCodePage() == 65001;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
     /// <summary>

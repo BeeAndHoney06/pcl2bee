@@ -26,15 +26,25 @@ public partial class PageComp
             ModBase.Log($"[Comp] 开始可视化{TypeNameSpaced}列表，已储藏 {storage.results.Count} 个结果，当前在第 {page + 1} 页");
             // 列表项
             PanProjects.Children.Clear();
-            var index = Math.Min(page * pageSize, storage.results.Count - 1);
-            foreach (var result in storage.results.GetRange(index, Math.Min(storage.results.Count - index, pageSize)))
+            // 结果为空时不能按索引切片（会算出负数区间导致整页空白），此处单独处理
+            if (storage.results.Count > 0)
             {
-                var showQuickDownload = result.Type != ModComp.CompType.ModPack &&
-                                        result.Type != ModComp.CompType.DataPack;
-                PanProjects.Children.Add(result.ToCompItem(loader.input.gameVersion is null,
-                    loader.input.modLoader == ModComp.CompLoaderType.Any &&
-                    (PageType == ModComp.CompType.Mod || PageType == ModComp.CompType.ModPack),
-                    showQuickDownload));
+                var index = Math.Min(page * pageSize, storage.results.Count - 1);
+                foreach (var result in storage.results.GetRange(index,
+                             Math.Min(storage.results.Count - index, pageSize)))
+                {
+                    var showQuickDownload = result.Type != ModComp.CompType.ModPack &&
+                                            result.Type != ModComp.CompType.DataPack;
+                    PanProjects.Children.Add(result.ToCompItem(loader.input.gameVersion is null,
+                        loader.input.modLoader == ModComp.CompLoaderType.Any &&
+                        (PageType == ModComp.CompType.Mod || PageType == ModComp.CompType.ModPack),
+                        showQuickDownload));
+                }
+            }
+            else
+            {
+                // 无结果时给出明确提示，避免用户看到空白页面
+                ModBase.Log($"[Comp] {TypeNameSpaced}列表没有结果");
             }
             // 页码
             CardPages.Visibility =
@@ -54,14 +64,23 @@ public partial class PageComp
             BtnPageRight.IsEnabled = isRightEnabled;
             BtnPageRight.Opacity = isRightEnabled ? 1d : 0.2d;
             // 错误信息
-            if (storage.errorMessage is null)
+            var errorText = storage.errorMessage;
+            if (string.IsNullOrEmpty(errorText) && loader.State == ModBase.LoadState.Failed)
+            {
+                // 加载失败：把加载器的错误原因显示出来，避免用户只看到空白页面
+                errorText = loader.Error?.Message;
+                if (string.IsNullOrEmpty(errorText))
+                    errorText = Lang.Text("Application.Control.Loading.Failed");
+            }
+
+            if (string.IsNullOrEmpty(errorText))
             {
                 HintError.Visibility = Visibility.Collapsed;
             }
             else
             {
                 HintError.Visibility = Visibility.Visible;
-                HintError.Text = storage.errorMessage;
+                HintError.Text = errorText;
             }
 
             // 强制返回顶部

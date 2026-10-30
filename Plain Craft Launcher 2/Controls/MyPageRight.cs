@@ -94,6 +94,7 @@ public class MyPageRight : AdornerDecorator
         pageLoaderAutoRun = autoRun;
         // 添加结束 Invoke
         if (finishedInvoke is not null)
+        {
             realLoader.PreviewFinish += _ =>
             {
                 while (PageState == PageStates.PageExit || PageState == PageStates.ContentExit)
@@ -101,6 +102,14 @@ public class MyPageRight : AdornerDecorator
                 ModBase.RunInUiWait(() => finishedInvoke(realLoader));
                 Thread.Sleep(20); // 由于大量初始化控件会导致掉帧，延迟触发 State 改变事件
             };
+            // 加载失败时不会触发 PreviewFinish，此处补一次回调，
+            // 让页面能把错误信息显示出来（否则用户只会看到空白页面）
+            realLoader.OnStateChangedUi += (loader, newState, _) =>
+            {
+                if (newState != ModBase.LoadState.Failed) return;
+                ModBase.RunInUiWait(() => finishedInvoke(realLoader));
+            };
+        }
         realLoader.OnStateChangedUi += (loader, newState, oldState) =>
             ModBase.RunInUi(() => PageLoaderState(loader, newState, oldState));
         // 隐藏 UI
@@ -485,6 +494,34 @@ public class MyPageRight : AdornerDecorator
         switch (newState)
         {
             case ModBase.LoadState.Failed:
+            {
+                if (oldState == ModBase.LoadState.Failed || oldState == ModBase.LoadState.Loading)
+                    return;
+                if (ModBase.modeDebug)
+                    ModBase.Log("[UI] 已触发 PageLoaderState (Failed)");
+                // 加载失败时也必须恢复内容区，否则用户会看到一片空白（无法重试、看不到错误信息）
+                switch (PageState)
+                {
+                    case PageStates.ContentEnter:
+                    case PageStates.ContentStay:
+                    case PageStates.LoaderWait:
+                    case PageStates.LoaderStay:
+                    {
+                        PageState = PageStates.ContentStay;
+                        panContent.Visibility = Visibility.Visible;
+                        panLoader.Visibility = Visibility.Collapsed;
+                        panAlways?.Visibility = Visibility.Visible;
+                        break;
+                    }
+                    case PageStates.LoaderExit:
+                    {
+                        PageState = PageStates.ContentExit;
+                        break;
+                    }
+                }
+
+                break;
+            }
             case ModBase.LoadState.Loading:
             {
                 if (oldState == ModBase.LoadState.Failed || oldState == ModBase.LoadState.Loading)
