@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Security;
 using System.Windows;
 using PCL.Core.App.Localization;

@@ -1,4 +1,4 @@
-﻿using PCL.Core.App.Localization;
+using PCL.Core.App.Localization;
 using PCL.Core.Logging;
 using PCL.Core.Utils;
 using PCL.Core.Utils.Exts;

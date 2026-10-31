@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Windows.Controls;
 using System.Windows.Input;
 using PCL.Core.App;

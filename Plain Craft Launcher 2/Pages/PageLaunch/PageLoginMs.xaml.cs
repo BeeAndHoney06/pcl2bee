@@ -1,4 +1,4 @@
-﻿using System.Security.Authentication;
+using System.Security.Authentication;
 using System.Windows;
 using PCL.Core.App.Localization;
 using PCL.Core.Minecraft.Profile;

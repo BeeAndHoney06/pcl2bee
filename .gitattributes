@@ -4,6 +4,27 @@
 * text=auto
 
 ###############################################################################
+# 编码与换行规范
+#
+# 历史上出现过「UTF-8 内容被按 GBK 解码后写回」造成的注释乱码，
+# 根源是不同工具链默认编码不一致。此处显式声明：
+#   - 所有文本文件以 UTF-8（无 BOM）存储
+#   - 文本文件统一使用 LF 换行（Windows 检出时由 Git 处理）
+# 配合 .editorconfig 中的 charset / end_of_line 声明一起生效。
+###############################################################################
+*.cs        text eol=lf working-tree-encoding=UTF-8
+*.xaml      text eol=lf working-tree-encoding=UTF-8
+*.csproj    text eol=lf working-tree-encoding=UTF-8
+*.props     text eol=lf working-tree-encoding=UTF-8
+*.targets   text eol=lf working-tree-encoding=UTF-8
+*.json      text eol=lf working-tree-encoding=UTF-8
+*.yml       text eol=lf working-tree-encoding=UTF-8
+*.yaml      text eol=lf working-tree-encoding=UTF-8
+*.md        text eol=lf working-tree-encoding=UTF-8
+*.txt       text eol=lf working-tree-encoding=UTF-8
+*.editorconfig text eol=lf working-tree-encoding=UTF-8
+
+###############################################################################
 # Set default behavior for command prompt diff.
 #
 # This is need for earlier builds of msysgit that does not have it on by
