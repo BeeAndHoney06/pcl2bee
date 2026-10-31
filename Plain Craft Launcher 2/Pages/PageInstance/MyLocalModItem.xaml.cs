@@ -792,7 +792,8 @@ public partial class MyLocalCompItem
                 var rect = new Border
                 {
                     Name = "RectBack",
-                    CornerRadius = new CornerRadius(3d),
+                    // 与列表项、卡片统一的圆角矩形磁贴
+                    CornerRadius = new CornerRadius(6d),
                     RenderTransform = new ScaleTransform(0.8d, 0.8d),
                     RenderTransformOrigin = new Point(0.5d, 0.5d),
                     BorderThickness = new Thickness(ModBase.GetWPFSize(1d)),

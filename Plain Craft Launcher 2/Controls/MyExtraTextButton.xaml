@@ -9,14 +9,15 @@
     <Grid.RenderTransform>
         <ScaleTransform ScaleX="0" ScaleY="0" />
     </Grid.RenderTransform>
+    <!-- 圆角取高度的 0.5，保证与其余按钮一致为胶囊形 -->
     <Border x:Name="PanClick" BorderThickness="0.001" Background="{StaticResource ColorBrushSemiTransparent}"
-            CornerRadius="{Binding ActualHeight, ConverterParameter=0.4, Converter={StaticResource MultiplicationConverter}, ElementName=PanBack, Mode=OneWay}" />
+            CornerRadius="{Binding ActualHeight, ConverterParameter=0.5, Converter={StaticResource MultiplicationConverter}, ElementName=PanBack, Mode=OneWay}" />
     <Grid x:Name="PanScale" IsHitTestVisible="False" RenderTransformOrigin="0.5,0.5" Margin="0,10,0,0">
         <Grid.RenderTransform>
             <ScaleTransform />
         </Grid.RenderTransform>
         <Border x:Name="PanColor" BorderThickness="0.001" Background="{DynamicResource ColorBrush3}"
-                CornerRadius="{Binding ActualHeight, ConverterParameter=0.4, Converter={StaticResource MultiplicationConverter}, ElementName=PanBack, Mode=OneWay}">
+                CornerRadius="{Binding ActualHeight, ConverterParameter=0.5, Converter={StaticResource MultiplicationConverter}, ElementName=PanBack, Mode=OneWay}">
             <Border.Effect>
                 <DropShadowEffect ShadowDepth="0" BlurRadius="10" Opacity="0.2" />
             </Border.Effect>

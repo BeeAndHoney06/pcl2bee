@@ -157,6 +157,16 @@ public sealed partial class ThemeService
             ColorTheme.CatBlue => (100, 0.50, 0.45),
             ColorTheme.DeathBlue => (105, 0.35, 0.30),
             ColorTheme.HmclBlue => (85, 0.45, 0.25),
+            // 海蓝：色相取 OKLCH 蓝色区间，明度调整略低于黄色主题以保证浅色模式下的可读性
+            ColorTheme.OceanBlue => (256, 0.25, 0.45),
+            // 彩虹系列：在 OKLCH 色相环上均分取色，明度调整按色相本身的感知亮度微调。
+            // 红、绿、青、紫的彩度上限低于黄蓝，过高的彩度会被裁剪成灰白，因此适当降低彩度调整值。
+            ColorTheme.RainbowRed => (29, 0.22, 0.42),
+            ColorTheme.RainbowOrange => (60, 0.30, 0.45),
+            ColorTheme.RainbowYellow => (100, 0.45, 0.45),
+            ColorTheme.RainbowGreen => (145, 0.22, 0.40),
+            ColorTheme.RainbowCyan => (195, 0.22, 0.40),
+            ColorTheme.RainbowPurple => (310, 0.20, 0.42),
             // 自定义主题：色相直接取用户 HSL 的 H（角度制一致）；
             // 饱和度/明度映射为亮度与彩度调整（与预设主题的参数范围对齐）
             ColorTheme.Custom => (

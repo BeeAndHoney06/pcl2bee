@@ -38,6 +38,17 @@ public enum ColorTheme
     CatBlue = 1,
     DeathBlue = 2,
     HmclBlue = 3,
+    OceanBlue = 4,
+
+    // 彩虹系列：与海蓝（OceanBlue = 4）一起组成红、橙、黄、绿、青、蓝、紫七色。
+    // 使用 12 起始的空闲区段，避免与既有的 Custom = 10 冲突，旧配置文件仍可正常读取。
+    RainbowRed = 12,
+    RainbowOrange = 13,
+    RainbowYellow = 14,
+    RainbowGreen = 15,
+    RainbowCyan = 16,
+    RainbowPurple = 17,
+
     Custom = 10
 }
 

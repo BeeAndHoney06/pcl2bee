@@ -4,7 +4,8 @@
         FocusVisualStyle="{x:Null}" x:Name="PanBack"
         Focusable="True" UseLayoutRounding="False" SnapsToDevicePixels="False"
         Background="{StaticResource ColorBrushSemiTransparent}">
-    <Border CornerRadius="3" x:Name="PanFore" BorderThickness="1" BorderBrush="{DynamicResource ColorBrush1}"
+    <!-- CornerRadius 会在 MyButton.xaml.cs 中按实际高度的一半刷新为胶囊 -->
+    <Border CornerRadius="999" x:Name="PanFore" BorderThickness="1" BorderBrush="{DynamicResource ColorBrush1}"
             RenderTransformOrigin="0.5,0.5" Background="{DynamicResource ColorBrushHalfWhite}">
         <Border.RenderTransform>
             <ScaleTransform />

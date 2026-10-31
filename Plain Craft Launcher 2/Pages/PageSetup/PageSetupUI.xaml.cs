@@ -12,28 +12,53 @@ namespace PCL;
 
 public partial class PageSetupUI
 {
-    public string[] ThemeColors => Basics.IsAprilFool
-        ? [Lang.Text("Setup.Ui.Theme.Color.SkyBlue"), Lang.Text("Setup.Ui.Theme.Color.CatBlue"), Lang.Text("Setup.Ui.Theme.Color.CrashBlue"), Lang.Text("Setup.Ui.Theme.Color.Hmcl")]
-        : [Lang.Text("Setup.Ui.Theme.Color.SkyBlue"), Lang.Text("Setup.Ui.Theme.Color.CatBlue"), Lang.Text("Setup.Ui.Theme.Color.CrashBlue"), Lang.Text("Setup.Ui.Theme.Color.Custom")];
+    /// <summary>
+    ///     主题下拉的显示顺序：原有主题 + 彩虹七色（海蓝 + 红橙黄绿青紫）。
+    ///     愚人节模式下用 HMCL 顶替“自定义”，避免把自定义配置误写成 HMCL。
+    /// </summary>
+    private static ColorTheme[] ThemeList => Basics.IsAprilFool
+        ?
+        [
+            ColorTheme.SkyBlue, ColorTheme.CatBlue, ColorTheme.DeathBlue,
+            ColorTheme.OceanBlue, ColorTheme.RainbowRed, ColorTheme.RainbowOrange, ColorTheme.RainbowYellow,
+            ColorTheme.RainbowGreen, ColorTheme.RainbowCyan, ColorTheme.RainbowPurple,
+            ColorTheme.HmclBlue
+        ]
+        :
+        [
+            ColorTheme.SkyBlue, ColorTheme.CatBlue, ColorTheme.DeathBlue,
+            ColorTheme.OceanBlue, ColorTheme.RainbowRed, ColorTheme.RainbowOrange, ColorTheme.RainbowYellow,
+            ColorTheme.RainbowGreen, ColorTheme.RainbowCyan, ColorTheme.RainbowPurple,
+            ColorTheme.Custom
+        ];
 
-    /// <summary>主题下拉索引 ↔ ColorTheme 枚举转换（下拉第 4 项 = Custom(10)）。</summary>
-    private static ColorTheme IndexToTheme(int index) => index switch
+    public string[] ThemeColors => ThemeList.Select(theme => Lang.Text(ThemeNameKey(theme))).ToArray();
+
+    private static string ThemeNameKey(ColorTheme theme) => theme switch
     {
-        0 => ColorTheme.SkyBlue,
-        1 => ColorTheme.CatBlue,
-        2 => ColorTheme.DeathBlue,
-        3 => ColorTheme.HmclBlue, // 愚人节隐藏项
-        _ => ColorTheme.Custom
+        ColorTheme.SkyBlue => "Setup.Ui.Theme.Color.SkyBlue",
+        ColorTheme.CatBlue => "Setup.Ui.Theme.Color.CatBlue",
+        ColorTheme.DeathBlue => "Setup.Ui.Theme.Color.CrashBlue",
+        ColorTheme.HmclBlue => "Setup.Ui.Theme.Color.Hmcl",
+        ColorTheme.OceanBlue => "Setup.Ui.Theme.Color.OceanBlue",
+        ColorTheme.RainbowRed => "Setup.Ui.Theme.Color.RainbowRed",
+        ColorTheme.RainbowOrange => "Setup.Ui.Theme.Color.RainbowOrange",
+        ColorTheme.RainbowYellow => "Setup.Ui.Theme.Color.RainbowYellow",
+        ColorTheme.RainbowGreen => "Setup.Ui.Theme.Color.RainbowGreen",
+        ColorTheme.RainbowCyan => "Setup.Ui.Theme.Color.RainbowCyan",
+        ColorTheme.RainbowPurple => "Setup.Ui.Theme.Color.RainbowPurple",
+        _ => "Setup.Ui.Theme.Color.Custom"
     };
 
-    private static int ThemeToIndex(ColorTheme theme) => theme switch
+    /// <summary>主题下拉索引 → ColorTheme。</summary>
+    private static ColorTheme IndexToTheme(int index)
     {
-        ColorTheme.SkyBlue => 0,
-        ColorTheme.CatBlue => 1,
-        ColorTheme.DeathBlue => 2,
-        ColorTheme.HmclBlue => 3,
-        _ => 4 // Custom（非愚人节下拉里索引 3）
-    };
+        var list = ThemeList;
+        return index >= 0 && index < list.Length ? list[index] : ColorTheme.Custom;
+    }
+
+    /// <summary>ColorTheme → 主题下拉索引；返回 -1 表示当前列表中不存在该项（如愚人节模式下配置了自定义主题）。</summary>
+    private static int ThemeToIndex(ColorTheme theme) => Array.IndexOf(ThemeList, theme);
 
     private void RefreshCustomColorVisibility()
     {

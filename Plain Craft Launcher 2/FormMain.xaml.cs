@@ -669,6 +669,105 @@ public partial class FormMain
         leftColumns[0].MaxWidth = available <= 0d ? 0d : available;
     }
 
+    // 顶部标签栏拖拽切换
+
+    private Point _titleSelectDragStart;
+    private bool _titleSelectDragging;
+    private MyRadioButton _titleSelectDragSource;
+    private MyRadioButton _titleSelectDragTarget;
+
+    /// <summary>
+    ///     记录按下的起点。真正的拖拽要等位移超过阈值后才开始，避免干扰正常点击。
+    /// </summary>
+    private void PanTitleSelect_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        _titleSelectDragStart = e.GetPosition(PanTitleSelect);
+        _titleSelectDragging = false;
+        _titleSelectDragSource = null;
+        _titleSelectDragTarget = null;
+    }
+
+    /// <summary>
+    ///     按住顶部标签栏左右拖动时，切换到鼠标下方最近的标签。
+    /// </summary>
+    private void PanTitleSelect_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (e.LeftButton != MouseButtonState.Pressed)
+        {
+            if (_titleSelectDragging)
+                EndTitleSelectDrag();
+            return;
+        }
+
+        var position = e.GetPosition(PanTitleSelect);
+        if (!_titleSelectDragging)
+        {
+            // 阈值：横向移动超过 10px 才进入拖拽状态
+            if (Math.Abs(position.X - _titleSelectDragStart.X) < 10d)
+                return;
+            _titleSelectDragging = true;
+            // 记住按下时所在的标签：只有拖到其它标签上才切换，避免先切回原标签再切走
+            _titleSelectDragSource = GetTitleSelectAt(_titleSelectDragStart);
+            PanTitleSelect.CaptureMouse();
+        }
+
+        var target = GetTitleSelectAt(position);
+        if (target is null || ReferenceEquals(target, _titleSelectDragTarget))
+            return;
+        // 还没离开按下时所在的标签，就先不切换
+        if (ReferenceEquals(target, _titleSelectDragSource) && _titleSelectDragTarget is null)
+            return;
+        _titleSelectDragTarget = target;
+        e.Handled = true;
+        if (target.Checked)
+            return;
+        ModBase.Log("[UI] 拖动切换到顶部标签：" + target.Text);
+        target.SetChecked(true, true, true);
+    }
+
+    private void PanTitleSelect_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (!_titleSelectDragging)
+            return;
+        EndTitleSelectDrag();
+        e.Handled = true; // 拖拽结束时不再触发标签自身的点击
+    }
+
+    private void EndTitleSelectDrag()
+    {
+        _titleSelectDragging = false;
+        _titleSelectDragSource = null;
+        _titleSelectDragTarget = null;
+        if (PanTitleSelect.IsMouseCaptured)
+            PanTitleSelect.ReleaseMouseCapture();
+    }
+
+    /// <summary>
+    ///     获取与给定位置横向最近的顶部标签，用于拖拽切换。
+    /// </summary>
+    private MyRadioButton GetTitleSelectAt(Point position)
+    {
+        MyRadioButton nearest = null;
+        var nearestDistance = double.MaxValue;
+        var left = 0d;
+        foreach (var child in PanTitleSelect.Children)
+        {
+            if (child is not MyRadioButton button)
+                continue;
+            var width = button.ActualWidth + button.Margin.Left + button.Margin.Right;
+            var distance = Math.Abs(position.X - (left + width / 2d));
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                nearest = button;
+            }
+
+            left += width;
+        }
+
+        return nearest;
+    }
+
     // 最小化
     private void BtnTitleMin_Click(object sender, EventArgs e)
     {
@@ -1985,6 +2084,11 @@ public partial class FormMain
     {
         ModAnimation.AniStop("FrmMain LeftChange");
         ModAnimation.AniStop("PageLeft PageChange"); // 停止左边栏变更导致的右页面切换动画，防止它与本动画一起触发多次 PageOnEnter
+        // 翻页动画：旧页面横向压缩，新页面横向展开
+        ModAnimation.AniStop("FrmMain PageFlipOut");
+        ModAnimation.AniStop("FrmMain PageFlipIn");
+        if (PanMainRight.Child is FrameworkElement oldRightPage)
+            PageFlipOut(oldRightPage);
         ModAnimation.AniControlEnabled += 1;
         // 清除新页面关联性
         if (targetLeft.Parent is not null)
@@ -2026,6 +2130,8 @@ public partial class FormMain
                 // 把新页面添加进容器
                 PanMainRight.Child = pageRight;
                 pageRight.Opacity = 0d;
+                // 先压缩再展开，形成翻页效果
+                PreparePageFlip(pageRight).ScaleX = PageFlipMinScale;
                 PanMainRight.Background = null;
                 ModAnimation.AniControlEnabled -= 1;
                 ModBase.RunInUi(() => BtnExtraBack.ShowRefresh(), true);
@@ -2034,9 +2140,59 @@ public partial class FormMain
             {
                 // 延迟触发页面通用动画，以使得在 Loaded 事件中加载的控件得以处理
                 pageRight.Opacity = 1d;
+                PageFlipIn(pageRight);
                 pageRight.PageOnEnter();
             }, 30, true)
         }, "FrmMain PageChangeRight");
+    }
+
+    // 翻页动画
+
+    /// <summary>翻页时页面横向压缩到的最小比例。</summary>
+    private const double PageFlipMinScale = 0.04d;
+
+    /// <summary>
+    ///     确保页面使用水平缩放变换，并返回该变换。
+    /// </summary>
+    private static ScaleTransform PreparePageFlip(FrameworkElement page)
+    {
+        if (page.RenderTransform is not ScaleTransform transform)
+        {
+            transform = new ScaleTransform(1d, 1d);
+            page.RenderTransform = transform;
+        }
+
+        page.RenderTransformOrigin = new Point(0.5d, 0.5d);
+        return transform;
+    }
+
+    /// <summary>
+    ///     翻页动画：旧页面横向压缩，在页面被替换时刚好结束。
+    /// </summary>
+    private static void PageFlipOut(FrameworkElement page)
+    {
+        if (page is null)
+            return;
+        var transform = PreparePageFlip(page);
+        ModAnimation.AniStart(
+            ModAnimation.AaDouble(delta => transform.ScaleX += (double)delta, PageFlipMinScale - transform.ScaleX,
+                120, 0, new ModAnimation.AniEaseInFluent(ModAnimation.AniEasePower.Middle)),
+            "FrmMain PageFlipOut");
+    }
+
+    /// <summary>
+    ///     翻页动画：新页面横向展开。
+    /// </summary>
+    private static void PageFlipIn(FrameworkElement page)
+    {
+        if (page is null)
+            return;
+        var transform = PreparePageFlip(page);
+        transform.ScaleX = PageFlipMinScale;
+        ModAnimation.AniStart(
+            ModAnimation.AaDouble(delta => transform.ScaleX += (double)delta, 1d - transform.ScaleX,
+                300, 0, new ModAnimation.AniEaseOutFluent(ModAnimation.AniEasePower.Strong)),
+            "FrmMain PageFlipIn");
     }
 
     /// <summary>

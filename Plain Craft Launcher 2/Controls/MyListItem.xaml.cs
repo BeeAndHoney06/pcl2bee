@@ -6,6 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 using System.Windows.Shapes;
 using PCL.Core.UI.Controls.SvgIcon;
 
@@ -193,13 +194,24 @@ public partial class MyListItem : IMyRadio
                 var rect = new Border
                 {
                     Name = "RectBack",
-                    CornerRadius = new CornerRadius(IsScaleAnimationEnabled || Height > 40d ? 6 : 0),
+                    CornerRadius = new CornerRadius(RectBackCornerRadius),
+                    // 悬浮磁贴：四周留出空隙，使每个列表项都像独立的浮动圆角矩形
+                    Margin = new Thickness(5d, 2.5d, 5d, 2.5d),
                     RenderTransform = IsScaleAnimationEnabled ? new ScaleTransform(0.8d, 0.8d) : null,
                     RenderTransformOrigin = new Point(0.5d, 0.5d),
                     BorderThickness = new Thickness(ModBase.GetWPFSize(1d)),
                     SnapsToDevicePixels = true,
                     IsHitTestVisible = false,
-                    Opacity = 0d
+                    Opacity = 0d,
+                    // 只在鼠标悬浮时才创建，投影开销仅作用于当前项
+                    Effect = new DropShadowEffect
+                    {
+                        ShadowDepth = 0d,
+                        BlurRadius = 10d,
+                        Direction = 270d,
+                        Opacity = 0.18d,
+                        Color = Colors.Black
+                    }
                 };
                 rect.SetResourceReference(Border.BackgroundProperty, "ColorBrush7");
                 rect.SetResourceReference(Border.BorderBrushProperty, "ColorBrush6");
@@ -331,13 +343,13 @@ public partial class MyListItem : IMyRadio
     public bool IsScaleAnimationEnabled
     {
         get => field;
-        set
-        {
-            field = value;
-            if (_RectBack is not null)
-                RectBack.CornerRadius = new CornerRadius(value ? 6 : 0);
-        }
+        set => field = value;
     } = true;
+
+    /// <summary>
+    ///     悬浮背景的圆角半径：统一使用圆角矩形，与卡片、磁贴的圆角保持一致。
+    /// </summary>
+    private const double RectBackCornerRadius = 6d;
 
     // 边距
     public int PaddingLeft

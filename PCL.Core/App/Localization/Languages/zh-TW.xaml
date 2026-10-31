@@ -3239,7 +3239,15 @@
 
     <sys:String x:Key="Setup.Ui.Theme.Color.CatBlue">亮黃</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.CrashBlue">金黃</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.Custom">自訂</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.Hmcl">HMCL</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.OceanBlue">海藍</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowCyan">彩虹青</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowGreen">彩虹綠</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowOrange">彩虹橙</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowPurple">彩虹紫</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowRed">彩虹紅</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowYellow">彩虹黃</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.SkyBlue">檸黃</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Dark">深色</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.DarkColor">深色配色</sys:String>
