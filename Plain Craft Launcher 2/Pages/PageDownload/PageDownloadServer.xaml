@@ -8,22 +8,63 @@
     <Grid>
         <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                               x:Name="PanBack">
-            <StackPanel Orientation="Vertical" Margin="5">
-                <!-- 服务端类型选择（保持切换能力） -->
-                <local:MyCard Title="{DynamicResource Download.Server.Type.Title}" Margin="15,20,20,15"
-                              UseAnimation="False">
-                    <StackPanel Margin="20,40,18,15">
-                        <local:MySearchBox x:Name="SearchBox" Margin="0,0,0,10"
-                                           HintText="{DynamicResource Download.Server.Search.Hint}"
-                                           SearchButtonVisibility="Visible" />
-                        <WrapPanel x:Name="PanTypeButtons" />
-                    </StackPanel>
-                </local:MyCard>
-                <StackPanel Name="PanMain" Margin="0,0,5,5" Grid.IsSharedSizeScope="True" />
-            </StackPanel>
+            <Grid Margin="5">
+                <!-- 版本列表视图 -->
+                <StackPanel x:Name="PanVersions">
+                    <local:MyCard Margin="20,20,20,15" Title="{DynamicResource Download.Server.Intro.Title}"
+                                  UseAnimation="False">
+                        <StackPanel Margin="25,40,15,20">
+                            <TextBlock Margin="0,0,0,11" Text="{DynamicResource Download.Server.Intro.Description}"
+                                       TextWrapping="Wrap" />
+                            <Grid Height="35">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Button" />
+                                </Grid.ColumnDefinitions>
+                                <local:MyButton Grid.Column="0" MinWidth="140" Padding="13,0"
+                                                Margin="0,0,20,0" HorizontalAlignment="Left"
+                                                Text="{DynamicResource Download.Server.OpenWebsite}"
+                                                ColorType="Highlight" Click="BtnWeb_Click" />
+                            </Grid>
+                        </StackPanel>
+                    </local:MyCard>
+                    <local:MySearchBox x:Name="SearchBox" Margin="20,0,20,10"
+                                       HintText="{DynamicResource Download.Server.Search.Hint}"
+                                       SearchButtonVisibility="Visible" />
+                    <StackPanel Name="PanMain" Margin="20,0,20,20" Grid.IsSharedSizeScope="True" />
+                </StackPanel>
+
+                <!-- 实例命名视图 -->
+                <StackPanel x:Name="PanSelect" Visibility="Collapsed">
+                    <local:MyCard Margin="20,20,20,15" Height="62" UseAnimation="False">
+                        <local:MyIconButton HorizontalAlignment="Left" Theme="Black" Opacity="0.6" x:Name="BtnBack"
+                                            Margin="13,0,0,0" Height="26" Width="26" LogoScale="0.87"
+                                            SvgIcon="lucide/arrow-left" />
+                        <local:MyImage x:Name="ImgLogo" Margin="52,0,0,0" VerticalAlignment="Center"
+                                       HorizontalAlignment="Left" Height="32"
+                                       RenderOptions.BitmapScalingMode="HighQuality" />
+                        <local:MyTextBox Margin="93,0,16,0" Padding="-1,0" MinHeight="30" FontSize="15"
+                                         VerticalAlignment="Center" x:Name="TextInstanceName" MaxLength="70"
+                                         HasBackground="False" />
+                    </local:MyCard>
+                    <local:MyCard Margin="20,0,20,15" Title="{DynamicResource Download.Server.Instance.Title}"
+                                  UseAnimation="False">
+                        <StackPanel Margin="25,40,20,20">
+                            <TextBlock x:Name="LabInstanceInfo" TextWrapping="Wrap" />
+                            <TextBlock Margin="0,10,0,0" Text="{DynamicResource Download.Server.Instance.FolderHint}"
+                                       TextWrapping="Wrap" Opacity="0.7" />
+                            <local:MyHint x:Name="HintName" Theme="Red" Margin="0,10,0,0" Visibility="Collapsed" />
+                        </StackPanel>
+                    </local:MyCard>
+                    <Grid Margin="20,0,20,25" Height="40">
+                        <local:MyButton x:Name="BtnDownload" HorizontalAlignment="Right" MinWidth="150" Height="40"
+                                        Padding="18,0" Text="{DynamicResource Download.Server.StartDownload}"
+                                        ColorType="Highlight" Click="BtnDownload_Click" />
+                    </Grid>
+                </StackPanel>
+            </Grid>
         </local:MyScrollViewer>
-        <local:MyCard HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,0" SnapsToDevicePixels="True"
-                      x:Name="PanLoad" UseAnimation="False">
+        <local:MyCard HorizontalAlignment="Center" VerticalAlignment="Center" Margin="40,0"
+                      SnapsToDevicePixels="True" x:Name="PanLoad" UseAnimation="False">
             <local:MyLoading Text="{DynamicResource Download.Server.Loading}" Margin="20,20,20,17" x:Name="Load"
                              HorizontalAlignment="Center" VerticalAlignment="Center" />
         </local:MyCard>

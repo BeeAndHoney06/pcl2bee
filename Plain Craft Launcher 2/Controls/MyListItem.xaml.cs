@@ -196,7 +196,7 @@ public partial class MyListItem : IMyRadio
                     Name = "RectBack",
                     CornerRadius = new CornerRadius(RectBackCornerRadius),
                     // 悬浮磁贴：四周留出空隙，使每个列表项都像独立的浮动圆角矩形
-                    Margin = new Thickness(5d, 2.5d, 5d, 2.5d),
+                    Margin = new Thickness(6d, 3d, 6d, 3d),
                     RenderTransform = IsScaleAnimationEnabled ? new ScaleTransform(0.8d, 0.8d) : null,
                     RenderTransformOrigin = new Point(0.5d, 0.5d),
                     BorderThickness = new Thickness(ModBase.GetWPFSize(1d)),
@@ -349,7 +349,7 @@ public partial class MyListItem : IMyRadio
     /// <summary>
     ///     悬浮背景的圆角半径：统一使用圆角矩形，与卡片、磁贴的圆角保持一致。
     /// </summary>
-    private const double RectBackCornerRadius = 6d;
+    private const double RectBackCornerRadius = 10d;
 
     // 边距
     public int PaddingLeft

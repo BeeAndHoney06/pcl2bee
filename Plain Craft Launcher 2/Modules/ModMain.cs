@@ -48,6 +48,8 @@ public static class ModMain
     public static PageDownloadLabyMod? frmDownloadLabyMod;
     public static PageDownloadLegacyFabric? frmDownloadLegacyFabric;
     public static PageDownloadServer? frmDownloadServer;
+    public static PageDownloadServer? frmDownloadServerSpigot;
+    public static PageDownloadServer? frmDownloadServerPurpur;
     public static PageAboutLeft? frmAboutLeft;
     public static PageAboutInfo? frmAboutInfo;
     public static PageAboutUpdate? frmAboutUpdate;

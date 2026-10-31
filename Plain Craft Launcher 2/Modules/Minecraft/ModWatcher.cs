@@ -186,6 +186,11 @@ public static class ModWatcher
         /// </summary>
         private readonly bool realTime;
 
+        /// <summary>
+        ///     是否为服务端控制台进程。服务端没有游戏窗口，退出时也不进行崩溃分析。
+        /// </summary>
+        private readonly bool isServer;
+
         private readonly object waitingLogLock = new();
         public uint countDebug;
         public uint countError;
@@ -229,17 +234,18 @@ public static class ModWatcher
         private string windowTitle = "";
 
         public Watcher(ModLoader.LoaderTask<Process, int> loader, McInstance version, string windowTitle,
-            string jStackPath, bool outputRealTime = false)
+            string jStackPath, bool outputRealTime = false, bool isServer = false)
         {
             this.loader = loader;
             this.version = version;
             this.windowTitle = windowTitle;
             realTime = outputRealTime;
+            this.isServer = isServer;
             pid = loader.input.Id;
             this.jStackPath = jStackPath;
 
             WatcherLog(Lang.Text("Watcher.Start"));
-            if (string.IsNullOrWhiteSpace(windowTitle))
+            if (!isServer && string.IsNullOrWhiteSpace(windowTitle))
                 WatcherLog("要求窗口标题：" + windowTitle);
 
             // 更改列表
@@ -273,9 +279,11 @@ public static class ModWatcher
                     while (State != MinecraftState.Ended && State != MinecraftState.Crashed &&
                            State != MinecraftState.Canceled && loader.State != ModBase.LoadState.Aborted)
                     {
-                        TimerWindow();
+                        // 服务端没有游戏窗口，跳过窗口检测
+                        if (!isServer)
+                            TimerWindow();
                         TimerLog();
-                        if (!string.IsNullOrWhiteSpace(windowTitle))
+                        if (!isServer && !string.IsNullOrWhiteSpace(windowTitle))
                             for (var i = 1; i <= 3; i++)
                             {
                                 if (State == MinecraftState.Running && !gameProcess.HasExited)
@@ -321,6 +329,59 @@ public static class ModWatcher
         ///     是否处理实时日志。
         /// </summary>
         public bool RealTimeLog => realTime;
+
+        /// <summary>
+        ///     是否为服务端控制台进程。
+        /// </summary>
+        public bool IsServer => isServer;
+
+        /// <summary>
+        ///     是否可以向该进程发送控制台指令。
+        /// </summary>
+        public bool CanSendCommand
+        {
+            get
+            {
+                if (!isServer || gameProcess is null || gameProcess.HasExited)
+                    return false;
+                try
+                {
+                    return gameProcess.StandardInput.BaseStream.CanWrite;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        ///     向服务端控制台发送一条指令，并将其回显到实时日志中。
+        /// </summary>
+        /// <returns>是否发送成功。</returns>
+        public bool SendCommand(string command)
+        {
+            if (!isServer)
+                return false;
+            if (string.IsNullOrWhiteSpace(command))
+                return false;
+            if (gameProcess is null || gameProcess.HasExited)
+                return false;
+            try
+            {
+                gameProcess.StandardInput.WriteLine(command);
+                gameProcess.StandardInput.Flush();
+                var level = GameLogLevel.Info;
+                LogRealTime($"> {command}", ref level);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ModBase.Log(ex, Lang.Text("LogPage.Command.Error.SendFailed"), ModBase.LogLevel.Hint,
+                    userSummary: Lang.Text("LogPage.Command.Error.SendFailed"));
+                return false;
+            }
+        }
 
         // 状态
         /// <summary>
@@ -409,7 +470,7 @@ public static class ModWatcher
 
                 foreach (var Str in copyed)
                     GameLog(Str);
-                if (State == MinecraftState.Loading)
+                if (!isServer && State == MinecraftState.Loading)
                     ProgressUpdate();
                 // 游戏退出检查
                 if (gameProcess.HasExited)
@@ -428,7 +489,13 @@ public static class ModWatcher
                     // WatcherLog("Minecraft 返回值为 1，考虑为任务管理器结束") '并不，崩了照样是 1
                     // State = MinecraftState.Ended
                     // Else
-                    if (State == MinecraftState.Loading)
+                    if (isServer)
+                    {
+                        // 服务端退出即视为正常结束，不进行崩溃分析
+                        if (State != MinecraftState.Crashed)
+                            State = MinecraftState.Ended;
+                    }
+                    else if (State == MinecraftState.Loading)
                     {
                         // 窗口未出现
                         WatcherLog(Lang.Text("Watcher.Crash.Suspected"));
@@ -701,6 +768,12 @@ public static class ModWatcher
         {
             if (State is MinecraftState.Crashed or MinecraftState.Ended)
                 return;
+            // 服务端进程不进行客户端崩溃分析
+            if (isServer)
+            {
+                State = MinecraftState.Ended;
+                return;
+            }
             State = MinecraftState.Crashed;
             // 崩溃分析
             if (!Config.Launch.DisableCrashAnalysis)

@@ -31,11 +31,11 @@ public class MyCard : AnimatedBackgroundGrid
         MainChrome = new MyDropShadow
         {
             Margin = new Thickness(-3, -3, -3, -3 - ModBase.GetWPFSize(1d)), ShadowRadius = 3d,
-            Opacity = dropShadowIdleOpacity, CornerRadius = new CornerRadius(6d)
+            Opacity = dropShadowIdleOpacity, CornerRadius = new CornerRadius(10d)
         };
         MainChrome.SetResourceReference(MyDropShadow.ColorProperty, "ColorObject1");
         Children.Insert(0, MainChrome);
-        mainBorder = new BlurBorder { CornerRadius = new CornerRadius(6d), IsHitTestVisible = false };
+        mainBorder = new BlurBorder { CornerRadius = new CornerRadius(10d), IsHitTestVisible = false };
         Children.Insert(1, mainBorder);
         mainGrid = new Grid();
         Children.Add(mainGrid);

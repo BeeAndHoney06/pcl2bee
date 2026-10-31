@@ -15,5 +15,6 @@ public enum McInstanceState
     LegacyFabric,
     Quilt,
     Cleanroom,
-    LabyMod
+    LabyMod,
+    Server
 }

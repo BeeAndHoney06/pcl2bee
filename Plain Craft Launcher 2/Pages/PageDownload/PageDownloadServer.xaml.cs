@@ -1,77 +1,65 @@
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using PCL.Core.App.Localization;
-using PCL.Core.Minecraft;
 using PCL.Core.UI;
 
 namespace PCL;
 
+/// <summary>
+///     服务端核心下载页（Paper / Spigot / Purpur）。
+///     界面与安装包下载保持一致：先选择游戏版本，再填写实例名称并开始下载。
+/// </summary>
 public partial class PageDownloadServer
 {
-    private ModServerDownload.ServerType currentType = ModServerDownload.ServerType.Vanilla;
+    private readonly ModServerDownload.ServerType serverType;
     private List<ModServerDownload.ServerVersionEntry> allVersions = [];
+    private ModServerDownload.ServerVersionEntry? selectedEntry;
+    private bool isBusy;
 
-    public PageDownloadServer()
+    public PageDownloadServer(ModServerDownload.ServerType type)
     {
+        serverType = type;
         InitializeComponent();
         Loaded += (_, _) =>
         {
             PanBack.ScrollToHome();
-            if (allVersions.Count == 0) Reload();
+            if (allVersions.Count == 0)
+                Reload();
         };
-        // 类型单选按钮组
-        var typeNames = new[]
-        {
-            (ModServerDownload.ServerType.Vanilla, "Download.Server.Type.Vanilla"),
-            (ModServerDownload.ServerType.Paper, "Download.Server.Type.Paper"),
-            (ModServerDownload.ServerType.Purpur, "Download.Server.Type.Purpur"),
-            (ModServerDownload.ServerType.Spigot, "Download.Server.Type.Spigot"),
-            (ModServerDownload.ServerType.Forge, "Download.Server.Type.Forge"),
-            (ModServerDownload.ServerType.Fabric, "Download.Server.Type.Fabric")
-        };
-        foreach (var (type, key) in typeNames)
-        {
-            var radio = new MyRadioBox
-            {
-                Text = Lang.Text(key), Height = 24d, Margin = new Thickness(0, 0, 18, 8),
-                Tag = type, Checked = type == ModServerDownload.ServerType.Vanilla
-            };
-            radio.Check += (_, _) => SwitchType(type);
-            PanTypeButtons.Children.Add(radio);
-        }
-
-        // 搜索过滤
-        SearchBox.Search += (_, _) => { if (allVersions.Count > 0) RenderVersions(); };
-        SearchBox.KeyDown += (_, e) =>
-        {
-            if (e.Key == Key.Enter && allVersions.Count > 0) RenderVersions();
-        };
+        BtnBack.Click += (_, _) => ExitSelectPage();
+        SearchBox.Search += (_, _) => RenderVersions();
+        SearchBox.TextChanged += (_, _) => RenderVersions();
+        TextInstanceName.TextChanged += (_, _) => ValidateName();
+        TextInstanceName.KeyDown += TextInstanceName_KeyDown;
     }
 
-    /// <summary>切换服务端类型并刷新。</summary>
-    public void SwitchType(ModServerDownload.ServerType type)
-    {
-        if (type == currentType && allVersions.Count > 0) return;
-        currentType = type;
-        Reload();
-    }
+    /// <summary>
+    ///     当前页面对应的服务端类型。
+    /// </summary>
+    public ModServerDownload.ServerType ServerType => serverType;
 
+    #region 加载
+
+    /// <summary>
+    ///     重新加载版本列表。
+    /// </summary>
     public void Reload()
     {
         PanLoad.Visibility = Visibility.Visible;
+        PanVersions.Visibility = Visibility.Visible;
+        ExitSelectPage();
         ModBase.RunInThread(() =>
         {
             List<ModServerDownload.ServerVersionEntry> versions;
             try
             {
-                versions = ModServerDownload.GetVersions(currentType);
+                versions = ModServerDownload.GetVersions(serverType);
             }
             catch (Exception ex)
             {
-                ModBase.Log(ex, $"[Server] 获取{currentType}服务端版本列表失败");
+                ModBase.Log(ex, $"[Server] 获取 {serverType} 版本列表失败");
                 ModBase.RunInUi(() =>
                 {
                     PanLoad.Visibility = Visibility.Collapsed;
@@ -88,15 +76,138 @@ public partial class PageDownloadServer
             ModBase.RunInUi(() =>
             {
                 allVersions = versions;
+                PanLoad.Visibility = Visibility.Collapsed;
                 RenderVersions();
             });
         });
     }
 
-    /// <summary>按原版游戏下载页的样式渲染：最新版卡片置顶 + 其余按主版本分组折叠。</summary>
+    #endregion
+
+    #region 选择与命名
+
+    private void EnterSelectPage(ModServerDownload.ServerVersionEntry entry)
+    {
+        selectedEntry = entry;
+        PanVersions.Visibility = Visibility.Collapsed;
+        PanSelect.Visibility = Visibility.Visible;
+        PanBack.ScrollToHome();
+        ImgLogo.Source = ModServerInstance.GetCoreLogo(serverType.ToString());
+        LabInstanceInfo.Text = Lang.Text("Download.Server.Instance.Info",
+            Lang.Text("Download.Server.Type." + serverType), entry.Version);
+        TextInstanceName.Text = ModServerDownload.GetDefaultInstanceName(serverType, entry.Version);
+        TextInstanceName.Focus();
+        TextInstanceName.SelectionStart = TextInstanceName.Text.Length;
+        ValidateName();
+    }
+
+    private void ExitSelectPage()
+    {
+        selectedEntry = null;
+        PanSelect.Visibility = Visibility.Collapsed;
+        PanVersions.Visibility = Visibility.Visible;
+        HintName.Visibility = Visibility.Collapsed;
+    }
+
+    /// <summary>
+    ///     校验实例名称，并同步下载按钮的可用状态。
+    /// </summary>
+    private void ValidateName()
+    {
+        var valid = ModServerDownload.IsInstanceNameValid(TextInstanceName.Text, out var error);
+        BtnDownload.IsEnabled = valid && !isBusy;
+        if (!valid && !string.IsNullOrWhiteSpace(TextInstanceName.Text))
+        {
+            HintName.Text = error;
+            HintName.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            HintName.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    private void TextInstanceName_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+            return;
+        e.Handled = true;
+        if (BtnDownload.IsEnabled)
+            StartDownload();
+    }
+
+    private void BtnDownload_Click(object sender, MouseButtonEventArgs e)
+    {
+        StartDownload();
+    }
+
+    private void StartDownload()
+    {
+        if (isBusy || selectedEntry is null)
+            return;
+        var instanceName = TextInstanceName.Text.Trim();
+        if (!ModServerDownload.IsInstanceNameValid(instanceName, out _))
+        {
+            ValidateName();
+            return;
+        }
+
+        isBusy = true;
+        BtnDownload.IsEnabled = false;
+        var entry = selectedEntry;
+        ModBase.RunInThread(() =>
+        {
+            try
+            {
+                ModServerDownload.DownloadToInstance(serverType, entry, instanceName, () =>
+                {
+                    // 下载完成：刷新实例列表，使服务端实例可被直接识别与启动
+                    ModBase.RunInUi(() =>
+                    {
+                        ModInstanceList.mcInstanceListLoader.Start(ModFolder.mcFolderSelected, true);
+                        HintService.Hint(Lang.Text("Download.Server.DownloadFinished", instanceName),
+                            HintType.Success);
+                        isBusy = false;
+                        ExitSelectPage();
+                        ValidateName();
+                    });
+                });
+            }
+            catch (Exception ex)
+            {
+                ModBase.Log(ex, Lang.Text("Download.Server.Error.DownloadFailed", entry.Version),
+                    ModBase.LogLevel.Msgbox,
+                    userSummary: Lang.Text("Download.Server.Error.DownloadFailed", entry.Version));
+                ModBase.RunInUi(() =>
+                {
+                    isBusy = false;
+                    ValidateName();
+                });
+            }
+        });
+    }
+
+    private void BtnWeb_Click(object sender, MouseButtonEventArgs e)
+    {
+        ModBase.OpenWebsite(serverType switch
+        {
+            ModServerDownload.ServerType.Paper => "https://papermc.io/downloads/paper",
+            ModServerDownload.ServerType.Purpur => "https://purpurmc.org/downloads",
+            _ => "https://www.spigotmc.org/"
+        });
+    }
+
+    #endregion
+
+    #region 版本列表渲染
+
+    /// <summary>
+    ///     按安装包下载页的样式渲染：最新版卡片置顶 + 其余按主版本分组折叠。
+    /// </summary>
     private void RenderVersions()
     {
-        PanLoad.Visibility = Visibility.Collapsed;
+        if (PanVersions.Visibility != Visibility.Visible)
+            return;
         PanMain.Children.Clear();
 
         // 搜索过滤
@@ -115,11 +226,12 @@ public partial class PageDownloadServer
             }
         }
 
-        if (versions.Count == 0) return;
+        if (versions.Count == 0)
+            return;
 
         // 按主版本号分组（1.21.4 → “1.21”；无点归“其他”）
         var groups = new List<(string Key, List<ModServerDownload.ServerVersionEntry> Items)>();
-        foreach (var entry in allVersions)
+        foreach (var entry in versions)
         {
             var key = GetGroupKey(entry.Version);
             var existing = groups.FirstOrDefault(g => g.Key == key);
@@ -175,59 +287,20 @@ public partial class PageDownloadServer
 
     private MyListItem BuildListItem(ModServerDownload.ServerVersionEntry entry)
     {
+        var typeName = Lang.Text("Download.Server.Type." + serverType);
         var item = new MyListItem
         {
-            Logo = ServerTypeLogo(currentType),
+            Logo = ModServerInstance.GetCoreLogo(serverType.ToString()),
             SnapsToDevicePixels = true,
-            Title = McFormatter.FormatVersion(entry.Version).Replace("_", " "),
+            Title = entry.Version,
             Height = 42d,
             Type = MyListItem.CheckType.Clickable,
-            Info = string.IsNullOrEmpty(entry.Detail)
-                ? Lang.Text("Download.Server.Type." + currentType)
-                : $"{Lang.Text("Download.Server.Type." + currentType)} · {entry.Detail}",
+            Info = string.IsNullOrEmpty(entry.Detail) ? typeName : $"{typeName} · {entry.Detail}",
             Tag = entry
         };
-        item.Click += ItemDownload_Click;
+        item.Click += (_, _) => EnterSelectPage(entry);
         return item;
     }
 
-    private static string ServerTypeLogo(ModServerDownload.ServerType type)
-    {
-        return type switch
-        {
-            ModServerDownload.ServerType.Paper => ModBase.pathImage + "Blocks/CobbleStone.png",
-            ModServerDownload.ServerType.Purpur => ModBase.pathImage + "Blocks/CommandBlock.png",
-            ModServerDownload.ServerType.Spigot => ModBase.pathImage + "Blocks/RedstoneBlock.png",
-            ModServerDownload.ServerType.Forge => ModBase.pathImage + "Blocks/Anvil.png",
-            ModServerDownload.ServerType.Fabric => ModBase.pathImage + "Blocks/Fabric.png",
-            _ => ModBase.pathImage + "Blocks/Grass.png"
-        };
-    }
-
-    private void ItemDownload_Click(object sender, MouseButtonEventArgs e)
-    {
-        // 防御：Tag 非预期类型时不崩溃（例如控件被复用或结构被改动）
-        if (sender is not MyListItem { Tag: ModServerDownload.ServerVersionEntry entry })
-        {
-            ModBase.Log("[Server] 下载入口的条目数据异常，已忽略本次点击", ModBase.LogLevel.Developer);
-            return;
-        }
-
-        var folder = SystemDialogs.SelectFolder(Lang.Text("Download.Server.SelectFolder"));
-        if (string.IsNullOrEmpty(folder)) return;
-        ModBase.RunInThread(() =>
-        {
-            try
-            {
-                ModServerDownload.Download(currentType, entry, folder);
-                ModBase.RunInUi(() => HintService.Hint(
-                    Lang.Text("Download.Server.DownloadStarted"), HintType.Success));
-            }
-            catch (Exception ex)
-            {
-                ModBase.Log(ex, $"下载{currentType}服务端失败（{entry.Version}）", ModBase.LogLevel.Msgbox,
-                    userSummary: Lang.Text("Download.Server.Error.DownloadFailed", entry.Version));
-            }
-        });
-    }
+    #endregion
 }

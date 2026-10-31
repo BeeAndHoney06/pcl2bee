@@ -1552,6 +1552,8 @@ public partial class FormMain
         DownloadLabyMod = 17,
         DownloadLegacyFabric = 18,
         DownloadServer = 19,
+        DownloadServerSpigot = 20,
+        DownloadServerPurpur = 21,
 
         SetupLaunch = 0,
         SetupUI = 1,

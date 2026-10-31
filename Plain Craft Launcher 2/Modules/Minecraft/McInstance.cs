@@ -47,6 +47,26 @@ public class McInstance
         /// </summary>
         public McInstanceState state = McInstanceState.Error;
 
+        /// <summary>
+        ///     该实例是否为服务端实例（位于 serverversion 文件夹，启动时运行服务端核心而非游戏客户端）。
+        /// </summary>
+        public bool IsServer;
+
+        /// <summary>
+        ///     服务端核心名称（如 Paper、Spigot、Purpur），仅服务端实例使用。
+        /// </summary>
+        public string ServerCore = "";
+
+        /// <summary>
+        ///     服务端对应的 Minecraft 版本，仅服务端实例使用。
+        /// </summary>
+        public string ServerVersion = "";
+
+        /// <summary>
+        ///     服务端核心 jar 的完整路径，仅服务端实例使用。
+        /// </summary>
+        public string ServerJarPath = "";
+
         /// <summary></summary>
         /// <param name="name">实例名，或实例文件夹的完整路径（不规定是否以 \ 结尾）。</param>
         public McInstance(string name)
@@ -66,6 +86,10 @@ public class McInstance
         {
             get
             {
+                // 服务端实例直接使用自身文件夹作为根目录
+                if (IsServer)
+                    return PathInstance;
+
                 if (Config.Instance.IndieV2Config.IsDefault(PathInstance))
                 {
                     if (!IsLoaded)
@@ -134,6 +158,9 @@ public class McInstance
         {
             get
             {
+                // 服务端实例没有客户端 Mod 的概念
+                if (IsServer)
+                    return false;
                 if (!IsLoaded)
                     Load();
                 return Info.HasFabric || Info.HasLegacyFabric || Info.HasQuilt || Info.HasForge || Info.HasLiteLoader ||
@@ -150,6 +177,18 @@ public class McInstance
             {
                 if (field is not null)
                     return field;
+
+                // 服务端实例没有版本 JSON，直接构造最小可用的版本信息
+                if (IsServer)
+                {
+                    field = new McInstanceInfo
+                    {
+                        VanillaName = string.IsNullOrEmpty(ServerVersion) ? Lang.Text("Minecraft.Version.Unknown") : ServerVersion,
+                        vanilla = Version.TryParse(ServerVersion, out var serverVersion) ? serverVersion : new Version(0, 0)
+                    };
+                    return field;
+                }
+
                 field = new McInstanceInfo();
 
                 #region 获取游戏版本
@@ -608,10 +647,70 @@ public class McInstance
         }
 
         /// <summary>
+        ///     检查服务端实例：确认文件夹与核心 jar 存在，并填充展示信息。
+        /// </summary>
+        private bool CheckServer()
+        {
+            if (!Directory.Exists(PathInstance))
+            {
+                state = McInstanceState.Error;
+                Desc = Lang.Text("Select.Instance.Description.NotFound", Name);
+                IsLoaded = true;
+                return false;
+            }
+
+            try
+            {
+                // 读取元数据并定位核心 jar
+                var meta = ModServerInstance.ReadMeta(PathInstance);
+                if (meta is not null)
+                {
+                    if (string.IsNullOrEmpty(ServerCore))
+                        ServerCore = meta.Core;
+                    if (string.IsNullOrEmpty(ServerVersion))
+                        ServerVersion = meta.GameVersion;
+                }
+
+                var jarPath = ModServerInstance.FindJar(PathInstance, meta);
+                if (string.IsNullOrEmpty(jarPath))
+                {
+                    state = McInstanceState.Error;
+                    Desc = Lang.Text("Select.Server.Description.NoCore");
+                    Logo = ModServerInstance.GetCoreLogo(ServerCore);
+                    IsLoaded = true;
+                    return false;
+                }
+
+                ServerJarPath = jarPath;
+                if (string.IsNullOrEmpty(ServerCore))
+                    ServerCore = ModServerInstance.DetectCoreFromFileName(Path.GetFileNameWithoutExtension(jarPath));
+
+                state = McInstanceState.Server;
+                Desc = Lang.Text("Select.Server.Description.Format", ServerCore, ServerVersion);
+                Logo = ModServerInstance.GetCoreLogo(ServerCore);
+                IsLoaded = true;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                state = McInstanceState.Error;
+                Desc = Lang.Text("Select.Instance.Description.NoPermission");
+                ModBase.Log(ex, Lang.Text("Select.Server.Error.Check", PathInstance), ModBase.LogLevel.Hint,
+                    userSummary: Lang.Text("Select.Server.Error.Check", PathInstance));
+                IsLoaded = true;
+                return false;
+            }
+        }
+
+        /// <summary>
         ///     检查 Minecraft 版本，若检查通过 State 则为 Original 且返回 True。
         /// </summary>
         public bool Check()
         {
+            // 服务端实例不依赖版本 JSON，只检查文件夹与核心文件
+            if (IsServer)
+                return CheckServer();
+
             // 检查文件夹
             if (!Directory.Exists(PathInstance))
             {
@@ -691,6 +790,13 @@ public class McInstance
         /// </summary>
         public McInstance Load()
         {
+            // 服务端实例仅做轻量检查，不读取版本 JSON
+            if (IsServer)
+            {
+                CheckServer();
+                return this;
+            }
+
             try
             {
                 // 检查实例，若出错则跳过数据确定阶段

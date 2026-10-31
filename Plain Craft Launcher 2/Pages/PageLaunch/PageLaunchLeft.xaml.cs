@@ -159,7 +159,24 @@ public partial class PageLaunchLeft
 
             // 确认 Minecraft 版本实例
             var selection = States.Game.SelectedInstance;
-            var instance = selection == "" ? null : new McInstance(selection);
+            McInstance? instance = null;
+            if (!string.IsNullOrEmpty(selection))
+            {
+                // 优先在实例列表中查找（含 serverversion 中的服务端实例）
+                instance = ModInstanceList.mcInstanceList
+                    .SelectMany(pair => pair.Value)
+                    .FirstOrDefault(v => v.Name == selection);
+                instance ??= new McInstance(selection);
+            }
+
+            // 单独处理 serverversion 中的服务端实例（实例列表尚未加载完成时也能识别）
+            if (instance is not null && !instance.IsServer)
+            {
+                var serverFolder = Path.Combine(ModServerInstance.RootFolder, selection);
+                if (Directory.Exists(serverFolder))
+                    instance = new McInstance(serverFolder) { IsServer = true };
+            }
+
             if (instance is null || !instance.PathInstance.StartsWithF(ModFolder.mcFolderSelected) ||
                 !instance.Check())
             {
@@ -236,6 +253,13 @@ public partial class PageLaunchLeft
                 {
                     HintService.Hint(Lang.Text("Launch.Home.Instance.InstallingCannotLaunch"), HintType.Error);
                     return;
+                }
+
+                // 服务端实例：启动服务端核心并打开控制台
+                if (ModInstanceList.McMcInstanceSelected.IsServer)
+                {
+                    ModServerInstance.Start(ModInstanceList.McMcInstanceSelected);
+                    break;
                 }
 
                 ModLaunch.McLaunchStart();
@@ -323,7 +347,8 @@ public partial class PageLaunchLeft
                 ModBase.Log("[Minecraft] 启动按钮：Minecraft 实例：" + ModInstanceList.McMcInstanceSelected.PathInstance);
                 ModMain.frmLaunchLeft.BtnLaunch.Text = Lang.Text("Launch.Home.Button.Launch");
                 ModMain.frmLaunchLeft.BtnInstance.IsEnabled = true;
-                if (ProfileService.Current is not null)
+                // 服务端实例不需要登录档案即可启动
+                if (ModInstanceList.McMcInstanceSelected.IsServer || ProfileService.Current is not null)
                     BtnLaunch.IsEnabled = true;
                 else
                     BtnLaunch.IsEnabled = false;
@@ -341,6 +366,9 @@ public partial class PageLaunchLeft
                 ? Visibility.Collapsed
                 : Visibility.Visible;
         if (currentState == 3) ModMain.frmLaunchLeft.BtnMore.Visibility = ModMain.frmLaunchLeft.BtnInstance.Visibility;
+        // 服务端实例不提供客户端实例设置入口
+        if (currentState == 3 && ModInstanceList.McMcInstanceSelected is { IsServer: true })
+            ModMain.frmLaunchLeft.BtnMore.Visibility = Visibility.Collapsed;
     }
 
     // 取消按钮
@@ -373,6 +401,9 @@ public partial class PageLaunchLeft
     private void BtnMore_Click(object sender, MouseButtonEventArgs e)
     {
         if (ModLaunch.mcLaunchLoader.State == ModBase.LoadState.Loading)
+            return;
+        // 服务端实例没有客户端实例设置页
+        if (ModInstanceList.McMcInstanceSelected is { IsServer: true })
             return;
         ModInstanceList.McMcInstanceSelected.Load();
         PageInstanceLeft.McInstance = ModInstanceList.McMcInstanceSelected;

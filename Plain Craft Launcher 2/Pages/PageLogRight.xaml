@@ -7,24 +7,44 @@
     <Grid>
         <Grid x:Name="PanAllBack">
             <local:MyCard Margin="16,16,16,100" x:Name="PanLogCard">
-                <local:MyScrollViewer Margin="12,40,12,20"
-                                      VerticalScrollBarVisibility="Auto"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      x:Name="PanBack">
-                    <RichTextBox x:Name="PanLog"
-                                 FontSize="14"
-                                 FontFamily="Consolas"
-                                 HorizontalAlignment="Stretch"
-                                 VerticalAlignment="Stretch"
-                                 BorderThickness="0"
-                                 Background="Transparent"
-                                 IsReadOnly="True"
-                                 VirtualizingPanel.IsVirtualizing="True"
-                                 VirtualizingPanel.VirtualizationMode="Recycling"
-                                 VirtualizingPanel.IsContainerVirtualizable="True"
-                                 VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-                                 VirtualizingPanel.ScrollUnit="Pixel" />
-                </local:MyScrollViewer>
+                <Grid Margin="12,40,12,20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <local:MyScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"
+                                          HorizontalScrollBarVisibility="Disabled"
+                                          x:Name="PanBack">
+                        <RichTextBox x:Name="PanLog"
+                                     FontSize="14"
+                                     FontFamily="Consolas"
+                                     HorizontalAlignment="Stretch"
+                                     VerticalAlignment="Stretch"
+                                     BorderThickness="0"
+                                     Background="Transparent"
+                                     IsReadOnly="True"
+                                     VirtualizingPanel.IsVirtualizing="True"
+                                     VirtualizingPanel.VirtualizationMode="Recycling"
+                                     VirtualizingPanel.IsContainerVirtualizable="True"
+                                     VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                                     VirtualizingPanel.ScrollUnit="Pixel" />
+                    </local:MyScrollViewer>
+                    <!-- 服务端控制台输入框（与实时日志融为一体，胶囊形） -->
+                    <Grid Grid.Row="1" x:Name="PanCommand" Visibility="Collapsed" Height="36" Margin="0,10,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <local:MyTextBox x:Name="TextCommand" Grid.Column="0" Height="36" Padding="14,0"
+                                         FontSize="14" FontFamily="Consolas" MaxLength="256"
+                                         HintText="{DynamicResource LogPage.Command.Hint}"
+                                         KeyDown="TextCommand_KeyDown" />
+                        <local:MyButton x:Name="BtnSendCommand" Grid.Column="1" Height="36" MinWidth="96"
+                                        Padding="18,0" Margin="10,0,0,0"
+                                        Text="{DynamicResource LogPage.Command.Send}"
+                                        ColorType="Highlight" Click="BtnSendCommand_Click" />
+                    </Grid>
+                </Grid>
             </local:MyCard>
         </Grid>
 

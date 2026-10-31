@@ -282,15 +282,49 @@
                     </x:Array>
                 </local:MyListItem.Buttons>
             </local:MyListItem>
+            <TextBlock Text="{DynamicResource Download.Left.ServerGroup}" Margin="13,10,5,4" Opacity="0.6"
+                       FontSize="12" />
             <local:MyListItem x:Name="ItemServer" Type="RadioBox" IsScaleAnimationEnabled="False" Tag="19"
                               Check="PageCheck"
                               MinPaddingRight="35" Height="36" VerticalAlignment="Top"
-                              Title="{DynamicResource Download.Left.Server}"
+                              Title="{DynamicResource Download.Left.ServerPaper}"
                               LogoScale="1.0"
                               SvgIcon="lucide/server">
                 <local:MyListItem.Buttons>
                     <x:Array Type="{x:Type local:MyIconButton}">
                         <local:MyIconButton Tag="19" ToolTip="{DynamicResource Common.Action.Refresh}"
+                                            ToolTipService.Placement="Right" Click="RefreshButton_Click"
+                                            ToolTipService.InitialShowDelay="200" ToolTipService.VerticalOffset="-1"
+                                            LogoScale="0.85"
+                                            SvgIcon="lucide/refresh-cw" />
+                    </x:Array>
+                </local:MyListItem.Buttons>
+            </local:MyListItem>
+            <local:MyListItem x:Name="ItemServerSpigot" Type="RadioBox" IsScaleAnimationEnabled="False" Tag="20"
+                              Check="PageCheck"
+                              MinPaddingRight="35" Height="36" VerticalAlignment="Top"
+                              Title="{DynamicResource Download.Left.ServerSpigot}"
+                              LogoScale="1.0"
+                              SvgIcon="lucide/server">
+                <local:MyListItem.Buttons>
+                    <x:Array Type="{x:Type local:MyIconButton}">
+                        <local:MyIconButton Tag="20" ToolTip="{DynamicResource Common.Action.Refresh}"
+                                            ToolTipService.Placement="Right" Click="RefreshButton_Click"
+                                            ToolTipService.InitialShowDelay="200" ToolTipService.VerticalOffset="-1"
+                                            LogoScale="0.85"
+                                            SvgIcon="lucide/refresh-cw" />
+                    </x:Array>
+                </local:MyListItem.Buttons>
+            </local:MyListItem>
+            <local:MyListItem x:Name="ItemServerPurpur" Type="RadioBox" IsScaleAnimationEnabled="False" Tag="21"
+                              Check="PageCheck"
+                              MinPaddingRight="35" Height="36" VerticalAlignment="Top"
+                              Title="{DynamicResource Download.Left.ServerPurpur}"
+                              LogoScale="1.0"
+                              SvgIcon="lucide/server">
+                <local:MyListItem.Buttons>
+                    <x:Array Type="{x:Type local:MyIconButton}">
+                        <local:MyIconButton Tag="21" ToolTip="{DynamicResource Common.Action.Refresh}"
                                             ToolTipService.Placement="Right" Click="RefreshButton_Click"
                                             ToolTipService.InitialShowDelay="200" ToolTipService.VerticalOffset="-1"
                                             LogoScale="0.85"

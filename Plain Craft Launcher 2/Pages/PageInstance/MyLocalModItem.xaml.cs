@@ -793,7 +793,7 @@ public partial class MyLocalCompItem
                 {
                     Name = "RectBack",
                     // 与列表项、卡片统一的圆角矩形磁贴
-                    CornerRadius = new CornerRadius(6d),
+                    CornerRadius = new CornerRadius(10d),
                     RenderTransform = new ScaleTransform(0.8d, 0.8d),
                     RenderTransformOrigin = new Point(0.5d, 0.5d),
                     BorderThickness = new Thickness(ModBase.GetWPFSize(1d)),

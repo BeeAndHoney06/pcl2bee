@@ -245,6 +245,11 @@ public partial class PageSelectRight
                         cardName = Lang.Text("Select.Instance.Card.AprilFools");
                         break;
                     }
+                    case McInstanceCardType.Server:
+                    {
+                        cardName = Lang.Text("Select.Instance.Card.Servers");
+                        break;
+                    }
 
                     default:
                     {
@@ -468,6 +473,20 @@ public partial class PageSelectRight
         btnDel.Click += (_, _) => DeleteVersion(sender, version);
         if (version.state != McInstanceState.Error)
         {
+            if (version.IsServer)
+            {
+                // 服务端实例：直接启动并打开控制台
+                var btnLaunch = new MyIconButton { LogoScale = 1.05d, SvgIcon = "lucide/play" };
+                btnLaunch.ToolTip = Lang.Text("Select.Server.Launch");
+                ToolTipService.SetPlacement(btnLaunch, PlacementMode.Center);
+                ToolTipService.SetVerticalOffset(btnLaunch, 30d);
+                ToolTipService.SetHorizontalOffset(btnLaunch, 2d);
+                btnLaunch.Click += (_, _) => ModServerInstance.Start(version);
+                sender.MouseRightButtonUp += (_, _) => ModServerInstance.Start(version);
+                sender.Buttons = new[] { btnStar, btnOpenFolder, btnDel, btnLaunch };
+                return;
+            }
+
             var btnCont = new MyIconButton { LogoScale = 1.1d, SvgIcon = "lucide/settings" };
             btnCont.ToolTip = Lang.Text("Select.Instance.Settings");
             ToolTipService.SetPlacement(btnCont, PlacementMode.Center);
@@ -506,7 +525,9 @@ public partial class PageSelectRight
     public static void Item_Click(MyListItem sender, EventArgs e)
     {
         var instance = (McInstance)sender.Tag;
-        if (new McInstance(instance.PathInstance).Check())
+        // 服务端实例直接使用自身信息检查，其余实例重新读取版本 JSON
+        var checkInstance = instance.IsServer ? instance : new McInstance(instance.PathInstance);
+        if (checkInstance.Check())
         {
             // 正常实例
             ModInstanceList.McMcInstanceSelected = instance;

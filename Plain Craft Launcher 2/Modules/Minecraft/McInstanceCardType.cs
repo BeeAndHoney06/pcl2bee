@@ -9,5 +9,6 @@ public enum McInstanceCardType
     OriginalLike = 3,
     Rubbish = 4,
     Fool = 5,
-    Error = 6
+    Error = 6,
+    Server = 7
 }

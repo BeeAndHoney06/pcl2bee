@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using PCL.Core.App;
 using PCL.Core.App.Localization;
@@ -17,11 +18,18 @@ public partial class PageLogRight
     public Run labInfo;
     public Run labWarn;
 
+    /// <summary>
+    ///     当前已订阅事件日志监视器，用于切换时解绑，避免重复订阅。
+    /// </summary>
+    private ModWatcher.Watcher? attachedLog;
+
     public PageLogRight()
     {
         Initialized += (_, _) => Init();
         Loaded += PageLogRight_Loaded;
         InitializeComponent();
+        // 输入框高度确定后重新计算胶囊圆角
+        TextCommand.SizeChanged += (_, _) => UpdateCommandBoxRadius();
     }
 
     public void Init()
@@ -77,6 +85,12 @@ public partial class PageLogRight
         BtnOperationExportStackDump.IsEnabled = !ModMain.frmLogLeft.currentLog.gameProcess.HasExited &&
                                                 !string.IsNullOrWhiteSpace(ModMain.frmLogLeft.currentLog.jStackPath);
         SliderMaxLog.Value = Config.System.MaxGameLog;
+        // 服务端实例：在日志界面底部显示控制台指令输入框
+        var isServerLog = ModMain.frmLogLeft.currentLog.IsServer;
+        PanCommand.Visibility = isServerLog ? Visibility.Visible : Visibility.Collapsed;
+        BtnSendCommand.IsEnabled = isServerLog && !ModMain.frmLogLeft.currentLog.gameProcess.HasExited;
+        if (isServerLog)
+            UpdateCommandBoxRadius();
         // y = 10x + 50 (0 <= x <= 5, 50 <= y <= 100)
         // y = 50x - 150 (5 < x <= 13, 100 < y <= 500)
         // y = 100x - 800 (13 < x <= 28, 500 < y <= 2000)
@@ -91,10 +105,24 @@ public partial class PageLogRight
             };
         });
         // 绑定日志输出
-        PanLog.Document = ModMain.frmLogLeft.flowDocuments[ModMain.frmLogLeft.currentUuid];
-        // 绑定事件
+        if (!ModMain.frmLogLeft.flowDocuments.TryGetValue(ModMain.frmLogLeft.currentUuid, out var logDocument))
+        {
+            // 日志文档尚未创建，等待下一次选择刷新
+            ModBase.Log("[Log] 日志文档尚未就绪，跳过本次刷新", ModBase.LogLevel.Debug);
+            return;
+        }
+
+        PanLog.Document = logDocument;
+        // 绑定事件（先解绑上一次的监视器，避免重复订阅）
+        if (attachedLog is not null)
+        {
+            attachedLog.LogOutput -= OnLogOutput;
+            attachedLog.GameExit -= OnGameExit;
+        }
+
         ModMain.frmLogLeft.currentLog.LogOutput += OnLogOutput;
         ModMain.frmLogLeft.currentLog.GameExit += OnGameExit;
+        attachedLog = ModMain.frmLogLeft.currentLog;
         RefreshLabText();
     }
 
@@ -193,6 +221,53 @@ public partial class PageLogRight
     {
         ModBase.RunInUi(() => BtnOperationKill.IsEnabled = false);
         ModBase.RunInUi(() => BtnOperationExportStackDump.IsEnabled = false);
+        ModBase.RunInUi(() => BtnSendCommand.IsEnabled = false);
+    }
+
+    #endregion
+
+    #region 控制台指令
+
+    /// <summary>
+    ///     让输入框呈现胶囊形（圆角半径 = 高度的一半）。
+    /// </summary>
+    private void UpdateCommandBoxRadius()
+    {
+        var height = TextCommand.ActualHeight > 0 ? TextCommand.ActualHeight : TextCommand.Height;
+        if (height > 0)
+            TextCommand.CornerRadius = new CornerRadius(height / 2d);
+    }
+
+    private void TextCommand_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key != Key.Enter)
+            return;
+        e.Handled = true;
+        SendCommand();
+    }
+
+    private void BtnSendCommand_Click(object sender, MouseButtonEventArgs e)
+    {
+        SendCommand();
+    }
+
+    private void SendCommand()
+    {
+        var log = ModMain.frmLogLeft?.currentLog;
+        if (log is null || !log.IsServer)
+            return;
+        var command = TextCommand.Text.Trim();
+        if (string.IsNullOrEmpty(command))
+            return;
+        if (!log.SendCommand(command))
+        {
+            HintService.Hint(Lang.Text("LogPage.Command.Error.SendFailed"), HintType.Error);
+            return;
+        }
+
+        TextCommand.Text = "";
+        if (CheckAutoScroll.Checked == true)
+            PanBack.ScrollToBottom();
     }
 
     #endregion

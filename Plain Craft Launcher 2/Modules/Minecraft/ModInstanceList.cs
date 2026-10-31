@@ -91,10 +91,15 @@ public static class ModInstanceList
             if (!folderList.Any())
             {
                 ModBase.WriteIni(Path.Combine(path, "PCL.ini"), "InstanceCache", "");
-                McMcInstanceSelected = null;
-                States.Game.SelectedInstance = "";
-                ModBase.Log("[Minecraft] 未找到可用 Minecraft 实例");
-                return;
+                // 仍然可能只有服务端实例可用
+                mcInstanceList = ModServerInstance.MergeInto(mcInstanceList);
+                if (mcInstanceList.Count == 0)
+                {
+                    McMcInstanceSelected = null;
+                    States.Game.SelectedInstance = "";
+                    ModBase.Log("[Minecraft] 未找到可用 Minecraft 实例");
+                    return;
+                }
             }
 
             // 根据文件夹名列表生成辨识码
@@ -123,6 +128,9 @@ public static class ModInstanceList
                 ModBase.WriteIni(Path.Combine(path, "PCL.ini"), "InstanceCache", folderListCheck.ToString());
                 mcInstanceList = InitMcInstanceListWithoutCache(path);
             }
+
+            // 追加 serverversion 文件夹中的服务端实例（不参与客户端实例缓存）
+            mcInstanceList = ModServerInstance.MergeInto(mcInstanceList);
 
             _isFirstMcInstanceListLoad = false;
 
@@ -316,7 +324,12 @@ public static class ModInstanceList
 
         #region 循环加载每个实例的信息
 
-        foreach (var folder in new DirectoryInfo(path + "versions").GetDirectories())
+        // 只有服务端实例时可能不存在 versions 文件夹
+        var versionsDirectory = new DirectoryInfo(path + "versions");
+        if (!versionsDirectory.Exists)
+            return new Dictionary<McInstanceCardType, List<PCL.McInstance>>();
+
+        foreach (var folder in versionsDirectory.GetDirectories())
         {
             if (!folder.Exists || !folder.EnumerateFiles().Any())
             {

@@ -60,7 +60,9 @@ public partial class PageLogLeft
                 var newItem = new MyListItem
                 {
                     IsScaleAnimationEnabled = false, Type = MyListItem.CheckType.RadioBox, MinPaddingRight = 30,
-                    Title = version.Name, Info = $"{version.Info} - {Lang.Date(proc.StartTime, "T")}", Height = 40d, Tag = uuid
+                    Title = version.Name,
+                    Info = $"{(version.IsServer ? version.Desc : version.Info)} - {Lang.Date(proc.StartTime, "T")}",
+                    Height = 40d, Tag = uuid
                 };
                 newItem.Changed += ModMain.frmLogLeft.Version_Change;
                 // Dim KillButton As New MyIconButton With {.Logo = Logo.IconButtonCross, .LogoScale = 0.85}
@@ -144,7 +146,11 @@ public partial class PageLogLeft
         var uuid = ModBase.GetUuid();
         shownLogs.Add(new KeyValuePair<int, ModWatcher.Watcher>(uuid, watcher));
         watcher.LogOutput += OnLogOutput;
-        ModBase.RunInUi(() => flowDocuments.Add(uuid, new FlowDocument())); // TODO：在 UI 线程创建
+        // 必须在 Reload 读取前完成 FlowDocument 创建，因此使用同步的 UI 调用避免竞态
+        if (ModBase.RunInUi())
+            flowDocuments[uuid] = new FlowDocument();
+        else
+            ModBase.RunInUiWait(() => flowDocuments[uuid] = new FlowDocument());
         SelectionChange(uuid);
         ModMain.frmMain.BtnExtraLog.ShowRefresh();
     }

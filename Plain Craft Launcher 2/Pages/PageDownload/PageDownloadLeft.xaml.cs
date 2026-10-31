@@ -182,6 +182,18 @@ public partial class PageDownloadLeft : IRefreshable
                 ItemServer.Checked = true;
                 break;
             }
+            case FormMain.PageSubType.DownloadServerSpigot:
+            {
+                if (ModMain.frmDownloadServerSpigot is not null) ModMain.frmDownloadServerSpigot.Reload();
+                ItemServerSpigot.Checked = true;
+                break;
+            }
+            case FormMain.PageSubType.DownloadServerPurpur:
+            {
+                if (ModMain.frmDownloadServerPurpur is not null) ModMain.frmDownloadServerPurpur.Reload();
+                ItemServerPurpur.Checked = true;
+                break;
+            }
             case FormMain.PageSubType.DownloadCompFavorites:
             {
                 if (ModMain.frmDownloadCompFavorites is not null)
@@ -229,6 +241,8 @@ public partial class PageDownloadLeft : IRefreshable
         ItemLegacyFabric.Check += PageCheck;
         ItemLabyMod.Check += PageCheck;
         ItemServer.Check += PageCheck;
+        ItemServerSpigot.Check += PageCheck;
+        ItemServerPurpur.Check += PageCheck;
 
         AnimatedControl = PanItem;
     }
@@ -353,8 +367,20 @@ public partial class PageDownloadLeft : IRefreshable
             case FormMain.PageSubType.DownloadServer:
             {
                 if (ModMain.frmDownloadServer is null)
-                    ModMain.frmDownloadServer = new PageDownloadServer();
+                    ModMain.frmDownloadServer = new PageDownloadServer(ModServerDownload.ServerType.Paper);
                 return ModMain.frmDownloadServer;
+            }
+            case FormMain.PageSubType.DownloadServerSpigot:
+            {
+                if (ModMain.frmDownloadServerSpigot is null)
+                    ModMain.frmDownloadServerSpigot = new PageDownloadServer(ModServerDownload.ServerType.Spigot);
+                return ModMain.frmDownloadServerSpigot;
+            }
+            case FormMain.PageSubType.DownloadServerPurpur:
+            {
+                if (ModMain.frmDownloadServerPurpur is null)
+                    ModMain.frmDownloadServerPurpur = new PageDownloadServer(ModServerDownload.ServerType.Purpur);
+                return ModMain.frmDownloadServerPurpur;
             }
 
             default:
