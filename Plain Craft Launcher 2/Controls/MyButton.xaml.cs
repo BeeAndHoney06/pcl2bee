@@ -56,6 +56,23 @@ public partial class MyButton
         MouseEnter += (_, _) => Button_MouseEnter();
         MouseLeftButtonUp += (_, _) => Button_MouseUp();
         MouseLeave += (_, _) => Button_MouseLeave();
+        PanFore.SizeChanged += (_, _) => RefreshCapsuleCorner();
+    }
+
+    /// <summary>
+    ///     胶囊圆角：始终取按钮实际高度的一半，保证左右两端都是半圆。
+    /// </summary>
+    private void RefreshCapsuleCorner()
+    {
+        var radius = PanFore.ActualHeight / 2d;
+        if (radius <= 0d)
+            return;
+        var corner = new CornerRadius(radius);
+        if (!PanFore.CornerRadius.Equals(corner))
+            PanFore.CornerRadius = corner;
+        // 外层底色同步圆角，避免胶囊按钮背后露出方角
+        if (!PanBack.CornerRadius.Equals(corner))
+            PanBack.CornerRadius = corner;
     }
 
     public InlineCollection Inlines => LabText.Inlines;

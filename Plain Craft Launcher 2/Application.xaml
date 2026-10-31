@@ -162,8 +162,9 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Thumb">
-                            <Border Background="{DynamicResource ColorBrushSemiTransparent}" SnapsToDevicePixels="True">
-                                <Border Background="{TemplateBinding Foreground}" CornerRadius="3" Margin="2" />
+                            <Border Background="Transparent" SnapsToDevicePixels="True">
+                                <!-- 胶囊滑块：左右与上下都留出空隙，形成悬浮的圆头胶囊 -->
+                                <Border Background="{TemplateBinding Foreground}" CornerRadius="999" Margin="1.5,3" />
                             </Border>
                         </ControlTemplate>
                     </Setter.Value>
@@ -181,7 +182,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ScrollBar">
-                            <Border CornerRadius="2">
+                            <Border CornerRadius="999">
                                 <Track x:Name="PART_Track" IsDirectionReversed="true"
                                        IsEnabled="{TemplateBinding IsMouseOver}">
                                     <Track.Resources>

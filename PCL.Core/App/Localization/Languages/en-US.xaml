@@ -3300,6 +3300,13 @@
     <sys:String x:Key="Setup.Ui.Theme.Custom.Lightness">Custom lightness</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.CrashBlue">Golden Yellow</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.Hmcl">HMCL</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.OceanBlue">Ocean Blue</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowCyan">Rainbow Cyan</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowGreen">Rainbow Green</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowOrange">Rainbow Orange</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowPurple">Rainbow Purple</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowRed">Rainbow Red</sys:String>
+    <sys:String x:Key="Setup.Ui.Theme.Color.RainbowYellow">Rainbow Yellow</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Color.SkyBlue">Lemon Yellow</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.Dark">Dark</sys:String>
     <sys:String x:Key="Setup.Ui.Theme.DarkColor">Dark theme color</sys:String>
