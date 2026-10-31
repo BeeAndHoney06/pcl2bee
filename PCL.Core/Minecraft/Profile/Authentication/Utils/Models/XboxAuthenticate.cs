@@ -1,4 +1,4 @@
-﻿namespace PCL.Core.Minecraft.Profile.Authentication.Utils.Models;
+namespace PCL.Core.Minecraft.Profile.Authentication.Utils.Models;
 
 public record XboxAuthenticate<T>
 {

@@ -1,4 +1,4 @@
-﻿namespace PCL.Core.Minecraft.Profile.Models;
+namespace PCL.Core.Minecraft.Profile.Models;
 
 public enum ProfileType
 {

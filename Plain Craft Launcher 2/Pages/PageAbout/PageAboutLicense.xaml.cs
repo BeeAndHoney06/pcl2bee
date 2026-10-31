@@ -1,4 +1,4 @@
-﻿namespace PCL;
+namespace PCL;
 
 public partial class PageAboutLicense
 {

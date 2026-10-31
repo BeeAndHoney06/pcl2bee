@@ -2,3 +2,26 @@
 
 # IDE0028: 简化集合初始化
 dotnet_style_collection_initializer = true:silent
+
+# ── 编码规范 ────────────────────────────────────────────────
+# 仓库内所有文本文件统一使用 UTF-8（无 BOM）+ LF 换行。
+# 历史上曾出现「UTF-8 内容被按 GBK 解码后写回」导致的注释乱码
+# （例如 鍗曟枃浠跺帇缂 这类字符），根源是工具链默认编码不一致。
+# 显式声明 charset 可避免编辑器/脚本再次写入错误编码。
+charset = utf-8
+
+# ── 换行符 ──────────────────────────────────────────────────
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{xaml,csproj,props,targets,json,yml,yaml}]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{md,txt}]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true

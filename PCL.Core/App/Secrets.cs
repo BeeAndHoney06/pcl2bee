@@ -1,4 +1,4 @@
-﻿using PCL.Core.Utils.Exts;
+using PCL.Core.Utils.Exts;
 using PCL.Core.Utils.OS;
 
 namespace PCL.Core.App;
