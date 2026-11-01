@@ -768,6 +768,19 @@ public partial class FormMain
         return nearest;
     }
 
+    /// <summary>
+    ///     获取与给定主页面种类对应的顶部标签。
+    ///     标签在 StackPanel 中的先后顺序与 PageType 的枚举值并不一致（例如服务器管理排在关于之前），
+    ///     因此必须按 Tag 匹配，而不能用下标。
+    /// </summary>
+    private MyRadioButton GetTitleSelect(PageType page)
+    {
+        foreach (var child in PanTitleSelect.Children)
+            if (child is MyRadioButton button && button.Tag is not null && ModBase.Val(button.Tag) == (double)page)
+                return button;
+        return null;
+    }
+
     // 最小化
     private void BtnTitleMin_Click(object sender, EventArgs e)
     {
@@ -1810,8 +1823,11 @@ public partial class FormMain
             // 切换到主页面
             PageChangeExit();
             isChangingPage = true; // 防止下面的勾选直接触发了 PageChangeActual
-            ((MyRadioButton)PanTitleSelect.Children[(int)stack.page]).SetChecked(true, true,
-                string.IsNullOrEmpty(PageNameGet(pageCurrent)));
+            var titleSelect = GetTitleSelect(stack.page);
+            if (titleSelect is not null)
+                titleSelect.SetChecked(true, true, string.IsNullOrEmpty(PageNameGet(pageCurrent)));
+            else
+                ModBase.Log("[Control] 未能找到主页面对应的顶部标签：" + stack.page, ModBase.LogLevel.Debug);
             isChangingPage = false;
             switch (stack.page)
             {

@@ -29,7 +29,7 @@
                                       Title="{DynamicResource About.Thanks.ServerControlPad.Name}"
                                       Info="{DynamicResource About.Thanks.ServerControlPad.Info}"
                                       SvgIcon="lucide/server" LogoScale="1"
-                                      Type="Button" Click="ItemServerControlPad_Click" />
+                                      Type="Clickable" Click="ItemServerControlPad_Click" />
                 </StackPanel>
             </local:MyCard>
         </StackPanel>
