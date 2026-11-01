@@ -86,6 +86,8 @@ public partial class MyListItem : IMyRadio
                     ModAnimation.AaOpacity(RectBack, 1d - RectBack.Opacity, time,
                         ease: new ModAnimation.AniEaseOutFluent())
                 });
+                // 投影只在悬浮时挂上（全局共享一个冻结实例），避免每个列表项各持有一个 DropShadowEffect
+                RectBack.Effect = RectBackHoverShadow;
                 if (IsScaleAnimationEnabled)
                 {
                     ani.Add(ModAnimation.AaScaleTransform(RectBack,
@@ -111,6 +113,8 @@ public partial class MyListItem : IMyRadio
                 }
 
                 ani.Add(ModAnimation.AaOpacity(RectBack, -RectBack.Opacity, time));
+                // 淡出结束后摘掉投影引用，释放该列表项对效果对象的持有
+                ani.Add(ModAnimation.AaCode(() => RectBack.Effect = null, time, after: true));
                 if (IsScaleAnimationEnabled)
                     ani.AddRange(new[]
                     {
@@ -202,16 +206,8 @@ public partial class MyListItem : IMyRadio
                     BorderThickness = new Thickness(ModBase.GetWPFSize(1d)),
                     SnapsToDevicePixels = true,
                     IsHitTestVisible = false,
-                    Opacity = 0d,
-                    // 只在鼠标悬浮时才创建，投影开销仅作用于当前项
-                    Effect = new DropShadowEffect
-                    {
-                        ShadowDepth = 0d,
-                        BlurRadius = 10d,
-                        Direction = 270d,
-                        Opacity = 0.18d,
-                        Color = Colors.Black
-                    }
+                    Opacity = 0d
+                    // 投影（Effect）不在此创建：改由悬浮动画挂上共享的冻结实例，见 RectBackHoverShadow
                 };
                 rect.SetResourceReference(Border.BackgroundProperty, "ColorBrush7");
                 rect.SetResourceReference(Border.BorderBrushProperty, "ColorBrush6");
@@ -350,6 +346,28 @@ public partial class MyListItem : IMyRadio
     ///     悬浮背景的圆角半径：统一使用圆角矩形，与卡片、磁贴的圆角保持一致。
     /// </summary>
     private const double RectBackCornerRadius = 10d;
+
+    /// <summary>
+    ///     悬浮投影：全局共享一个已冻结的实例。
+    ///     原先每个 MyListItem 都在初始化时 new 一个 DropShadowEffect，
+    ///     列表项较多时（如资源下载页每页 40 项）会持续累积效果对象开销；
+    ///     改为悬浮时挂上共享实例、移出时摘下，效果对象始终只有一个。
+    /// </summary>
+    private static readonly DropShadowEffect RectBackHoverShadow = CreateRectBackHoverShadow();
+
+    private static DropShadowEffect CreateRectBackHoverShadow()
+    {
+        var shadow = new DropShadowEffect
+        {
+            ShadowDepth = 0d,
+            BlurRadius = 10d,
+            Direction = 270d,
+            Opacity = 0.18d,
+            Color = Colors.Black
+        };
+        shadow.Freeze(); // 冻结后可安全地在多个元素间共享
+        return shadow;
+    }
 
     // 边距
     public int PaddingLeft

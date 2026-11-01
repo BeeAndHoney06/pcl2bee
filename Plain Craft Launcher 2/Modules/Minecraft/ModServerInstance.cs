@@ -341,11 +341,16 @@ public static class ModServerInstance
                 ModBase.RunInUi(() => ModMain.frmMain.PageChange(FormMain.PageType.GameLog));
                 HintService.Hint(Lang.Text("Select.Server.Launched", instance.Name), HintType.Success);
             }
+            catch (ModBase.CancelledException)
+            {
+                // 用户主动取消（例如未同意 EULA），无需提示错误
+                ModBase.Log($"[Server] 启动被用户取消：{instance.Name}");
+            }
             catch (Exception ex)
             {
-                ModBase.Log(ex, Lang.Text("Select.Server.Error.LaunchFailed", instance.Name),
+                ModBase.Log(ex, $"启动服务端 {instance.Name} 失败",
                     ModBase.LogLevel.Msgbox,
-                    userSummary: Lang.Text("Select.Server.Error.LaunchFailed", instance.Name));
+                    userSummary: Lang.Text("Select.Server.Error.LaunchFailed", instance.Name, ex.Message));
             }
             finally
             {
@@ -402,16 +407,31 @@ public static class ModServerInstance
 
     /// <summary>
     ///     确保实例文件夹中存在已同意 EULA 的 eula.txt。
+    ///     Minecraft EULA 属于法律协议，必须由用户本人明确同意；不同意则取消启动。
     /// </summary>
     private static void EnsureEula(string folder)
     {
         var path = Path.Combine(folder, "eula.txt");
         if (File.Exists(path) && File.ReadAllText(path).ContainsF("eula=true", true))
             return;
+
+        var choice = 0;
+        ModBase.RunInUiWait(() => choice = ModMain.MyMsgBox(
+            Lang.Text("Select.Server.Eula.Message"),
+            Lang.Text("Select.Server.Eula.Title"),
+            Lang.Text("Select.Server.Eula.Agree"),
+            Lang.Text("Common.Action.Cancel"),
+            isWarn: true));
+        if (choice != 1)
+        {
+            ModBase.Log("[Server] 用户未同意 Minecraft EULA，已取消启动");
+            throw new ModBase.CancelledException();
+        }
+
         ModBase.WriteFile(path,
             "#By changing the setting below to TRUE you are indicating your agreement to our EULA (https://aka.ms/MinecraftEULA).\r\n" +
             "eula=true\r\n");
-        ModBase.Log($"[Server] 已自动写入 eula.txt：{folder}");
+        ModBase.Log($"[Server] 用户已同意 EULA，已写入 eula.txt：{folder}");
         HintService.Hint(Lang.Text("Select.Server.EulaAccepted"), HintType.Info);
     }
 

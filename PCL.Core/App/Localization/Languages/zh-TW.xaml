@@ -3706,7 +3706,10 @@
     <sys:String x:Key="Select.Server.Core.Unknown">未知</sys:String>
     <sys:String x:Key="Select.Server.Launch">啟動伺服器</sys:String>
     <sys:String x:Key="Select.Server.Launched">已啟動伺服器 {0}，控制台已接入即時日誌。</sys:String>
-    <sys:String x:Key="Select.Server.EulaAccepted">首次啟動已自動同意 EULA（eula.txt）。</sys:String>
+    <sys:String x:Key="Select.Server.EulaAccepted">已依您的確認記錄 EULA 同意（eula.txt）。</sys:String>
+    <sys:String x:Key="Select.Server.Eula.Title">Minecraft 終端使用者授權協議</sys:String>
+    <sys:String x:Key="Select.Server.Eula.Message">啟動伺服器端前需要您本人同意 Minecraft 終端使用者授權協議（EULA）。&#xA;&#xA;點擊「我同意」後將在此實例目錄寫入 eula.txt，並以您的名義記錄同意狀態；點擊「取消」則不啟動伺服器端。&#xA;&#xA;協議全文：https://aka.ms/MinecraftEULA</sys:String>
+    <sys:String x:Key="Select.Server.Eula.Agree">我同意</sys:String>
     <sys:String x:Key="Select.Server.Error.CannotLaunch">無法啟動伺服器 {0}：實例不完整。</sys:String>
     <sys:String x:Key="Select.Server.Error.AlreadyRunning">伺服器 {0} 已在執行。</sys:String>
     <sys:String x:Key="Select.Server.Error.NoCore">伺服器 {0} 缺少核心 jar 檔案。</sys:String>

@@ -263,11 +263,12 @@ public static class ModWatcher
             WatcherStateChanged();
 
             // 初始化进程与日志读取
+            // 注意：必须先挂事件再 BeginXxxReadLine，否则开头几行输出会因尚无订阅者而丢失
             gameProcess = loader.input;
-            gameProcess.BeginOutputReadLine();
-            gameProcess.BeginErrorReadLine();
             gameProcess.OutputDataReceived += LogReceived;
             gameProcess.ErrorDataReceived += LogReceived;
+            gameProcess.BeginOutputReadLine();
+            gameProcess.BeginErrorReadLine();
 
             // 初始化时钟
             // 设置窗口标题

@@ -3709,7 +3709,10 @@
     <sys:String x:Key="Select.Server.Core.Unknown">Unknown</sys:String>
     <sys:String x:Key="Select.Server.Launch">Start server</sys:String>
     <sys:String x:Key="Select.Server.Launched">Server {0} started; the console is now shown in the live log view.</sys:String>
-    <sys:String x:Key="Select.Server.EulaAccepted">The EULA was accepted automatically on first start (eula.txt).</sys:String>
+    <sys:String x:Key="Select.Server.EulaAccepted">EULA acceptance recorded with your confirmation (eula.txt).</sys:String>
+    <sys:String x:Key="Select.Server.Eula.Title">Minecraft End User Licence Agreement</sys:String>
+    <sys:String x:Key="Select.Server.Eula.Message">You must accept the Minecraft End User Licence Agreement (EULA) yourself before the server can be started.&#xA;&#xA;Choosing "I agree" writes eula.txt into this instance folder and records the acceptance in your name. Choosing "Cancel" does not start the server.&#xA;&#xA;Full text: https://aka.ms/MinecraftEULA</sys:String>
+    <sys:String x:Key="Select.Server.Eula.Agree">I agree</sys:String>
     <sys:String x:Key="Select.Server.Error.CannotLaunch">Cannot start server {0}: the instance is incomplete.</sys:String>
     <sys:String x:Key="Select.Server.Error.AlreadyRunning">Server {0} is already running.</sys:String>
     <sys:String x:Key="Select.Server.Error.NoCore">Server {0} is missing its core jar file.</sys:String>
