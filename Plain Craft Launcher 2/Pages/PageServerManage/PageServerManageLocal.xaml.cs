@@ -79,6 +79,9 @@ public partial class PageServerManageLocal
             Launcher.frmMain?.PageChange(FormMain.PageType.Download, FormMain.PageSubType.DownloadServer);
         }, true));
         actions.Children.Add(Button(Lang.Text("Server.Local.Refresh"), (_, _) => ShowList(), false, 10));
+        // 把现有 MC 实例里的服务端接入统一管理（互补能力：实例式服务端 + 本模块的管理功能）
+        actions.Children.Add(Button(Lang.Text("Server.Local.ImportFromInstance"),
+            async (_, _) => await ImportFromInstancesAsync(), false, 10));
         actions.Children.Add(Button(Lang.Text("Server.Local.OpenFolder"), (_, _) =>
         {
             _store.EnsureRoot();
@@ -1116,4 +1119,56 @@ public partial class PageServerManageLocal
     };
 
     #endregion
+
+    /// <summary>
+    ///     扫描 MC 实例中包含服务端核心的目录，并以「外部目录」方式接入服务器管理。
+    /// </summary>
+    private async Task ImportFromInstancesAsync()
+    {
+        List<(string Name, string Directory, string Jar)> candidates = [];
+        foreach (var instance in ModServerInstance.ScanInstances())
+        {
+            var jar = ModServerInstance.FindJar(instance.PathInstance, ModServerInstance.ReadMeta(instance.PathInstance));
+            if (string.IsNullOrWhiteSpace(jar)) continue;
+            candidates.Add((instance.Name, instance.PathInstance, jar));
+        }
+
+        if (candidates.Count == 0)
+        {
+            PCL.Core.UI.Hints.HintService.Show(
+                PCL.Core.UI.Hints.Hints.Info(Lang.Text("Server.Local.ImportNone")));
+            return;
+        }
+
+        var radios = candidates.Select(candidate =>
+            (IMyRadio)new MyRadioBox { Text = candidate.Name, Tag = candidate }).ToList();
+        var index = ModMain.MyMsgBoxSelect(radios, Lang.Text("Server.Local.ImportTitle"),
+            Lang.Text("Server.Local.ImportConfirm"));
+        if (index is null) return;
+
+        var picked = candidates[index.Value];
+        try
+        {
+            var entry = new ServerInstance
+            {
+                Name = Path.GetFileName(picked.Directory),
+                Kind = ServerKind.Vanilla,
+                MinecraftVersion = ModBase.ReadIni(Path.Combine(picked.Directory, "PCL", "Setup.ini"), "Info", "Vanilla") ?? "",
+                JarFile = Path.GetFileName(picked.Jar),
+                LaunchMode = "jar",
+                ExternalDirectory = picked.Directory
+            };
+            _store.Create(entry);
+            PCL.Core.UI.Hints.HintService.Show(
+                PCL.Core.UI.Hints.Hints.Success(Lang.Text("Server.Local.ImportDone", entry.Name)));
+        }
+        catch (Exception ex)
+        {
+            ModBase.Log(ex, "接入实例服务端失败", ModBase.LogLevel.Msgbox,
+                userSummary: Lang.Text("Server.Local.ImportFailed", ex.Message));
+        }
+
+        await Task.CompletedTask;
+        ShowList();
+    }
 }

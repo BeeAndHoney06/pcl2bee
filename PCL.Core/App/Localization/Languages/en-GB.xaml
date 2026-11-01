@@ -3760,6 +3760,12 @@
     <sys:String x:Key="Server.Local.Description">Manage independent server directories under PCL/Servers with console, configuration, files and backups.</sys:String>
     <sys:String x:Key="Server.Local.Create">Create server</sys:String>
     <sys:String x:Key="Server.Local.Refresh">Refresh</sys:String>
+    <sys:String x:Key="Server.Local.ImportFromInstance">Attach Instance Server</sys:String>
+    <sys:String x:Key="Server.Local.ImportTitle">Select an instance to attach</sys:String>
+    <sys:String x:Key="Server.Local.ImportConfirm">Attach</sys:String>
+    <sys:String x:Key="Server.Local.ImportNone">No instance containing a server jar was found.</sys:String>
+    <sys:String x:Key="Server.Local.ImportDone">Attached server "{0}"; you can start and manage it here.</sys:String>
+    <sys:String x:Key="Server.Local.ImportFailed">Failed to attach instance server: {0}</sys:String>
     <sys:String x:Key="Server.Local.OpenFolder">Open Servers folder</sys:String>
     <sys:String x:Key="Server.Local.Empty">No local servers yet. Deploy one from Download → Server.</sys:String>
     <sys:String x:Key="Server.Local.Port">port {0}</sys:String>

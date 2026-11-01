@@ -80,8 +80,12 @@ public sealed class ServerStore
                 return null;
 
             instance.Id = id;
-            instance.Directory = directory;
-            instance.EulaAccepted = IsEulaAccepted(directory);
+            // 外部目录（例如 MC 实例）优先：服务端文件与 eula.txt 都不在 Servers 下
+            var runtimeDirectory = string.IsNullOrWhiteSpace(instance.ExternalDirectory)
+                ? directory
+                : instance.ExternalDirectory;
+            instance.Directory = runtimeDirectory;
+            instance.EulaAccepted = IsEulaAccepted(runtimeDirectory);
             return instance;
         }
         catch (Exception ex)
@@ -101,7 +105,9 @@ public sealed class ServerStore
 
         var directory = GetDirectory(instance.Id);
         System.IO.Directory.CreateDirectory(directory);
-        instance.Directory = directory;
+        instance.Directory = string.IsNullOrWhiteSpace(instance.ExternalDirectory)
+            ? directory
+            : instance.ExternalDirectory;
         instance.CreatedAt = DateTime.Now;
         Save(instance);
         return instance;
@@ -113,7 +119,10 @@ public sealed class ServerStore
             throw new ArgumentException("服务端 ID 不能为空", nameof(instance));
         var directory = GetDirectory(instance.Id);
         System.IO.Directory.CreateDirectory(directory);
-        instance.Directory = directory;
+        // 元数据始终存放在 Servers 下；运行目录可能是外部目录
+        instance.Directory = string.IsNullOrWhiteSpace(instance.ExternalDirectory)
+            ? directory
+            : instance.ExternalDirectory;
 
         var metaPath = Path.Combine(directory, MetaFileName);
         var tempPath = metaPath + ".tmp";

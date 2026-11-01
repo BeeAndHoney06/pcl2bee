@@ -68,6 +68,12 @@ public sealed class ServerInstance
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? LastStartedAt { get; set; }
 
+    /// <summary>
+    ///     外部服务端目录（非 PCL/Servers 下，例如某个 MC 实例目录）。
+    ///     为空表示由 <see cref="ServerStore" /> 管理的标准目录。
+    /// </summary>
+    public string ExternalDirectory { get; set; } = "";
+
     [JsonIgnore] public string Directory { get; set; } = "";
     [JsonIgnore] public ServerRuntimeState RuntimeState { get; set; } = ServerRuntimeState.Stopped;
     [JsonIgnore] public bool EulaAccepted { get; set; }

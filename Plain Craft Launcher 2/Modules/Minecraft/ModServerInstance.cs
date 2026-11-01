@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using PCL.Core.App.Localization;
+using PCL.Core.Minecraft.Server;
 using PCL.Core.Minecraft;
 using PCL.Core.UI;
 
@@ -363,17 +364,16 @@ public static class ModServerInstance
     /// <summary>
     ///     根据服务端对应的 Minecraft 版本推算所需的最低 Java 版本。
     /// </summary>
+    /// <summary>
+    ///     由 Minecraft 版本推导所需 Java 主版本。
+    ///     统一复用服务器管理模块（PCL.Core）中的判定，避免两处逻辑不一致。
+    /// </summary>
     private static Version? GetRequiredJavaVersion(string mcVersion)
     {
-        if (string.IsNullOrWhiteSpace(mcVersion) || !Version.TryParse(mcVersion, out var version))
+        if (string.IsNullOrWhiteSpace(mcVersion))
             return null;
-        if (version >= new Version(1, 20, 5))
-            return new Version(21, 0);
-        if (version >= new Version(1, 18))
-            return new Version(17, 0);
-        if (version >= new Version(1, 17))
-            return new Version(16, 0);
-        return new Version(1, 8);
+        var major = ServerJavaEnvironment.GetFallbackRequiredMajor(mcVersion);
+        return major > 0 ? new Version(major, 0) : null;
     }
 
     /// <summary>

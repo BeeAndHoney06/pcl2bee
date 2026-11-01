@@ -3757,6 +3757,12 @@
     <sys:String x:Key="Server.Local.Description">管理 PCL/Servers 下的独立服务器目录，支持启动、控制台、文件与备份。</sys:String>
     <sys:String x:Key="Server.Local.Create">新建服务器</sys:String>
     <sys:String x:Key="Server.Local.Refresh">刷新</sys:String>
+    <sys:String x:Key="Server.Local.ImportFromInstance">接入實例伺服器</sys:String>
+    <sys:String x:Key="Server.Local.ImportTitle">選擇要接入的實例</sys:String>
+    <sys:String x:Key="Server.Local.ImportConfirm">接入</sys:String>
+    <sys:String x:Key="Server.Local.ImportNone">沒有找到包含伺服器核心的實例。</sys:String>
+    <sys:String x:Key="Server.Local.ImportDone">已接入伺服器「{0}」，可在伺服器管理中啟動與管理。</sys:String>
+    <sys:String x:Key="Server.Local.ImportFailed">接入實例伺服器失敗：{0}</sys:String>
     <sys:String x:Key="Server.Local.OpenFolder">打开 Servers 目录</sys:String>
     <sys:String x:Key="Server.Local.Empty">还没有本地服务器。前往“下载 → 服务端”一键部署一个吧。</sys:String>
     <sys:String x:Key="Server.Local.Port">端口 {0}</sys:String>
