@@ -28,6 +28,11 @@ public static class ModMain
     public static SplashScreen? frmStart;
     public static PageLaunchLeft? frmLaunchLeft;
     public static PageLaunchRight? frmLaunchRight;
+    // 服务器管理（移植自 ErieneNeko/PCL-CE-ServerControlPad，Apache-2.0）
+    public static PageServerManageLeft? frmServerManageLeft;
+    public static PageServerManageLocal? frmServerLocal;
+    public static PageServerManageRemote? frmServerRemote;
+
     public static PageLogLeft? frmLogLeft;
     public static PageLogRight? frmLogRight;
     public static PageSelectLeft? frmSelectLeft;

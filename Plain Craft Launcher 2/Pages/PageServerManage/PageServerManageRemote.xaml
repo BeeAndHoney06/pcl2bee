@@ -1,0 +1,20 @@
+<!-- ─────────────────────────────────────────────────────────────────────────
+     服务器管理模块：移植自 ErieneNeko/PCL-CE-ServerControlPad
+       https://github.com/ErieneNeko/PCL-CE-ServerControlPad
+       原作者：ErieneNeko    许可：Apache License 2.0
+       已适配本项目：本地化改用 DynamicResource，其余逻辑保持一致。
+────────────────────────────────────────────────────────────────────────────── -->
+<local:MyPageRight
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:PCL"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" x:Class="PCL.PageServerManageRemote"
+    PanScroll="{Binding ElementName=PanBack}"
+    >
+    <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          x:Name="PanBack">
+        <StackPanel x:Name="PanMain" Margin="25,25,25,20" />
+    </local:MyScrollViewer>
+</local:MyPageRight>

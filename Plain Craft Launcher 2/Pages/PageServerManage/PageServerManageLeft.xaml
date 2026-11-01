@@ -1,0 +1,32 @@
+<!-- ─────────────────────────────────────────────────────────────────────────
+     服务器管理模块：移植自 ErieneNeko/PCL-CE-ServerControlPad
+       https://github.com/ErieneNeko/PCL-CE-ServerControlPad
+       原作者：ErieneNeko    许可：Apache License 2.0
+       已适配本项目：本地化改用 DynamicResource，其余逻辑保持一致。
+────────────────────────────────────────────────────────────────────────────── -->
+<local:MyPageLeft x:Class="PCL.PageServerManageLeft"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:local="clr-namespace:PCL"
+                  mc:Ignorable="d"
+                  >
+    <local:MyScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                          Style="{StaticResource ScrollViewerFullMargin}">
+        <StackPanel Orientation="Vertical" x:Name="PanItem" Margin="0,12,0,0">
+            <TextBlock Text="{DynamicResource Server.Left.Category}" Margin="13,5,5,3"
+                       Opacity="0.6" FontSize="12" />
+            <local:MyListItem x:Name="ItemLocal" IsScaleAnimationEnabled="False"
+                              Type="RadioBox" Tag="1" Check="PageCheck"
+                              MinPaddingRight="35" Height="36" VerticalAlignment="Top"
+                              Title="{DynamicResource Server.Left.Local}"
+                              LogoScale="0.9" SvgIcon="lucide/server" />
+            <local:MyListItem x:Name="ItemRemote" IsScaleAnimationEnabled="False"
+                              Type="RadioBox" Tag="2" Check="PageCheck"
+                              MinPaddingRight="35" Height="36" VerticalAlignment="Top"
+                              Title="{DynamicResource Server.Left.Remote}"
+                              LogoScale="0.9" SvgIcon="lucide/network" />
+        </StackPanel>
+    </local:MyScrollViewer>
+</local:MyPageLeft>

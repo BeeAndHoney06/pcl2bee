@@ -172,6 +172,10 @@
                                                  Check="BtnTitleSelect_Click"
                                                  LogoScale="1.1"
                                                  SvgIcon="lucide/settings" />
+                            <local:MyRadioButton x:Name="BtnTitleSelectServer" Text="{DynamicResource Main.Tab.Server}" Tag="4" Margin="5,0" Padding="2,0"
+                                                 Check="BtnTitleSelect_Click"
+                                                 LogoScale="1"
+                                                 SvgIcon="lucide/server" />
                             <local:MyRadioButton x:Name="BtnTitleSelectAbout" Text="{DynamicResource Main.Tab.About}" Tag="3" Margin="5,0" Padding="2,0"
                                                  Check="BtnTitleSelect_Click"
                                                  LogoScale="1"

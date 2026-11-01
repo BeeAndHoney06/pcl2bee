@@ -1493,6 +1493,11 @@ public partial class FormMain
         About = 3,
 
         /// <summary>
+        ///     服务器管理（本地服务端实例 + MCSManager 远程面板）。
+        /// </summary>
+        ServerManage = 4,
+
+        /// <summary>
         ///     实例选择。这是一个副页面。
         /// </summary>
         InstanceSelect = 5,
@@ -1552,6 +1557,9 @@ public partial class FormMain
         DownloadLabyMod = 17,
         DownloadLegacyFabric = 18,
         DownloadServer = 19,
+
+        ServerLocal = 1,
+        ServerRemote = 2,
         DownloadServerSpigot = 20,
         DownloadServerPurpur = 21,
 
@@ -1687,6 +1695,12 @@ public partial class FormMain
                     if (ModMain.frmAboutLeft is null)
                         ModMain.frmAboutLeft = new PageAboutLeft();
                     return ModMain.frmAboutLeft.pageID;
+                }
+
+                case PageType.ServerManage:
+                {
+                    ModMain.frmServerManageLeft ??= new PageServerManageLeft();
+                    return ModMain.frmServerManageLeft.PageId;
                 }
 
                 case PageType.InstanceSetup:
@@ -1995,6 +2009,14 @@ public partial class FormMain
                         ModMain.frmAboutLeft ??= new PageAboutLeft();
                         subType = ModMain.frmAboutLeft.pageID;
                         PageChangeAnim(ModMain.frmAboutLeft, (FrameworkElement)ModMain.frmAboutLeft.PageGet(subType));
+                        break;
+                    }
+                case PageType.ServerManage: // 服务器管理
+                    {
+                        ModMain.frmServerManageLeft ??= new PageServerManageLeft();
+                        subType = ModMain.frmServerManageLeft.PageId;
+                        PageChangeAnim(ModMain.frmServerManageLeft,
+                            (FrameworkElement)ModMain.frmServerManageLeft.PageGet(subType));
                         break;
                     }
                 case PageType.GameLog: // 实时日志

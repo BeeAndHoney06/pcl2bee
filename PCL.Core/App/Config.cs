@@ -656,4 +656,34 @@ public static partial class Config
         [ConfigItem<string>("VersionServerAuthServer", "")] public partial ArgConfig<string> AuthServerAddress { get; }
         [ConfigItem<bool>("VersionServerLoginLock", false)] public partial ArgConfig<bool> AuthLocked { get; }
     }
+
+    /// <summary>
+    ///     服务器管理相关配置（本地服务端实例 + MCSManager 远程面板）。
+    /// </summary>
+    [ConfigGroup("Server")] partial class ServerConfigGroup
+    {
+        /// <summary>
+        ///     上次使用的 MCSManager 面板地址。
+        /// </summary>
+        [ConfigItem<string>("ServerMcsmAddress", "", ConfigSource.Local)]
+        public partial string McsmAddress { get; set; }
+
+        /// <summary>
+        ///     MCSManager API Key。加密存储，权限等同于生成它的账号。
+        /// </summary>
+        [ConfigItem<string>("ServerMcsmApiKey", "", ConfigSource.SharedEncrypt)]
+        public partial string McsmApiKey { get; set; }
+
+        /// <summary>
+        ///     上次成功连接的面板用户名，仅用于界面显示。
+        /// </summary>
+        [ConfigItem<string>("ServerMcsmUserName", "", ConfigSource.Local)]
+        public partial string McsmUserName { get; set; }
+
+        /// <summary>
+        ///     打开服务器管理页面时自动尝试连接。
+        /// </summary>
+        [ConfigItem<bool>("ServerMcsmAutoConnect", true, ConfigSource.Local)]
+        public partial bool McsmAutoConnect { get; set; }
+    }
 }
