@@ -3,6 +3,9 @@ pcl2bee
 
 **重要通知：**
 *伟大的HighPing64x已于**2026-11-8**被踢出项目合作者名单，他本人也表示不愿意继续为项目提供更新和任何开发。*
+
 **R.I.P**
+
 <img width="256" height="256" alt="b_b1c0c43391d79c1662f94a083a497fb4" src="https://github.com/user-attachments/assets/fde918e3-4641-4370-8a03-1417e421c89f" />
-(*2026-2026*)
+
+*2026-2026*
