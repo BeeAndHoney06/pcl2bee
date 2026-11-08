@@ -13,6 +13,7 @@ public partial class PageAboutLeft
         ItemInfo.Check += PageCheck;
         ItemUpdate.Check += PageCheck;
         ItemLicense.Check += PageCheck;
+        ItemSponsor.Check += PageCheck;
     }
 
     private void PageCheck(object sender, ModBase.RouteEventArgs e)
@@ -27,6 +28,8 @@ public partial class PageAboutLeft
         {
             case FormMain.PageSubType.AboutUpdate:
                 return ModMain.frmAboutUpdate ??= new PageAboutUpdate();
+            case FormMain.PageSubType.AboutSponsor:
+                return ModMain.frmAboutSponsor ??= new PageAboutSponsor();
             case FormMain.PageSubType.AboutLicense:
                 return ModMain.frmAboutLicense ??= new PageAboutLicense();
             default:

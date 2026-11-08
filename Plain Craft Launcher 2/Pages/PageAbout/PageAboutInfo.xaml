@@ -21,17 +21,6 @@
                                   Text="{DynamicResource About.Info.Copied}" />
                 </StackPanel>
             </local:MyCard>
-            <!-- 特别鸣谢 -->
-            <local:MyCard Margin="25,0,25,15" Title="{DynamicResource About.Thanks.Title}">
-                <StackPanel Margin="25,40,25,20" HorizontalAlignment="Stretch">
-                    <TextBlock Text="{DynamicResource About.Thanks.Intro}" TextWrapping="Wrap" Opacity="0.75" />
-                    <local:MyListItem Margin="0,12,0,0" Height="48" IsScaleAnimationEnabled="False"
-                                      Title="{DynamicResource About.Thanks.ServerControlPad.Name}"
-                                      Info="{DynamicResource About.Thanks.ServerControlPad.Info}"
-                                      SvgIcon="lucide/server" LogoScale="1"
-                                      Type="Clickable" Click="ItemServerControlPad_Click" />
-                </StackPanel>
-            </local:MyCard>
         </StackPanel>
     </local:MyScrollViewer>
 </local:MyPageRight>

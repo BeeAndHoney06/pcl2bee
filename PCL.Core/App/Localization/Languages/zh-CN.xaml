@@ -895,6 +895,22 @@
     <sys:String x:Key="Instance.Export.Task.DownloadPclRelease">下载 PCL CE 正式版</sys:String>
     <sys:String x:Key="Instance.Export.Task.FetchFileInfo">联网获取文件信息</sys:String>
     <sys:String x:Key="Instance.Export.ZipFilter">压缩文件(*.zip)|*.zip</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Title">导出格式</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Label">整合包格式</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Pcl">PCL2 Bee 整合包 (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Modrinth">Modrinth 整合包 (.mrpack)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.CurseForge">CurseForge 整合包 (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Ftb">FTB 整合包 (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.MultiMc">MultiMC 实例 (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Technic">Technic 整合包 (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.AtLauncher">ATLauncher 实例 (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.Pcl">默认格式，可选择是否打包启动器本体。</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.Modrinth">符合 Modrinth 规范的 mrpack，可上传至 Modrinth。</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.CurseForge">生成 manifest.json 与 overrides，可在线获取的资源会写入清单，可导入 CurseForge 及兼容的启动器。</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.Ftb">生成 FTB App 可识别的清单，资源通过 CurseForge 文件 ID 在线获取。</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.MultiMc">生成 mmc-pack.json 与 instance.cfg，所有文件会直接打包。</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.Technic">游戏文件位于根目录并包含 bin/modpack.jar，所有文件会直接打包。</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.AtLauncher">生成 instance.json 与 minecraft 目录，所有文件会直接打包。</sys:String>
 
     <!-- Instance.Export.Advanced -->
 
@@ -3726,13 +3742,12 @@
     <sys:String x:Key="Main.Tab.Server">服务器</sys:String>
     <sys:String x:Key="Main.Tab.About">关于</sys:String>
     <sys:String x:Key="About.Left.Category">关于</sys:String>
-    <sys:String x:Key="About.Thanks.Title">特别鸣谢</sys:String>
-    <sys:String x:Key="About.Thanks.Intro">以下开源项目为本启动器的功能提供了重要帮助，在此向作者致谢。</sys:String>
-    <sys:String x:Key="About.Thanks.ServerControlPad.Name">PCL CE Server Control Pad（ErieneNeko）</sys:String>
-    <sys:String x:Key="About.Thanks.ServerControlPad.Info">服务器下载、部署与本地/远程（MCSM）管理模块，Apache-2.0 许可。点击前往项目主页。</sys:String>
     <sys:String x:Key="About.Left.Info">软件信息</sys:String>
     <sys:String x:Key="About.Left.Update">软件更新</sys:String>
     <sys:String x:Key="About.Left.License">版权声明</sys:String>
+    <sys:String x:Key="About.Left.Sponsor">赞助</sys:String>
+    <sys:String x:Key="About.Sponsor.Message">我们非常希望您能给予我们赞助，您的施舍会成为我们开发的动力。</sys:String>
+    <sys:String x:Key="About.Sponsor.Button">立即赞助</sys:String>
     <sys:String x:Key="About.Info.Version">当前版本：{0}（内部版本 {1}）</sys:String>
     <sys:String x:Key="About.Info.Copy">复制版本号</sys:String>
     <sys:String x:Key="About.Info.Copied">版本号已复制</sys:String>

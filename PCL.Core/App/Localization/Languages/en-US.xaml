@@ -895,6 +895,22 @@
     <sys:String x:Key="Instance.Export.Task.DownloadPclRelease">Download PCL2 Bee release</sys:String>
     <sys:String x:Key="Instance.Export.Task.FetchFileInfo">Get file information</sys:String>
     <sys:String x:Key="Instance.Export.ZipFilter">ZIP file (*.zip)|*.zip</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Title">Export format</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Label">Modpack format</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Pcl">PCL2 Bee modpack (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Modrinth">Modrinth modpack (.mrpack)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.CurseForge">CurseForge modpack (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Ftb">FTB modpack (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.MultiMc">MultiMC instance (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Technic">Technic modpack (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.AtLauncher">ATLauncher instance (.zip)</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.Pcl">Default format. You can choose whether to bundle the launcher itself.</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.Modrinth">An mrpack that follows the Modrinth specification and can be uploaded to Modrinth.</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.CurseForge">Generates manifest.json and overrides. Files that can be fetched online are listed in the manifest. Importable into CurseForge and compatible launchers.</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.Ftb">Generates a manifest recognised by the FTB App. Resources are fetched online by CurseForge file ID.</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.MultiMc">Generates mmc-pack.json and instance.cfg. All files are bundled directly.</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.Technic">Game files are placed in the root together with bin/modpack.jar. All files are bundled directly.</sys:String>
+    <sys:String x:Key="Instance.Export.Format.Desc.AtLauncher">Generates instance.json and a minecraft folder. All files are bundled directly.</sys:String>
 
     <!-- Instance.Export.Advanced -->
 
@@ -3729,13 +3745,12 @@
     <sys:String x:Key="Main.Tab.Server">Servers</sys:String>
     <sys:String x:Key="Main.Tab.About">About</sys:String>
     <sys:String x:Key="About.Left.Category">About</sys:String>
-    <sys:String x:Key="About.Thanks.Title">Special Thanks</sys:String>
-    <sys:String x:Key="About.Thanks.Intro">The following open-source projects contributed significantly to this launcher. Many thanks to their authors.</sys:String>
-    <sys:String x:Key="About.Thanks.ServerControlPad.Name">PCL CE Server Control Pad (ErieneNeko)</sys:String>
-    <sys:String x:Key="About.Thanks.ServerControlPad.Info">Server download, deployment and local/remote (MCSM) management module, licensed under Apache-2.0. Click to open the project page.</sys:String>
     <sys:String x:Key="About.Left.Info">Software info</sys:String>
     <sys:String x:Key="About.Left.Update">Software update</sys:String>
     <sys:String x:Key="About.Left.License">Copyright notice</sys:String>
+    <sys:String x:Key="About.Left.Sponsor">Sponsor</sys:String>
+    <sys:String x:Key="About.Sponsor.Message">We sincerely hope you can sponsor us. Your support will be the driving force behind our development.</sys:String>
+    <sys:String x:Key="About.Sponsor.Button">Sponsor now</sys:String>
     <sys:String x:Key="About.Info.Version">Version: {0} (build {1})</sys:String>
     <sys:String x:Key="About.Info.Copy">Copy version</sys:String>
     <sys:String x:Key="About.Info.Copied">Version copied</sys:String>

@@ -1,0 +1,24 @@
+<local:MyPageRight
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:PCL"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    x:Class="PCL.PageAboutSponsor"
+    PanScroll="{Binding ElementName=PanBack}">
+    <local:MyScrollViewer x:Name="PanBack" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Orientation="Vertical" Margin="0,10,0,10">
+            <local:MyCard Margin="25,15,25,15" Title="{DynamicResource About.Left.Sponsor}">
+                <StackPanel Margin="25,40,25,20" HorizontalAlignment="Stretch">
+                    <TextBlock x:Name="LabSponsorMessage" FontSize="14" TextWrapping="Wrap"
+                               Text="{DynamicResource About.Sponsor.Message}" />
+                    <WrapPanel ItemHeight="35" Margin="0,18,0,0">
+                        <local:MyButton x:Name="BtnSponsor" MinWidth="120" ColorType="Highlight" Margin="0,0,10,0"
+                                        Text="{DynamicResource About.Sponsor.Button}" Click="BtnSponsor_Click" />
+                    </WrapPanel>
+                </StackPanel>
+            </local:MyCard>
+        </StackPanel>
+    </local:MyScrollViewer>
+</local:MyPageRight>

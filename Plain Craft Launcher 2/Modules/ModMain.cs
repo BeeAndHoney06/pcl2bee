@@ -59,6 +59,7 @@ public static class ModMain
     public static PageAboutInfo? frmAboutInfo;
     public static PageAboutUpdate? frmAboutUpdate;
     public static PageAboutLicense? frmAboutLicense;
+    public static PageAboutSponsor? frmAboutSponsor;
     public static PageDownloadMod? frmDownloadMod;
     public static PageDownloadPack? frmDownloadPack;
     public static PageDownloadDataPack? frmDownloadDataPack;

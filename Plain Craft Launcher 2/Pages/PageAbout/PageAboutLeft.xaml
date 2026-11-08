@@ -22,6 +22,10 @@
                               Check="PageCheck" Height="36" VerticalAlignment="Top"
                               MinPaddingRight="35"
                               Title="{DynamicResource About.Left.License}" LogoScale="0.95" SvgIcon="lucide/scroll-text" />
+            <local:MyListItem x:Name="ItemSponsor" IsScaleAnimationEnabled="False" Type="RadioBox" Tag="3"
+                              Check="PageCheck" Height="36" VerticalAlignment="Top"
+                              MinPaddingRight="35"
+                              Title="{DynamicResource About.Left.Sponsor}" LogoScale="0.95" SvgIcon="lucide/heart" />
         </StackPanel>
     </local:MyScrollViewer>
 </local:MyPageLeft>

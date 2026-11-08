@@ -1592,6 +1592,7 @@ public partial class FormMain
         AboutInfo = 0,
         AboutUpdate = 1,
         AboutLicense = 2,
+        AboutSponsor = 3,
 
 
         VersionOverall = 0,

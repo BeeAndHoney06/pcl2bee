@@ -48,9 +48,57 @@ public class ExportOption : DependencyObject
     public bool RequireModLoaderOrOptiFine { get; set; }
 }
 
+/// <summary>
+///     导出整合包时所使用的格式。
+/// </summary>
+public enum ModpackFormat
+{
+    /// <summary>PCL2 Bee 整合包（zip，可选择是否打包启动器本体）。</summary>
+    Pcl,
+
+    /// <summary>Modrinth 整合包（mrpack）。</summary>
+    Modrinth,
+
+    /// <summary>CurseForge 整合包（zip + manifest.json）。</summary>
+    CurseForge,
+
+    /// <summary>FTB 整合包（zip + FTB App 的 manifest.json）。</summary>
+    Ftb,
+
+    /// <summary>MultiMC 实例（zip + mmc-pack.json）。</summary>
+    MultiMc,
+
+    /// <summary>Technic 整合包（zip + bin/modpack.jar）。</summary>
+    Technic,
+
+    /// <summary>ATLauncher 实例（zip + instance.json）。</summary>
+    AtLauncher
+}
+
 public partial class PageInstanceExport : IRefreshable
 {
     private string currentVersion = "";
+
+    /// <summary>
+    ///     当前选择的整合包导出格式。
+    /// </summary>
+    private ModpackFormat SelectedFormat
+    {
+        get
+        {
+            var tag = (ComboFormat.SelectedItem as MyComboBoxItem)?.Tag as string;
+            return tag switch
+            {
+                "modrinth" => ModpackFormat.Modrinth,
+                "curseforge" => ModpackFormat.CurseForge,
+                "ftb" => ModpackFormat.Ftb,
+                "multimc" => ModpackFormat.MultiMc,
+                "technic" => ModpackFormat.Technic,
+                "atlauncher" => ModpackFormat.AtLauncher,
+                _ => ModpackFormat.Pcl
+            };
+        }
+    }
 
     public PageInstanceExport()
     {
@@ -94,7 +142,61 @@ public partial class PageInstanceExport : IRefreshable
         ResetConfigOverrides();
         ReloadAllSubOptions();
         RefreshAllOptionsUI();
+        ApplyFormatConstraints();
         PanBack.ScrollToHome();
+    }
+
+    /// <summary>
+    ///     切换整合包格式时，刷新提示与相关选项的可用状态。
+    /// </summary>
+    private void ComboFormat_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (!IsLoaded) return; // 初始化期间控件尚未就绪
+        ApplyFormatConstraints();
+    }
+
+    /// <summary>
+    ///     根据所选格式，约束其他选项的可用状态，并更新格式说明。
+    /// </summary>
+    private void ApplyFormatConstraints()
+    {
+        var format = SelectedFormat;
+        if (HintFormat is not null)
+            HintFormat.Text = Lang.Text("Instance.Export.Format.Desc." + format);
+        // 能否根据清单在线获取文件
+        var remoteResolvable = format is ModpackFormat.Pcl or ModpackFormat.Modrinth
+            or ModpackFormat.CurseForge or ModpackFormat.Ftb;
+        // MultiMC / Technic / ATLauncher 无法根据清单在线下载，只能把全部文件打包进去
+        if (!remoteResolvable)
+        {
+            CheckAdvancedInclude.Checked = true;
+            CheckAdvancedInclude.IsEnabled = false;
+        }
+        else
+        {
+            CheckAdvancedInclude.IsEnabled = true;
+        }
+
+        // Modrinth 上传模式仅在 PCL2 Bee、Modrinth 格式下有意义
+        if (format is ModpackFormat.Modrinth)
+        {
+            CheckAdvancedModrinth.Checked = true;
+            CheckAdvancedModrinth.IsEnabled = false;
+        }
+        else if (format is ModpackFormat.CurseForge or ModpackFormat.Ftb)
+        {
+            CheckAdvancedModrinth.Checked = false;
+            CheckAdvancedModrinth.IsEnabled = false;
+        }
+        else
+        {
+            CheckAdvancedModrinth.IsEnabled = !(bool)CheckAdvancedInclude.Checked;
+        }
+
+        // 只有 PCL2 Bee 格式可以打包启动器本体
+        if (format != ModpackFormat.Pcl) CheckOptionsPcl.Checked = false;
+        CheckOptionsPcl.IsEnabled = format == ModpackFormat.Pcl && !(bool)CheckAdvancedModrinth.Checked;
+        CheckOptionsPclCustom.IsEnabled = (bool)CheckOptionsPcl.Checked;
     }
 
     // 自动填写整合包名称
@@ -803,6 +905,7 @@ public partial class PageInstanceExport : IRefreshable
     {
         var packName = string.IsNullOrEmpty(TextExportName.Text) ? TextExportName.HintText : TextExportName.Text;
         var packVersion = string.IsNullOrEmpty(TextExportVersion.Text) ? "1.0.0" : TextExportVersion.Text;
+        var format = SelectedFormat;
 
         // 重复任务检查
         var loaderName = Lang.Text("Instance.Export.ExportTask.Prefix") + packName;
@@ -837,10 +940,21 @@ public partial class PageInstanceExport : IRefreshable
         if (packPath is null)
         {
             var extensions = new List<string>();
-            if (CheckAdvancedModrinth.Checked == false)
-                extensions.Add(Lang.Text("Instance.Export.ZipFilter"));
-            if (CheckOptionsPcl.Checked == false)
-                extensions.Add(Lang.Text("Instance.Export.MrpackFilter"));
+            switch (format)
+            {
+                case ModpackFormat.Modrinth:
+                    extensions.Add(Lang.Text("Instance.Export.MrpackFilter"));
+                    break;
+                case ModpackFormat.Pcl:
+                    if (CheckAdvancedModrinth.Checked == false)
+                        extensions.Add(Lang.Text("Instance.Export.ZipFilter"));
+                    if (CheckOptionsPcl.Checked == false)
+                        extensions.Add(Lang.Text("Instance.Export.MrpackFilter"));
+                    break;
+                default:
+                    extensions.Add(Lang.Text("Instance.Export.ZipFilter"));
+                    break;
+            }
             packPath = SystemDialogs.SelectSaveFile(Lang.Text("Instance.Export.SelectSaveLocation"),
                 packName + (string.IsNullOrEmpty(TextExportVersion.Text) ? "" : " " + TextExportVersion.Text),
                 extensions.Join("|"));
@@ -855,16 +969,24 @@ public partial class PageInstanceExport : IRefreshable
         var overridesFolder = Path.Combine(cacheFolder, "modpack", "overrides");
         var mcInstance = PageInstanceLeft.McInstance;
         var pathIndie = mcInstance.PathIndie;
-        var checkHostedAssets = (bool)!CheckAdvancedInclude.Checked;
-        var modrinthUploadMode = (bool)CheckAdvancedModrinth.Checked;
-        var includePCL = (bool)CheckOptionsPcl.Checked;
-        var includePCLCustom = (bool)(includePCL ? CheckOptionsPclCustom.Checked : (bool?)false);
+        // MultiMC / Technic / ATLauncher 无法根据清单在线获取文件，只能全部打包
+        var remoteResolvable = format is ModpackFormat.Pcl or ModpackFormat.Modrinth
+            or ModpackFormat.CurseForge or ModpackFormat.Ftb;
+        var checkHostedAssets = remoteResolvable && (bool)!CheckAdvancedInclude.Checked;
+        var modrinthUploadMode = (format is ModpackFormat.Pcl or ModpackFormat.Modrinth) &&
+                                 (bool)CheckAdvancedModrinth.Checked;
+        var includePCL = format == ModpackFormat.Pcl && (bool)CheckOptionsPcl.Checked;
+        var includePCLCustom = includePCL && (bool)CheckOptionsPclCustom.Checked;
+        ModBase.Log($"[Export] 导出格式：{format}，联网解析：{checkHostedAssets}，打包启动器：{includePCL}");
         var allRules = StandardizeLines(GetAllRules(), true).ToList();
         var allExtraFiles = StandardizeLines(GetExtraFileLines(), false).ToList();
         ModBase.Log($"[Export] 准备导出整合包，共有 {allRules.Count} 条规则，{allExtraFiles.Count} 条追加内容行");
 
         // 构造步骤加载器
         var loaders = new List<ModLoader.LoaderBase>();
+        // CurseForge / FTB 格式需要写入 CurseForge 的项目 ID 与文件 ID
+        var curseForgeIds = new Dictionary<ModLocalComp.LocalCompFile, (int ProjectId, int FileId)>();
+        var curseForgeIdsLock = new object();
 
         #region 准备 PCL 文件
         
@@ -1081,6 +1203,11 @@ public partial class PageInstanceExport : IRefreshable
                                 if (modFile is null) continue;
                                 loader.output.AddToList(modFile,
                                     ModComp.CompFile.HandleCurseForgeDownloadUrls(file["downloadUrl"].ToString()));
+                                // 记录 CurseForge 的项目 ID 与文件 ID，供 CurseForge / FTB 整合包清单使用
+                                if (file["modId"] is not null && file["id"] is not null)
+                                    lock (curseForgeIdsLock)
+                                        curseForgeIds[modFile] =
+                                            (file["modId"].ToObject<int>(), file["id"].ToObject<int>());
                             }
 
                             ModBase.Log($"[Export] 从 CurseForge 获取到 {curseForgeRaw.AsArray().Count} 个本地资源项的对应信息");
@@ -1136,6 +1263,15 @@ public partial class PageInstanceExport : IRefreshable
             Lang.Text("Instance.Export.Task.CreateArchive"),
             loader =>
             {
+                // CurseForge / FTB / MultiMC / Technic / ATLauncher 使用各自平台的清单规范
+                if (format is ModpackFormat.CurseForge or ModpackFormat.Ftb or ModpackFormat.MultiMc
+                    or ModpackFormat.Technic or ModpackFormat.AtLauncher)
+                {
+                    ExportThirdPartyPack(loader, format, cacheFolder, packPath, packName, packVersion, mcInstance,
+                        curseForgeIds, curseForgeIdsLock);
+                    return;
+                }
+
                 // 整理文件列表
                 var files = new JsonArray();
                 foreach (var Pair in loader.input)
@@ -1212,6 +1348,291 @@ public partial class PageInstanceExport : IRefreshable
         ModMain.frmMain.BtnExtraDownload.ShowRefresh();
         ModMain.frmMain.BtnExtraDownload.Ribble();
         ModMain.frmMain.PageChange(FormMain.PageType.TaskManager);
+    }
+
+    #endregion
+
+    #region 第三方整合包格式
+
+    /// <summary>
+    ///     导出 JSON 时使用的序列化设置。
+    /// </summary>
+    private static readonly JsonSerializerOptions ExportJsonOptions =
+        new(JsonCompat.SerializerOptions) { WriteIndented = true };
+
+    /// <summary>
+    ///     按 CurseForge / FTB / MultiMC / Technic / ATLauncher 的规范生成整合包并打包。
+    /// </summary>
+    /// <param name="loader">当前的打包加载器。</param>
+    /// <param name="format">目标格式。</param>
+    /// <param name="cacheFolder">导出缓存目录，其 modpack 子目录即为整合包根目录。</param>
+    /// <param name="packPath">最终输出路径。</param>
+    /// <param name="packName">整合包名称。</param>
+    /// <param name="packVersion">整合包版本。</param>
+    /// <param name="mcInstance">当前实例。</param>
+    /// <param name="curseForgeIds">CurseForge 项目 ID 与文件 ID 缓存。</param>
+    /// <param name="curseForgeIdsLock">访问上述缓存时使用的锁。</param>
+    private static void ExportThirdPartyPack(
+        ModLoader.LoaderTask<Dictionary<ModLocalComp.LocalCompFile, List<string>>, int> loader,
+        ModpackFormat format, string cacheFolder, string packPath, string packName, string packVersion,
+        McInstance mcInstance, Dictionary<ModLocalComp.LocalCompFile, (int ProjectId, int FileId)> curseForgeIds,
+        object curseForgeIdsLock)
+    {
+        var modpackFolder = Path.Combine(cacheFolder, "modpack");
+        var overridesFolder = Path.Combine(modpackFolder, "overrides");
+        var info = mcInstance.Info;
+        ModBase.Log($"[Export] 按 {format} 规范生成整合包");
+
+        // 1. CurseForge / FTB 使用在线清单，其余格式只能全部打包
+        var manifestFiles = new JsonArray();
+        if (format is ModpackFormat.CurseForge or ModpackFormat.Ftb)
+            foreach (var Pair in loader.input ?? [])
+            {
+                (int ProjectId, int FileId) ids;
+                lock (curseForgeIdsLock)
+                {
+                    if (!curseForgeIds.TryGetValue(Pair.Key, out ids))
+                        continue;
+                }
+
+                manifestFiles.Add(new JsonObject
+                {
+                    { "projectID", ids.ProjectId }, { "fileID", ids.FileId }, { "required", true }
+                });
+                // 已写入清单的文件可以在线获取，无需再打包
+                if (File.Exists(Pair.Key.path))
+                    File.Delete(Pair.Key.path);
+            }
+
+        ModBase.Log($"[Export] 已收录 {manifestFiles.Count} 个文件到在线下载清单");
+        loader.Progress = 0.3d;
+
+        // 2. 生成元数据文件，并按格式整理目录结构
+        switch (format)
+        {
+            case ModpackFormat.CurseForge:
+            {
+                // 清单 + overrides 目录
+                WriteExportJson(Path.Combine(modpackFolder, "manifest.json"),
+                    BuildCurseForgeManifest(packName, packVersion, info, manifestFiles));
+                break;
+            }
+            case ModpackFormat.Ftb:
+            {
+                // FTB App 的清单同样基于 CurseForge 文件 ID，但额外需要 targets 等信息
+                WriteExportJson(Path.Combine(modpackFolder, "manifest.json"),
+                    BuildFtbManifest(packName, packVersion, info, manifestFiles));
+                break;
+            }
+            case ModpackFormat.MultiMc:
+            {
+                // MultiMC 实例：mmc-pack.json + instance.cfg + .minecraft 目录
+                MoveDirectoryInto(overridesFolder, Path.Combine(modpackFolder, ".minecraft"));
+                WriteExportJson(Path.Combine(modpackFolder, "mmc-pack.json"), BuildMultiMcPack(info));
+                File.WriteAllText(Path.Combine(modpackFolder, "instance.cfg"),
+                    $"InstanceType=OneSix\r\nname={packName}\r\niconKey=default\r\n");
+                break;
+            }
+            case ModpackFormat.Technic:
+            {
+                // Technic 整合包：游戏文件直接位于根目录，另需 bin/modpack.jar
+                MoveDirectoryInto(overridesFolder, modpackFolder);
+                CopyTechnicModpackJar(mcInstance, modpackFolder);
+                WriteExportJson(Path.Combine(modpackFolder, "pack.json"),
+                    BuildSimplePackMeta(packName, packVersion, info));
+                break;
+            }
+            case ModpackFormat.AtLauncher:
+            {
+                // ATLauncher 实例：instance.json + minecraft 目录
+                MoveDirectoryInto(overridesFolder, Path.Combine(modpackFolder, "minecraft"));
+                WriteExportJson(Path.Combine(modpackFolder, "instance.json"),
+                    BuildSimplePackMeta(packName, packVersion, info));
+                break;
+            }
+        }
+
+        loader.Progress = 0.7d;
+
+        // 3. 打包并清理缓存
+        Directory.CreateDirectory(ModBase.GetPathFromFullPath(packPath));
+        if (File.Exists(packPath))
+            File.Delete(packPath);
+        ZipFile.CreateFromDirectory(modpackFolder, packPath);
+        loader.Progress = 0.95d;
+
+        Directory.Delete(cacheFolder, true);
+        ModBase.OpenExplorer(packPath);
+    }
+
+    /// <summary>
+    ///     写入带缩进的 JSON 文件。
+    /// </summary>
+    private static void WriteExportJson(string path, JsonNode json)
+    {
+        Directory.CreateDirectory(ModBase.GetPathFromFullPath(path));
+        File.WriteAllText(path, json.ToJsonString(ExportJsonOptions));
+    }
+
+    /// <summary>
+    ///     生成 CurseForge 标准的 manifest.json。
+    /// </summary>
+    private static JsonObject BuildCurseForgeManifest(string packName, string packVersion, McInstanceInfo info,
+        JsonArray files)
+    {
+        var modLoaders = new JsonArray();
+        var loaderId = GetModLoaderId(info);
+        if (!string.IsNullOrEmpty(loaderId))
+            modLoaders.Add(new JsonObject { { "id", loaderId }, { "primary", true } });
+        return new JsonObject
+        {
+            { "minecraft", new JsonObject { { "version", info.VanillaName }, { "modLoaders", modLoaders } } },
+            { "manifestType", "minecraftModpack" },
+            { "manifestVersion", 1 },
+            { "name", packName },
+            { "version", packVersion },
+            { "author", "PCL2 Bee" },
+            { "files", files },
+            { "overrides", "overrides" }
+        };
+    }
+
+    /// <summary>
+    ///     生成 FTB App 可识别的 manifest.json（packType 为 curseforge）。
+    /// </summary>
+    private static JsonObject BuildFtbManifest(string packName, string packVersion, McInstanceInfo info,
+        JsonArray files)
+    {
+        var targets = new JsonArray();
+        var loaderId = GetModLoaderId(info);
+        if (!string.IsNullOrEmpty(loaderId))
+            targets.Add(new JsonObject { { "version", info.VanillaName }, { "id", loaderId }, { "type", "game" } });
+        var id = Guid.NewGuid().ToString();
+        return new JsonObject
+        {
+            { "name", packName },
+            { "version", packVersion },
+            { "author", "PCL2 Bee" },
+            { "id", id },
+            { "versionId", id },
+            { "packType", "curseforge" },
+            { "releaseType", "release" },
+            { "isPrivate", false },
+            { "files", files },
+            { "targets", targets },
+            { "overrides", "overrides" }
+        };
+    }
+    private static string GetModLoaderId(McInstanceInfo info)
+    {
+        if (info.HasNeoForge) return "neoforge-" + info.NeoForge;
+        if (info.HasForge) return "forge-" + info.Forge;
+        if (info.HasFabric) return "fabric-" + info.Fabric;
+        if (info.HasQuilt) return "quilt-" + info.Quilt;
+        return "";
+    }
+
+    /// <summary>
+    ///     生成 MultiMC 的 mmc-pack.json。
+    /// </summary>
+    private static JsonObject BuildMultiMcPack(McInstanceInfo info)
+    {
+        var components = new JsonArray
+        {
+            new JsonObject { { "uid", "net.minecraft" }, { "version", info.VanillaName }, { "important", true } }
+        };
+        if (info.HasForge)
+            components.Add(new JsonObject
+                { { "uid", "net.minecraftforge" }, { "version", info.Forge }, { "important", true } });
+        if (info.HasNeoForge)
+            components.Add(new JsonObject
+                { { "uid", "net.neoforged" }, { "version", info.NeoForge }, { "important", true } });
+        if (info.HasFabric)
+            components.Add(new JsonObject
+                { { "uid", "net.fabricmc.fabric-loader" }, { "version", info.Fabric }, { "important", true } });
+        return new JsonObject { { "formatVersion", 1 }, { "components", components } };
+    }
+
+    /// <summary>
+    ///     生成包含游戏版本与加载器信息的简易元数据（供 Technic / ATLauncher 使用）。
+    /// </summary>
+    private static JsonObject BuildSimplePackMeta(string packName, string packVersion, McInstanceInfo info)
+    {
+        var loader = "";
+        var loaderVersion = "";
+        if (info.HasNeoForge)
+        {
+            loader = "neoforge";
+            loaderVersion = info.NeoForge;
+        }
+        else if (info.HasForge)
+        {
+            loader = "forge";
+            loaderVersion = info.Forge;
+        }
+        else if (info.HasFabric)
+        {
+            loader = "fabric";
+            loaderVersion = info.Fabric;
+        }
+        else if (info.HasQuilt)
+        {
+            loader = "quilt";
+            loaderVersion = info.Quilt;
+        }
+
+        return new JsonObject
+        {
+            { "name", packName },
+            { "version", packVersion },
+            {
+                "minecraft", new JsonObject
+                {
+                    { "version", info.VanillaName }, { "modLoader", loader }, { "modLoaderVersion", loaderVersion }
+                }
+            }
+        };
+    }
+
+    /// <summary>
+    ///     Technic 整合包要求 bin/modpack.jar 存在，此处直接复制实例自身的版本 Jar。
+    /// </summary>
+    private static void CopyTechnicModpackJar(McInstance mcInstance, string modpackFolder)
+    {
+        try
+        {
+            var instanceFolder = mcInstance.PathInstance.TrimEnd('\\', '/');
+            var instanceName = Path.GetFileName(instanceFolder);
+            var versionJar = Path.Combine(instanceFolder, instanceName + ".jar");
+            if (!File.Exists(versionJar))
+            {
+                ModBase.Log("[Export] 未找到实例版本 Jar，跳过 bin/modpack.jar", ModBase.LogLevel.Debug);
+                return;
+            }
+
+            var binFolder = Path.Combine(modpackFolder, "bin");
+            Directory.CreateDirectory(binFolder);
+            File.Copy(versionJar, Path.Combine(binFolder, "modpack.jar"), true);
+        }
+        catch (Exception ex)
+        {
+            ModBase.Log(ex, "复制 Technic modpack.jar 失败", ModBase.LogLevel.Debug);
+        }
+    }
+
+    /// <summary>
+    ///     将 source 中的全部内容移动到 target（自动合并同名目录），随后删除 source。
+    /// </summary>
+    private static void MoveDirectoryInto(string source, string target)
+    {
+        Directory.CreateDirectory(target);
+        if (!Directory.Exists(source))
+            return;
+        foreach (var file in Directory.EnumerateFiles(source))
+            File.Move(file, Path.Combine(target, Path.GetFileName(file)), true);
+        foreach (var folder in Directory.EnumerateDirectories(source))
+            MoveDirectoryInto(folder, Path.Combine(target, Path.GetFileName(folder)));
+        Directory.Delete(source, true);
     }
 
     #endregion

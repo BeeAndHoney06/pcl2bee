@@ -27,10 +27,4 @@ public partial class PageAboutInfo
 
     private void BtnSource_Click(object sender, MouseButtonEventArgs e)
         => ModBase.OpenWebsite("https://github.com/BeeAndHoney06/pcl2bee/");
-
-    /// <summary>
-    ///     打开服务器管理模块的来源仓库（Apache-2.0 鸣谢）。
-    /// </summary>
-    private void ItemServerControlPad_Click(object sender, MouseButtonEventArgs e)
-        => ModBase.OpenWebsite("https://github.com/ErieneNeko/PCL-CE-ServerControlPad");
 }

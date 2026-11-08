@@ -16,6 +16,37 @@
             <StackPanel Margin="25,10,25,65">
                 <local:MyHint Margin="0,15,0,0" Text="{DynamicResource Instance.Export.ModrinthWarning}" Theme="Yellow"
                               x:Name="HintOptiFine" />
+                <local:MyCard Title="{DynamicResource Instance.Export.Format.Title}" Margin="0,15" CanSwap="True"
+                              IsSwapped="True">
+                    <StackPanel Margin="25,37,23,18">
+                        <Grid Height="28">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
+                                       Text="{DynamicResource Instance.Export.Format.Label}" Margin="0,0,20,0" />
+                            <local:MyComboBox Grid.Column="1" x:Name="ComboFormat" SelectedIndex="0"
+                                              SelectionChanged="ComboFormat_SelectionChanged">
+                                <local:MyComboBoxItem Tag="pcl"
+                                                      Content="{DynamicResource Instance.Export.Format.Pcl}" />
+                                <local:MyComboBoxItem Tag="modrinth"
+                                                      Content="{DynamicResource Instance.Export.Format.Modrinth}" />
+                                <local:MyComboBoxItem Tag="curseforge"
+                                                      Content="{DynamicResource Instance.Export.Format.CurseForge}" />
+                                <local:MyComboBoxItem Tag="ftb"
+                                                      Content="{DynamicResource Instance.Export.Format.Ftb}" />
+                                <local:MyComboBoxItem Tag="multimc"
+                                                      Content="{DynamicResource Instance.Export.Format.MultiMc}" />
+                                <local:MyComboBoxItem Tag="technic"
+                                                      Content="{DynamicResource Instance.Export.Format.Technic}" />
+                                <local:MyComboBoxItem Tag="atlauncher"
+                                                      Content="{DynamicResource Instance.Export.Format.AtLauncher}" />
+                            </local:MyComboBox>
+                        </Grid>
+                        <local:MyHint x:Name="HintFormat" Theme="Blue" Margin="0,10,0,0" />
+                    </StackPanel>
+                </local:MyCard>
                 <local:MyCard Margin="0,15">
                     <Grid Margin="22,15,25,15">
                         <Grid.ColumnDefinitions>
