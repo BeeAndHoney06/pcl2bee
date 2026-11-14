@@ -139,26 +139,26 @@ public class MyComboBox : ComboBox
                 (IsEditable && ((MyTextBox)Template.FindName("PART_EditableTextBox", this)).IsFocused))
             {
                 foreColorName = "ColorBrush3";
-                backColorName = "ColorBrush7";
+                backColorName = "GlassHover";
                 time = 10;
             }
             else if (IsMouseOver)
             {
                 foreColorName = "ColorBrush4";
-                backColorName = "ColorBrush7";
+                backColorName = "GlassHover";
                 time = 100;
             }
             else
             {
                 foreColorName = "ColorBrushBg0";
-                backColorName = "ColorBrushHalfWhite";
+                backColorName = "GlassControl";
                 time = 100;
             }
         }
         else
         {
             foreColorName = "ColorBrushGray5";
-            backColorName = "ColorBrushGray6";
+            backColorName = "GlassDisabled";
             time = 200;
         }
 

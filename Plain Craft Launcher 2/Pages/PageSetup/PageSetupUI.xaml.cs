@@ -12,61 +12,6 @@ namespace PCL;
 
 public partial class PageSetupUI
 {
-    /// <summary>
-    ///     主题下拉的显示顺序：原有主题 + 彩虹七色（海蓝 + 红橙黄绿青紫）。
-    ///     愚人节模式下用 HMCL 顶替“自定义”，避免把自定义配置误写成 HMCL。
-    /// </summary>
-    private static ColorTheme[] ThemeList => Basics.IsAprilFool
-        ?
-        [
-            ColorTheme.SkyBlue, ColorTheme.CatBlue, ColorTheme.DeathBlue,
-            ColorTheme.OceanBlue, ColorTheme.RainbowRed, ColorTheme.RainbowOrange, ColorTheme.RainbowYellow,
-            ColorTheme.RainbowGreen, ColorTheme.RainbowCyan, ColorTheme.RainbowPurple,
-            ColorTheme.HmclBlue
-        ]
-        :
-        [
-            ColorTheme.SkyBlue, ColorTheme.CatBlue, ColorTheme.DeathBlue,
-            ColorTheme.OceanBlue, ColorTheme.RainbowRed, ColorTheme.RainbowOrange, ColorTheme.RainbowYellow,
-            ColorTheme.RainbowGreen, ColorTheme.RainbowCyan, ColorTheme.RainbowPurple,
-            ColorTheme.Custom
-        ];
-
-    public string[] ThemeColors => ThemeList.Select(theme => Lang.Text(ThemeNameKey(theme))).ToArray();
-
-    private static string ThemeNameKey(ColorTheme theme) => theme switch
-    {
-        ColorTheme.SkyBlue => "Setup.Ui.Theme.Color.SkyBlue",
-        ColorTheme.CatBlue => "Setup.Ui.Theme.Color.CatBlue",
-        ColorTheme.DeathBlue => "Setup.Ui.Theme.Color.CrashBlue",
-        ColorTheme.HmclBlue => "Setup.Ui.Theme.Color.Hmcl",
-        ColorTheme.OceanBlue => "Setup.Ui.Theme.Color.OceanBlue",
-        ColorTheme.RainbowRed => "Setup.Ui.Theme.Color.RainbowRed",
-        ColorTheme.RainbowOrange => "Setup.Ui.Theme.Color.RainbowOrange",
-        ColorTheme.RainbowYellow => "Setup.Ui.Theme.Color.RainbowYellow",
-        ColorTheme.RainbowGreen => "Setup.Ui.Theme.Color.RainbowGreen",
-        ColorTheme.RainbowCyan => "Setup.Ui.Theme.Color.RainbowCyan",
-        ColorTheme.RainbowPurple => "Setup.Ui.Theme.Color.RainbowPurple",
-        _ => "Setup.Ui.Theme.Color.Custom"
-    };
-
-    /// <summary>主题下拉索引 → ColorTheme。</summary>
-    private static ColorTheme IndexToTheme(int index)
-    {
-        var list = ThemeList;
-        return index >= 0 && index < list.Length ? list[index] : ColorTheme.Custom;
-    }
-
-    /// <summary>ColorTheme → 主题下拉索引；返回 -1 表示当前列表中不存在该项（如愚人节模式下配置了自定义主题）。</summary>
-    private static int ThemeToIndex(ColorTheme theme) => Array.IndexOf(ThemeList, theme);
-
-    private void RefreshCustomColorVisibility()
-    {
-        var isCustom = Config.Preference.Theme.LightColor == ColorTheme.Custom ||
-                       Config.Preference.Theme.DarkColor == ColorTheme.Custom;
-        PanCustomColor.Visibility = isCustom ? Visibility.Visible : Visibility.Collapsed;
-    }
-    
     public new bool isLoaded;
 
     public PageSetupUI()
@@ -101,15 +46,8 @@ public partial class PageSetupUI
             SliderLauncherOpacity.Value = Config.Preference.Theme.WindowOpacity;
             CheckLauncherLogo.Checked = Config.Preference.ShowStartupLogo;
             ComboDarkMode.SelectedIndex = (int)Config.Preference.Theme.ColorMode;
-            ComboDarkColor.SelectedIndex = ThemeToIndex(Config.Preference.Theme.DarkColor);
-            ComboLightColor.SelectedIndex = ThemeToIndex(Config.Preference.Theme.LightColor);
             CheckShowLaunchingHint.Checked = Config.Preference.ShowLaunchingHint;
 
-            // 自定义主题颜色
-            SliderCustomHue.Value = Config.Preference.Theme.CustomHue;
-            SliderCustomSat.Value = Config.Preference.Theme.CustomSaturation;
-            SliderCustomLight.Value = Config.Preference.Theme.CustomLightness;
-            RefreshCustomColorVisibility();
 
             // 字体设置
             ComboUiFont.SelectedFontTag = Config.Preference.Font;
@@ -126,7 +64,6 @@ public partial class PageSetupUI
             SliderBackgroundOpacity.Value = Config.Preference.Background.WallpaperOpacity;
             SliderBackgroundBlur.Value = Config.Preference.Background.WallpaperBlurRadius;
             ComboBackgroundSuit.SelectedIndex = Config.Preference.Background.WallpaperSuitMode;
-            CheckBackgroundColorful.Checked = Config.Preference.Background.BackgroundColorful;
             var autoPauseVideo = Config.Preference.Background.AutoPauseVideo;
             CheckAutoPauseVideo.Checked = autoPauseVideo;
             if (ModVideoBack.IsGaming)
@@ -709,26 +646,6 @@ public partial class PageSetupUI
     private void BtnCustomTutorial_Click(object sender, MouseButtonEventArgs e)
     {
         ModBase.OpenWebsite("https://github.com/BeeAndHoney06/pcl2bee/wiki");
-    }
-
-    // 主题
-    private void ThemeColor_Change(object senderRaw, SelectionChangedEventArgs e)
-    {
-        var sender = (MyComboBox)senderRaw;
-        if (sender.SelectedIndex < 0) return;
-        SetByTag(sender.Tag?.ToString(), IndexToTheme(sender.SelectedIndex));
-        ThemeManager.ThemeRefresh();
-        RefreshCustomColorVisibility();
-    }
-
-    // 自定义主题颜色滑条
-    private void CustomColor_Change(object senderRaw, bool user)
-    {
-        var sender = (MySlider)senderRaw;
-        SetByTag(sender.Tag?.ToString(), sender.Value);
-        // 仅在当前（深/浅色对应的）主题为自定义时实时刷新
-        if (PCL.Core.UI.Theme.ThemeService.CurrentTheme == ColorTheme.Custom)
-            ThemeManager.ThemeRefresh();
     }
 
     // 滑动条

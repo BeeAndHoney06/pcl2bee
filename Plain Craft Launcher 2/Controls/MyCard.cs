@@ -13,7 +13,7 @@ public class MyCard : AnimatedBackgroundGrid
 {
     // 动画
     private const double dropShadowIdleOpacity = 0.07d;
-    private const double dropShadowHoverOpacity = 0.4d;
+    private const double dropShadowHoverOpacity = 0.16d;
 
     public static readonly DependencyProperty TitleProperty =
         DependencyProperty.Register("Title", typeof(string), typeof(MyCard), new PropertyMetadata(""));
@@ -22,6 +22,7 @@ public class MyCard : AnimatedBackgroundGrid
 
     // 控件
     private readonly Grid mainGrid;
+    private readonly Border _glassHighlight;
     private TextBlock _MainTextBlock;
     private bool isLoad;
 
@@ -31,16 +32,27 @@ public class MyCard : AnimatedBackgroundGrid
         MainChrome = new MyDropShadow
         {
             Margin = new Thickness(-3, -3, -3, -3 - ModBase.GetWPFSize(1d)), ShadowRadius = 3d,
-            Opacity = dropShadowIdleOpacity, CornerRadius = new CornerRadius(10d)
+            Opacity = dropShadowIdleOpacity, CornerRadius = new CornerRadius(14d)
         };
         MainChrome.SetResourceReference(MyDropShadow.ColorProperty, "ColorObject1");
         Children.Insert(0, MainChrome);
-        mainBorder = new BlurBorder { CornerRadius = new CornerRadius(10d), IsHitTestVisible = false };
+        mainBorder = new BlurBorder
+        {
+            CornerRadius = new CornerRadius(14d), IsHitTestVisible = false,
+            BorderThickness = new Thickness(1d), BlurRadius = 14d, BlurSamplingRate = 0.5d
+        };
+        mainBorder.SetResourceReference(Border.BorderBrushProperty, "GlassEdge");
         Children.Insert(1, mainBorder);
         mainGrid = new Grid();
+        _glassHighlight = new Border
+        {
+            CornerRadius = new CornerRadius(14d), IsHitTestVisible = false
+        };
+        _glassHighlight.SetResourceReference(Border.BackgroundProperty, "GlassSheen");
+        mainGrid.Children.Add(_glassHighlight);
         Children.Add(mainGrid);
         // 设置背景色
-        SetResourceReference(BackgroundBrushProperty, "ColorBrushTransparentBackground");
+        SetResourceReference(BackgroundBrushProperty, "GlassSurface");
         Loaded += (_, _) => Init();
         MouseEnter += MyCard_MouseEnter;
         MouseLeave += MyCard_MouseLeave;
@@ -88,6 +100,7 @@ public class MyCard : AnimatedBackgroundGrid
         {
             MainChrome.CornerRadius = value;
             mainBorder.CornerRadius = value;
+            _glassHighlight.CornerRadius = value;
         }
     }
 

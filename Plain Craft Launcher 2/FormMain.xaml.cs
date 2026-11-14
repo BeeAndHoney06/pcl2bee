@@ -226,24 +226,25 @@ public partial class FormMain
                         isWindowLoadFinished = true;
                     }
                 });
-                // 布局自检：中部导航必须与窗口中心对齐（仅调试模式记录，避免正常用户日志噪音）
+                // 布局自检：标题、导航和红绿灯不能重叠（仅调试模式记录）。
                 if (!ModBase.modeDebug) return;
                 ModBase.RunInUi(() =>
                 {
                     try
                     {
-                        if (PanTitleSelect is null || PanTitleMain is null) return;
-                        var navCenter = PanTitleSelect
-                            .TranslatePoint(new Point(PanTitleSelect.ActualWidth / 2d, 0d), this).X;
-                        var delta = Math.Abs(navCenter - ActualWidth / 2d);
-                        if (delta > 2d)
+                        if (PanTitleSelect is null || PanTitleLogoHost is null || BtnTitleZoom is null) return;
+                        var titleLeft = PanTitleLogoHost.TranslatePoint(new Point(0d, 0d), this).X;
+                        var titleRight = titleLeft + PanTitleLogoHost.ActualWidth;
+                        var navRight = PanTitleSelect.TranslatePoint(new Point(PanTitleSelect.ActualWidth, 0d), this).X;
+                        var controlsRight = BtnTitleZoom.TranslatePoint(new Point(BtnTitleZoom.ActualWidth, 0d), this).X;
+                        if (titleLeft < Math.Max(controlsRight, navRight) - 1d || titleRight > PanTitle.ActualWidth + 1d)
                             ModBase.Log(
-                                $"[UI] 标题导航未居中（偏移 {delta:0.#}px）：请检查 PanTitleMain 的左右列是否均为 1*",
+                                "[UI] 标题栏存在重叠：请检查标题、导航与红绿灯的独立占位",
                                 ModBase.LogLevel.Developer);
                     }
                     catch (Exception ex)
                     {
-                        ModBase.Log(ex, "[UI] 标题导航居中自检失败", ModBase.LogLevel.Developer);
+                        ModBase.Log(ex, "[UI] 标题栏布局自检失败", ModBase.LogLevel.Developer);
                     }
                 });
             }
@@ -489,7 +490,9 @@ public partial class FormMain
         // 设置 DWM 窗口框架
         try
         {
-            WindowInterop.ExtendFrameIntoClientArea(hwnd, -1);
+            // 分层透明窗口由 WPF 合成 Alpha，不再混用 DWM 实色窗口框架。
+            if (!AllowsTransparency)
+                WindowInterop.ExtendFrameIntoClientArea(hwnd, -1);
         }
         catch (Exception ex)
         {
@@ -659,16 +662,6 @@ public partial class FormMain
             WindowState = WindowState.Normal; // 修复 #1938
     }
 
-    // 标题栏改变大小
-    private void PanTitle_SizeChanged(object sender, EventArgs e)
-    {
-        // 仅裁剪 Logo 区宽度，避免与中部导航重叠；列结构被改动时安全跳过而非抛异常
-        if (PanTitleMain?.ColumnDefinitions is not { Count: >= 1 } mainColumns) return;
-        if (PanTitleLeft?.ColumnDefinitions is not { Count: >= 1 } leftColumns) return;
-        var available = mainColumns[0].ActualWidth - 30d;
-        leftColumns[0].MaxWidth = available <= 0d ? 0d : available;
-    }
-
     // 顶部标签栏拖拽切换
 
     private Point _titleSelectDragStart;
@@ -785,6 +778,29 @@ public partial class FormMain
     private void BtnTitleMin_Click(object sender, EventArgs e)
     {
         WindowState = WindowState.Minimized;
+    }
+
+    private Rect? _titleZoomRestoreBounds;
+
+    private void BtnTitleZoom_Click(object sender, RoutedEventArgs e)
+    {
+        // 保持 Normal 状态，兼容现有自绘边框对系统最大化的限制。
+        if (_titleZoomRestoreBounds is { } bounds)
+        {
+            Left = bounds.Left;
+            Top = bounds.Top;
+            Width = bounds.Width;
+            Height = bounds.Height;
+            _titleZoomRestoreBounds = null;
+            return;
+        }
+
+        _titleZoomRestoreBounds = new Rect(Left, Top, ActualWidth, ActualHeight);
+        var workArea = SystemParameters.WorkArea;
+        Left = workArea.Left;
+        Top = workArea.Top;
+        Width = workArea.Width;
+        Height = workArea.Height;
     }
 
     private void BtnTitleHelp_Click(object sender, EventArgs e)

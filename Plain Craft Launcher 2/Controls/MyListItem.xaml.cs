@@ -22,6 +22,7 @@ public partial class MyListItem : IMyRadio
     public bool isMouseOverAnimationEnabled = true;
 
     private string stateLast;
+    private MyCard? _navigationCard;
 
     public object tag { get; set; }
     public event IMyRadio.CheckEventHandler? Check;
@@ -82,7 +83,7 @@ public partial class MyListItem : IMyRadio
                 ani.AddRange(new[]
                 {
                     ModAnimation.AaColor(RectBack, Border.BackgroundProperty,
-                        isMouseDown ? "ColorBrush6" : "ColorBrushBg1", time),
+                        isMouseDown ? "GlassHover" : "GlassControl", time),
                     ModAnimation.AaOpacity(RectBack, 1d - RectBack.Opacity, time,
                         ease: new ModAnimation.AniEaseOutFluent())
                 });
@@ -119,7 +120,7 @@ public partial class MyListItem : IMyRadio
                     ani.AddRange(new[]
                     {
                         ModAnimation.AaColor(RectBack, Border.BackgroundProperty,
-                            isMouseDown ? "ColorBrush6" : "ColorBrush7", time),
+                            isMouseDown ? "GlassHover" : "GlassControl", time),
                         ModAnimation.AaScaleTransform(this, 1d - ((ScaleTransform)RenderTransform).ScaleX, time * 3,
                             ease: new ModAnimation.AniEaseOutFluent()),
                         ModAnimation.AaScaleTransform(RectBack,
@@ -143,7 +144,8 @@ public partial class MyListItem : IMyRadio
                 }
 
                 // 由于鼠标已经移入，所以直接实例化 RectBack
-                RectBack.Background = (Brush)ThemeManager.AppResources["ColorBrushBg1"];
+                RectBack.SetResourceReference(Border.BackgroundProperty,
+                    "GlassControl");
                 RectBack.Opacity = 1d;
                 RectBack.RenderTransform = new ScaleTransform(1d, 1d);
                 RenderTransform = new ScaleTransform(1d, 1d);
@@ -161,7 +163,7 @@ public partial class MyListItem : IMyRadio
                 {
                     if (IsScaleAnimationEnabled)
                         RectBack.RenderTransform = new ScaleTransform(0.75d, 0.75d);
-                    RectBack.Background = (Brush)ThemeManager.AppResources["ColorBrush7"];
+                    RectBack.SetResourceReference(Border.BackgroundProperty, "GlassControl");
                     RectBack.Opacity = 0d;
                 }
             }
@@ -172,6 +174,32 @@ public partial class MyListItem : IMyRadio
 
     private void MyListItem_Loaded(object sender, RoutedEventArgs e)
     {
+        // 复用现有卡片外观，仅用于左侧导航；内容列表及其操作按钮不变。
+        var isNavigation = false;
+        for (DependencyObject parent = VisualTreeHelper.GetParent(this); parent is not null;
+             parent = VisualTreeHelper.GetParent(parent))
+        {
+            if (parent is not MyPageLeft page) continue;
+            isNavigation = page is not PageLaunchLeft;
+            break;
+        }
+        if (isNavigation && _navigationCard is null)
+        {
+            _navigationCard = new MyCard
+            {
+                Margin = new Thickness(6d, 3d, 6d, 3d),
+                IsHitTestVisible = false,
+                HasMouseAnimation = false,
+                UseAnimation = false
+            };
+            SetColumnSpan(_navigationCard, 6);
+            SetRowSpan(_navigationCard, 4);
+            Children.Insert(0, _navigationCard);
+        }
+        if (_navigationCard is not null)
+            _navigationCard.Visibility = isNavigation ? Visibility.Visible : Visibility.Collapsed;
+        if (_RectBack is not null)
+            _RectBack.SetResourceReference(Border.BorderBrushProperty, isNavigation ? "ColorBrushGray5" : "ColorBrush6");
         if (Checked)
             SetResourceReference(ForegroundProperty, Height < 40d ? "ColorBrush3" : "ColorBrush2");
         else
@@ -210,10 +238,11 @@ public partial class MyListItem : IMyRadio
                     // 投影（Effect）不在此创建：改由悬浮动画挂上共享的冻结实例，见 RectBackHoverShadow
                 };
                 rect.SetResourceReference(Border.BackgroundProperty, "ColorBrush7");
-                rect.SetResourceReference(Border.BorderBrushProperty, "ColorBrush6");
+                rect.SetResourceReference(Border.BorderBrushProperty,
+                    _navigationCard?.Visibility == Visibility.Visible ? "ColorBrushGray5" : "ColorBrush6");
                 SetColumnSpan(rect, 999);
                 SetRowSpan(rect, 999);
-                Children.Insert(0, rect);
+                Children.Insert(_navigationCard is null ? 0 : 1, rect);
                 _RectBack = rect;
                 // <!--<Border x:Name = "RectBack" CornerRadius="3" RenderTransformOrigin="0.5,0.5" SnapsToDevicePixels="True" 
                 // IsHitTestVisible = "False" Opacity="0" BorderThickness="1" 

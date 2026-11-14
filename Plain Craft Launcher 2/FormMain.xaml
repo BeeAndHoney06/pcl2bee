@@ -11,12 +11,50 @@
     MouseMove="FormMain_MouseMove"
     x:Name="WindMain" x:Class="PCL.FormMain" Style="{StaticResource MyWindow}"
     AllowDrop="True" Topmost="True" Title="PCL2 Bee Edition" MinHeight="470" MinWidth="810"
+    TextElement.Foreground="White"
     ScrollViewer.VerticalScrollBarVisibility="Disabled" Icon="/Plain Craft Launcher 2;component/Images/icon.ico"
-    ResizeMode="CanResize" Background="{x:Null}" d:DesignWidth="870" d:DesignHeight="520" Width="850" Height="500"
-    WindowStartupLocation="CenterScreen" WindowStyle="SingleBorderWindow" AllowsTransparency="False">
+    ResizeMode="CanResize" Background="Transparent" d:DesignWidth="870" d:DesignHeight="520" Width="850" Height="500"
+    WindowStartupLocation="CenterScreen" WindowStyle="None" AllowsTransparency="True">
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo ThumbnailClipMargin="{Binding Margin, ElementName=PanForm}" />
     </Window.TaskbarItemInfo>
+    <Window.Resources>
+        <Style x:Key="TrafficLightButton" TargetType="Button">
+            <Setter Property="Width" Value="22" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Foreground" Value="#99000000" />
+            <Setter Property="BorderBrush" Value="#26000000" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid Background="Transparent">
+                            <Ellipse x:Name="Light" Width="12" Height="12"
+                                     Fill="{TemplateBinding Background}" Stroke="{TemplateBinding BorderBrush}" StrokeThickness="1" />
+                            <Path x:Name="Glyph" Width="6" Height="6" Stretch="Uniform"
+                                  HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Data="{Binding Content, RelativeSource={RelativeSource TemplatedParent}}" Stroke="{TemplateBinding Foreground}"
+                                  StrokeThickness="1.2" Opacity="0" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Glyph" Property="Opacity" Value="1" />
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Glyph" Property="Opacity" Value="1" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Light" Property="Opacity" Value="0.65" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Light" Property="Opacity" Value="0.4" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
     <WindowChrome.WindowChrome>
         <WindowChrome
             CaptionHeight="0"
@@ -102,13 +140,14 @@
         </Rectangle>
         <Border x:Name="PanBack" Margin="10">
             <Border.Clip>
-                <RectangleGeometry x:Name="RectForm" RadiusX="6" RadiusY="6" />
+                <RectangleGeometry x:Name="RectForm" RadiusX="18" RadiusY="18" />
             </Border.Clip>
-            <Grid x:Name="PanForm" SnapsToDevicePixels="False" UseLayoutRounding="False">
+            <Grid x:Name="PanForm" Background="{DynamicResource GlassWindow}" SnapsToDevicePixels="False" UseLayoutRounding="False">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
+                <Border Grid.RowSpan="2" Background="{DynamicResource GlassBackdrop}" IsHitTestVisible="False" />
                 <Canvas x:Name="ImgBack" IsHitTestVisible="False" Grid.Row="1"
                         RenderOptions.BitmapScalingMode="LowQuality">
                     <MediaElement x:Name="VideoBack" LoadedBehavior="Manual" UnloadedBehavior="Stop"
@@ -118,32 +157,50 @@
                 <local:AnimatedBackgroundGrid Grid.Row="0" x:Name="PanTitle" Height="48"
                                               MouseLeftButtonDown="FormDragMove"
                                               WindowChrome.IsHitTestVisibleInChrome="True"
-                                              BackgroundBrush="{DynamicResource ColorBrush3}">
+                                              BackgroundBrush="{DynamicResource ColorBrushTransparent}">
                     <!-- <Grid.Background> -->
                     <!--     <LinearGradientBrush EndPoint="1,0" StartPoint="0,0"> -->
                     <!--         <GradientStop Color="{StaticResource ColorObject4}" Offset="0"/> -->
                     <!--     </LinearGradientBrush> -->
                     <!-- </Grid.Background> -->
-                    <local:MyImage x:Name="ImgTitle" IsHitTestVisible="False" Stretch="UniformToFill" IsEnabled="False" RenderOptions.BitmapScalingMode="LowQuality" />
-                    <!-- macOS 风格红绿灯按钮：红-关闭 / 黄-最小化 / 绿-帮助(扩展)，左对齐 -->
-                    <local:MyIconButton x:Name="BtnTitleClose" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" Width="28" Margin="0,0,12,0" Theme="White" Click="BtnTitleClose_Click"
-                                        SvgIcon="lucide/x" />
-                    <local:MyIconButton x:Name="BtnTitleMin" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" Width="28" Margin="0,0,44,0" Theme="White" Click="BtnTitleMin_Click"
-                                       SvgIcon="lucide/minus" />
-                    <local:MyIconButton x:Name="BtnTitleHelp" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" Width="28" Margin="0,0,76,0" Theme="White" Visibility="Collapsed" Click="BtnTitleHelp_Click"
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="88" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="88" />
+                    </Grid.ColumnDefinitions>
+                    <local:MyImage x:Name="ImgTitle" Grid.ColumnSpan="3" IsHitTestVisible="False" Stretch="UniformToFill" IsEnabled="False" RenderOptions.BitmapScalingMode="LowQuality" />
+                    <controls:BlurBorder Grid.ColumnSpan="3" IsHitTestVisible="False"
+                                         Background="{DynamicResource GlassHeader}" BlurRadius="18" BlurSamplingRate="0.5" />
+                    <Border Grid.ColumnSpan="3" Background="{DynamicResource GlassSheen}"
+                            BorderBrush="{DynamicResource GlassEdge}" BorderThickness="0,0,0,1" IsHitTestVisible="False" />
+                    <!-- 左右等宽预留，使顶部 Tab 相对窗口居中，红绿灯独立占位。 -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <Button x:Name="BtnTitleClose" Style="{StaticResource TrafficLightButton}" Background="#FF5F57"
+                                Content="M0,0 L6,6 M0,6 L6,0" ToolTip="关闭" AutomationProperties.Name="关闭"
+                                Click="BtnTitleClose_Click" />
+                        <Button x:Name="BtnTitleMin" Style="{StaticResource TrafficLightButton}" Background="#FEBC2E"
+                                Content="M0,3 L6,3" ToolTip="最小化" AutomationProperties.Name="最小化"
+                                Click="BtnTitleMin_Click" />
+                        <Button x:Name="BtnTitleZoom" Style="{StaticResource TrafficLightButton}" Background="#28C840"
+                                Content="M0,3 L6,3 M3,0 L3,6" ToolTip="放大 / 还原" AutomationProperties.Name="放大 / 还原"
+                                Click="BtnTitleZoom_Click" />
+                    </StackPanel>
+                    <local:MyIconButton x:Name="BtnTitleHelp" Grid.Column="2" HorizontalAlignment="Right" Height="28" VerticalAlignment="Center" Width="28" Margin="0,0,12,0" Theme="White" Visibility="Collapsed" Click="BtnTitleHelp_Click"
                                         SvgIcon="lucide/circle-help" />
+                    <Grid Grid.Column="1" ClipToBounds="True">
                     <Grid x:Name="PanTitleMain" HorizontalAlignment="Stretch">
                         <Grid.ColumnDefinitions>
-                            <!-- 不变量：左右两列必须始终等宽（均为 1*），中部导航才能保持居中。
-                                 若需为窗口按钮预留空间，必须两侧同时预留，禁止单边改成固定像素。 -->
+                            <!-- 两侧等宽，Tab 居中；标题在左列内完整等比缩放。 -->
                             <ColumnDefinition x:Name="ColTitleLeft" Width="1*" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition x:Name="ColTitleRight" Width="1*" />
                         </Grid.ColumnDefinitions>
-                        <Grid x:Name="PanTitleLeft" SizeChanged="PanTitle_SizeChanged">
+                        <Viewbox x:Name="PanTitleLogoHost" Grid.Column="2" Stretch="Uniform" StretchDirection="DownOnly"
+                                 HorizontalAlignment="Right" VerticalAlignment="Center" MaxHeight="48">
+                        <Grid x:Name="PanTitleLeft" Height="48">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
                             <Path Grid.Column="0" x:Name="ShapeTitleLogo" Data="M26,29 v-25 h6 a7,7 180 0 1 0,14 h-6 M62.5,6.5 a10,11.5 180 1 0 0,18 M71,2.5 v24.5 h13.5" SnapsToDevicePixels="False" UseLayoutRounding="False" IsHitTestVisible="False" HorizontalAlignment="Left" Margin="19,15.5,0,15.5" Stretch="fill" Stroke="White" StrokeThickness="2.2" Width="39" />
@@ -155,6 +212,11 @@
                                 <Path Fill="{DynamicResource ColorBrush3}" Data="M3.1709 11.6098c-0.0423,-0.1524 -0.0783,-0.2985 -0.1079,-0.4382 -0.0297,-0.1397 -0.0551,-0.3048 -0.0762,-0.4953 -0.0212,-0.1905 -0.036,-0.4212 -0.0445,-0.6921 -0.0085,-0.2709 -0.0127,-0.6011 -0.0127,-0.9906 0,-0.3979 0.0042,-0.7324 0.0127,-1.0033 0.0085,-0.2709 0.0233,-0.5017 0.0445,-0.6922 0.0211,-0.1905 0.0465,-0.3577 0.0762,-0.5016 0.0296,-0.1439 0.0656,-0.2836 0.1079,-0.4191 0.2286,-0.7281 0.6054,-1.2658 1.1303,-1.6129 0.5249,-0.3471 1.1684,-0.5207 1.9304,-0.5207 0.6943,0 1.2954,0.1587 1.8034,0.4762 0.508,0.3175 0.8932,0.7684 1.1557,1.3526 0,0 -0.0169,0.0212 -0.0508,0.0635l-0.8001 0.381c-0.0169,0.0169 -0.0381,0.0127 -0.0635,-0.0127 -0.1947,-0.3979 -0.453,-0.7176 -0.7747,-0.9589 -0.3217,-0.2413 -0.7451,-0.3619 -1.27,-0.3619 -0.5334,0 -0.9673,0.1249 -1.3017,0.3746 -0.3345,0.2498 -0.5906,0.6118 -0.7684,1.0859 -0.0254,0.1016 -0.0508,0.2117 -0.0762,0.3302 -0.0254,0.1185 -0.0444,0.2625 -0.0571,0.4318 -0.0127,0.1693 -0.0233,0.3831 -0.0318,0.6413 -0.0085,0.2583 -0.0127,0.5737 -0.0127,0.9462 0,0.3725 0.0042,0.6858 0.0127,0.9398 0.0085,0.254 0.0191,0.4657 0.0318,0.635 0.0127,0.1693 0.0317,0.3154 0.0571,0.4381 0.0254,0.1228 0.0508,0.2308 0.0762,0.3239 0.1778,0.4741 0.4339,0.8361 0.7684,1.0858 0.3344,0.2498 0.7683,0.3747 1.3017,0.3747 0.5249,0 0.9483,-0.1207 1.27,-0.362 0.3217,-0.2413 0.58,-0.5609 0.7747,-0.9588 0.0254,-0.0254 0.0466,-0.0296 0.0635,-0.0127l0.8001 0.3937c0,0 0.0169,0.0212 0.0508,0.0635 -0.2625,0.5842 -0.6477,1.035 -1.1557,1.3525 -0.508,0.3175 -1.1091,0.4763 -1.8034,0.4763 -0.762,0 -1.4055,-0.1757 -1.9304,-0.5271 -0.5249,-0.3513 -0.9017,-0.8868 -1.1303,-1.6065 M11.4792 4.4343c0,-0.0254 0.0127,-0.0381 0.0381,-0.0381l5.715 0c0.0254,0 0.0381,0.0127 0.0381,0.0381l0 0.8763c0,0.0254 -0.0127,0.0381 -0.0381,0.0381l-4.5339 0c-0.1185,0 -0.1778,0.0635 -0.1778,0.1905l0 2.794c0,0.1185 0.0593,0.1778 0.1778,0.1778l3.8481 0c0.0254,0 0.0381,0.0127 0.0381,0.0381l0 0.8763c0,0.0254 -0.0127,0.0381 -0.0381,0.0381l-3.8481 0c-0.1185,0 -0.1778,0.0635 -0.1778,0.1905l0 2.8956c0,0.1185 0.0593,0.1778 0.1778,0.1778l4.5339 0c0.0254,0 0.0381,0.0127 0.0381,0.0381l0 0.889c0,0.0254 -0.0127,0.0381 -0.0381,0.0381l-5.715 0c-0.0254,0 -0.0381,-0.0127 -0.0381,-0.0381l0 -9.2202z" />
                             </Border>
                         </Grid>
+                        </Viewbox>
+                        <controls:BlurBorder Grid.Column="1" Height="35" VerticalAlignment="Center" Margin="8,0"
+                                             CornerRadius="17.5" BlurRadius="10" BlurSamplingRate="0.5"
+                                             Background="#18FFFFFF" BorderBrush="{DynamicResource GlassEdge}"
+                                             BorderThickness="1" IsHitTestVisible="False" />
                         <StackPanel Grid.Column="1" x:Name="PanTitleSelect" HorizontalAlignment="Left" Height="27"
                                     VerticalAlignment="Center" Orientation="Horizontal" Margin="13,0" Background="Transparent"
                                     MouseLeftButtonDown="PanTitleSelect_MouseLeftButtonDown"
@@ -182,15 +244,17 @@
                                                  SvgIcon="lucide/info" />
                         </StackPanel>
                     </Grid>
-                    <Grid x:Name="PanTitleInner" Visibility="Collapsed" Margin="-16,0,0,0" Opacity="0"
-                          HorizontalAlignment="Left" Width="{Binding ActualWidth, ElementName=PanTitle, Mode=OneWay}">
+                    <Grid x:Name="PanTitleInner" Visibility="Collapsed" Margin="-16,0,0,0" Opacity="0">
                         <local:MyIconButton HorizontalAlignment="Left" Theme="White" x:Name="BtnTitleInner"
                                             Margin="12,0,0,0" Height="28" Width="28" Click="BtnTitleInner_Click"
                                             LogoScale="0.87"
                                             SvgIcon="lucide/arrow-left" />
-                        <TextBlock SnapsToDevicePixels="False" IsHitTestVisible="False" Name="LabTitleInner"
-                                   VerticalAlignment="Center" Margin="47,1,60,0" HorizontalAlignment="Left"
-                                   Foreground="White" FontSize="15" />
+                        <Viewbox Stretch="Uniform" StretchDirection="DownOnly" Margin="47,1,12,0"
+                                 HorizontalAlignment="Right" VerticalAlignment="Center" MaxHeight="28">
+                            <TextBlock SnapsToDevicePixels="False" IsHitTestVisible="False" Name="LabTitleInner"
+                                       Foreground="White" FontSize="15" />
+                        </Viewbox>
+                    </Grid>
                     </Grid>
                 </local:AnimatedBackgroundGrid>
                 <Grid x:Name="PanLeft" Grid.Row="1" HorizontalAlignment="Left" SnapsToDevicePixels="True">
@@ -198,9 +262,10 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="1*" />
                     </Grid.ColumnDefinitions>
-                    <controls:BlurBorder IsHitTestVisible="False">
+                    <controls:BlurBorder IsHitTestVisible="False" BlurRadius="18" BlurSamplingRate="0.5"
+                                         BorderBrush="{DynamicResource GlassEdge}" BorderThickness="0,0,1,0">
                         <local:AnimatedBackgroundGrid x:Name="RectLeftBackground" Width="0"
-                                                      BackgroundBrush="{DynamicResource ColorBrushTransparentBackground}" />
+                                                      BackgroundBrush="{DynamicResource GlassSurface}" />
                     </controls:BlurBorder>
                     <Rectangle x:Name="RectLeftShadow" Width="4" HorizontalAlignment="Left" IsHitTestVisible="False"
                                Grid.Column="1">

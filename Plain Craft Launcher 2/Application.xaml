@@ -30,61 +30,85 @@
             <FontFamily x:Key="LaunchFontFamily">Resources/#PCL English, Microsoft YaHei UI, Segoe UI</FontFamily>
 
             <!-- 颜色表 -->
-            <SolidColorBrush x:Key="ColorBrush1">#343d4a</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrush2">#0b5bcb</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrush3">#1370f3</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrush4">#4890f5</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrush5">#96c0f9</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrush6">#d5e6fd</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrush7">#e0eafd</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrush8">#eaf2fe</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushBg0">#96c0f9</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushBg1">#bee0eafd</SolidColorBrush>
-            <Color x:Key="ColorObject1">#343d4a</Color>
-            <Color x:Key="ColorObject2">#0b5bcb</Color>
-            <Color x:Key="ColorObject3">#1370f3</Color>
-            <Color x:Key="ColorObject4">#4890f5</Color>
-            <Color x:Key="ColorObject5">#96c0f9</Color>
-            <Color x:Key="ColorObject6">#d5e6fd</Color>
-            <Color x:Key="ColorObject7">#e0eafd</Color>
-            <Color x:Key="ColorObject8">#eaf2fe</Color>
-            <Color x:Key="ColorObjectBg0">#96c0f9</Color>
-            <Color x:Key="ColorObjectBg1">#bee0eafd</Color>
+            <SolidColorBrush x:Key="ColorBrush1">#FFFFFF</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrush2">#FFFFFF</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrush3">#FFFFFF</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrush4">#F5F5F5</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrush5">#E6E6E6</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrush6">#308A8A8A</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrush7">#24A4A4A4</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrush8">#18BCBCBC</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushBg0">#6EEBEBEB</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushBg1">#1CEBEBEB</SolidColorBrush>
+            <Color x:Key="ColorObject1">#FFFFFF</Color>
+            <Color x:Key="ColorObject2">#FFFFFF</Color>
+            <Color x:Key="ColorObject3">#FFFFFF</Color>
+            <Color x:Key="ColorObject4">#F5F5F5</Color>
+            <Color x:Key="ColorObject5">#E6E6E6</Color>
+            <Color x:Key="ColorObject6">#308A8A8A</Color>
+            <Color x:Key="ColorObject7">#24A4A4A4</Color>
+            <Color x:Key="ColorObject8">#18BCBCBC</Color>
+            <Color x:Key="ColorObjectBg0">#6EEBEBEB</Color>
+            <Color x:Key="ColorObjectBg1">#1CEBEBEB</Color>
             <Color x:Key="ColorObjectMsgBoxShadow">#3c3c3c</Color>
-            <SolidColorBrush x:Key="ColorBrushGray1">#404040</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushGray2">#737373</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushGray3">#8c8c8c</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushGray4">#a6a6a6</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushGray5">#cccccc</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushGray6">#ebebeb</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushGray7">#f0f0f0</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushGray8">#f5f5f5</SolidColorBrush>
-            <Color x:Key="ColorObjectGray1">#404040</Color>
-            <Color x:Key="ColorObjectGray2">#737373</Color>
-            <Color x:Key="ColorObjectGray3">#8c8c8c</Color>
-            <Color x:Key="ColorObjectGray4">#a6a6a6</Color>
-            <Color x:Key="ColorObjectGray5">#cccccc</Color>
+            <SolidColorBrush x:Key="ColorBrushGray1">#FFFFFF</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushGray2">#F5F5F5</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushGray3">#EBEBEB</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushGray4">#DCDCDC</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushGray5">#C8C8C8</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushGray6">#10808080</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushGray7">#10808080</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushGray8">#10808080</SolidColorBrush>
+            <Color x:Key="ColorObjectGray1">#FFFFFF</Color>
+            <Color x:Key="ColorObjectGray2">#F5F5F5</Color>
+            <Color x:Key="ColorObjectGray3">#EBEBEB</Color>
+            <Color x:Key="ColorObjectGray4">#DCDCDC</Color>
+            <Color x:Key="ColorObjectGray5">#C8C8C8</Color>
             <Color x:Key="ColorObjectGray6">#ebebeb</Color>
             <Color x:Key="ColorObjectGray7">#f0f0f0</Color>
             <Color x:Key="ColorObjectGray8">#f5f5f5</Color>
             <SolidColorBrush x:Key="ColorBrushRedBack">#80fbdddd</SolidColorBrush>
             <SolidColorBrush x:Key="ColorBrushRedLight">#ff4c4c</SolidColorBrush>
             <SolidColorBrush x:Key="ColorBrushRedDark">#ce2111</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushHalfWhite" Color="#55ffffff" />
-            <SolidColorBrush x:Key="ColorBrushSemiWhite" Color="#bbffffff" />
-            <SolidColorBrush x:Key="ColorBrushWhite" Color="#ffffff" />
+            <SolidColorBrush x:Key="ColorBrushHalfWhite" Color="#10808080" />
+            <SolidColorBrush x:Key="ColorBrushSemiWhite" Color="#10808080" />
+            <SolidColorBrush x:Key="ColorBrushWhite" Color="#10808080" />
             <SolidColorBrush x:Key="ColorBrushTransparent" Color="#00ffffff" />
-            <SolidColorBrush x:Key="ColorBrushSemiTransparent">#01eaf2fe</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushTransparentBackground" Color="#d2fbfbfb" />
-            <SolidColorBrush x:Key="ColorBrushBackground">#fbfbfb</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushToolTip">#e5ffffff</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushMemory">#000000</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushSemiTransparent">#01303030</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushTransparentBackground" Color="#12808080" />
+            <SolidColorBrush x:Key="ColorBrushBackground">#12808080</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushToolTip">#BE808080</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushMemory">#FFFFFF</SolidColorBrush>
             <SolidColorBrush x:Key="ColorBrushFatal">#c23616</SolidColorBrush>
             <SolidColorBrush x:Key="ColorBrushError">#e74c3c</SolidColorBrush>
             <SolidColorBrush x:Key="ColorBrushWarn">#f39c12</SolidColorBrush>
             <SolidColorBrush x:Key="ColorBrushInfoDark">#ffffff</SolidColorBrush>
-            <SolidColorBrush x:Key="ColorBrushInfo">#000000</SolidColorBrush>
+            <SolidColorBrush x:Key="ColorBrushInfo">#FFFFFF</SolidColorBrush>
             <SolidColorBrush x:Key="ColorBrushDebug">#95a5a6</SolidColorBrush>
+
+            <!-- 中性玻璃材质；不使用高饱和主题色铺满面板。 -->
+            <SolidColorBrush x:Key="GlassSurface" Color="#12808080" />
+            <SolidColorBrush x:Key="GlassHeader" Color="#50181818" />
+            <SolidColorBrush x:Key="GlassWindow" Color="#08808080" />
+            <SolidColorBrush x:Key="GlassControl" Color="#10808080" />
+            <SolidColorBrush x:Key="GlassHover" Color="#28808080" />
+            <SolidColorBrush x:Key="GlassDisabled" Color="#08808080" />
+            <SolidColorBrush x:Key="GlassPopup" Color="#96808080" />
+            <LinearGradientBrush x:Key="GlassEdge" StartPoint="0,0" EndPoint="0.8,1">
+                <GradientStop Color="#70FFFFFF" Offset="0" />
+                <GradientStop Color="#18FFFFFF" Offset="0.45" />
+                <GradientStop Color="#30909090" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GlassSheen" StartPoint="0,0" EndPoint="0.35,1">
+                <GradientStop Color="#0CFFFFFF" Offset="0" />
+                <GradientStop Color="#00FFFFFF" Offset="0.55" />
+                <GradientStop Color="#04808080" Offset="1" />
+            </LinearGradientBrush>
+            <LinearGradientBrush x:Key="GlassBackdrop" StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#04808080" Offset="0" />
+                <GradientStop Color="#00FFFFFF" Offset="0.5" />
+                <GradientStop Color="#04808080" Offset="1" />
+            </LinearGradientBrush>
 
             <!-- Window -->
             <Style TargetType="{x:Type Window}" x:Key="MyWindow">
@@ -387,19 +411,19 @@
                                 <Trigger Property="IsEnabled" Value="False">
                                     <Trigger.Setters>
                                         <Setter Property="BorderBrush" Value="{DynamicResource ColorBrushGray5}" />
-                                        <Setter Property="Background" Value="{DynamicResource ColorBrushGray6}" />
+                                        <Setter Property="Background" Value="{DynamicResource GlassDisabled}" />
                                     </Trigger.Setters>
                                 </Trigger>
                                 <Trigger Property="IsMouseOver" Value="True">
                                     <Trigger.Setters>
                                         <Setter Property="BorderBrush" Value="{DynamicResource ColorBrush4}" />
-                                        <Setter Property="Background" Value="{DynamicResource ColorBrush7}" />
+                                        <Setter Property="Background" Value="{DynamicResource GlassHover}" />
                                     </Trigger.Setters>
                                 </Trigger>
                                 <Trigger Property="IsFocused" Value="True">
                                     <Trigger.Setters>
                                         <Setter Property="BorderBrush" Value="{DynamicResource ColorBrush3}" />
-                                        <Setter Property="Background" Value="{DynamicResource ColorBrush7}" />
+                                        <Setter Property="Background" Value="{DynamicResource GlassHover}" />
                                     </Trigger.Setters>
                                 </Trigger>
                             </ControlTemplate.Triggers>
@@ -449,7 +473,7 @@
                                        IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                        Placement="Bottom" PopupAnimation="Fade">
                                     <Grid x:Name="PanPopup">
-                                        <Border Background="{DynamicResource ColorBrushWhite}" CornerRadius="3" />
+                                        <Border Background="{DynamicResource GlassPopup}" CornerRadius="3" />
                                         <Border x:Name="dropDownBorder" CornerRadius="3"
                                                 BorderBrush="{TemplateBinding Foreground}" BorderThickness="1"
                                                 Width="{TemplateBinding Width}"
@@ -495,7 +519,7 @@
                                                IsOpen="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                                Placement="Bottom" PopupAnimation="Fade">
                                             <Grid x:Name="PanPopup">
-                                                <Border Background="{DynamicResource ColorBrushWhite}" CornerRadius="3" />
+                                                <Border Background="{DynamicResource GlassPopup}" CornerRadius="3" />
                                                 <Border x:Name="dropDownBorder" SnapsToDevicePixels="False"
                                                         CornerRadius="3" BorderBrush="{TemplateBinding Foreground}"
                                                         BorderThickness="1" Width="{TemplateBinding Width}"
@@ -606,8 +630,8 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ContextMenu">
-                            <Border BorderBrush="{DynamicResource ColorBrush1}" BorderThickness="1" CornerRadius="3"
-                                    Background="{DynamicResource ColorBrushWhite}" Margin="0,0,4,4"
+                            <Border BorderBrush="{DynamicResource GlassEdge}" BorderThickness="1" CornerRadius="12"
+                                    Background="{DynamicResource GlassPopup}" Margin="0,0,4,4"
                                     SnapsToDevicePixels="True">
                                 <Border.Effect>
                                     <DropShadowEffect Opacity="0.4" BlurRadius="4" ShadowDepth="2" />

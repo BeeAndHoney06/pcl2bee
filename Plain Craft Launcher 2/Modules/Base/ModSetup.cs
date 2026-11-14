@@ -605,10 +605,8 @@ public class ModSetup
             right = fallback[fallback.Count - 1];
         }
 
-        // 左侧 Logo 列：标题类型为「无」且启用左对齐时收窄为 0，否则与右侧等宽
-        var collapse = value && Config.Preference.WindowTitleType == LauncherTitleType.None;
-        left.Width = new GridLength(collapse ? 0d : 1d, GridUnitType.Star);
-        // 强制右列与左列对称（同为 1*）：即便此前被外部改成固定像素，也能自动恢复居中
+        // 顶部 Tab 始终相对窗口居中，切换标题设置时也保持左右等宽。
+        left.Width = new GridLength(1d, GridUnitType.Star);
         right.Width = new GridLength(1d, GridUnitType.Star);
     }
 

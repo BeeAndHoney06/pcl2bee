@@ -29,7 +29,12 @@
         <local:MyButton Grid.Row="3" Grid.Column="3" x:Name="BtnMore" Visibility="Collapsed" Height="35"
                         Click="BtnMore_Click"
                         Margin="0,10,10,0" TextPadding="36" Text="{DynamicResource Launch.Home.InstanceSettings}" />
-        <Grid Grid.ColumnSpan="5" Grid.Row="1" Margin="20,0" VerticalAlignment="Center" x:Name="PanLogin" />
+        <local:MyCard Grid.ColumnSpan="5" Grid.Row="1" Margin="20,12,20,16"
+                      VerticalAlignment="Center" UseAnimation="False">
+            <local:MyScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <Grid Margin="10,12" x:Name="PanLogin" />
+            </local:MyScrollViewer>
+        </local:MyCard>
         <Grid Grid.ColumnSpan="5" Grid.Row="2" RenderTransformOrigin="0.5,0.5">
             <Grid.RenderTransform>
                 <TransformGroup>

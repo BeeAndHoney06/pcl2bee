@@ -318,19 +318,19 @@ public class MyTextBox : TextBox
                     if (IsFocused)
                     {
                         foreColorName = "ColorBrush3";
-                        backColorName = "ColorBrush7";
+                        backColorName = "GlassHover";
                         animationTime = 10;
                     }
                     else if (IsMouseOver)
                     {
                         foreColorName = "ColorBrush4";
-                        backColorName = "ColorBrush7";
+                        backColorName = "GlassHover";
                         animationTime = 100;
                     }
                     else // 未选中
                     {
                         foreColorName = "ColorBrushBg0";
-                        backColorName = "ColorBrushHalfWhite";
+                        backColorName = "GlassControl";
                         animationTime = 100;
                     }
                 }
@@ -344,7 +344,7 @@ public class MyTextBox : TextBox
             else
             {
                 foreColorName = "ColorBrushGray5";
-                backColorName = "ColorBrushGray6";
+                backColorName = "GlassDisabled";
                 animationTime = 200;
             }
 

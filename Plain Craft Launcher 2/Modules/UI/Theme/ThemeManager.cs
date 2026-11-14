@@ -21,6 +21,7 @@ public static class ThemeManager
 
     public static void ThemeRefresh(int newTheme = -1)
     {
+        RefreshGlassResources();
         colorGray1 = new ModBase.MyColor(AppResources["ColorObjectGray1"]);
         colorGray4 = new ModBase.MyColor(AppResources["ColorObjectGray4"]);
         colorGray5 = new ModBase.MyColor(AppResources["ColorObjectGray5"]);
@@ -38,36 +39,34 @@ public static class ThemeManager
         });
     }
     
+    private static void RefreshGlassResources()
+    {
+        var dark = IsDarkMode;
+        SolidColorBrush Surface(byte alpha) => new(dark
+            ? Color.FromArgb(alpha, 20, 20, 20)
+            : Color.FromArgb(alpha, 128, 128, 128));
+        AppResources["GlassSurface"] = Surface(18);
+        AppResources["GlassWindow"] = Surface(8);
+        AppResources["GlassHeader"] = new SolidColorBrush(Color.FromArgb(80, 24, 24, 24));
+        AppResources["GlassControl"] = Surface(16);
+        AppResources["GlassHover"] = Surface(40);
+        AppResources["GlassDisabled"] = Surface(8);
+        AppResources["GlassPopup"] = Surface(150);
+        // 沿用这些资源的旧页面也使用玻璃底色，文字和状态色保持原值。
+        foreach (var key in new[] { "ColorBrushHalfWhite", "ColorBrushSemiWhite" })
+            AppResources[key] = Surface(16);
+        AppResources["ColorBrushTransparentBackground"] = Surface(18);
+        AppResources["ColorBrushToolTip"] = Surface(190);
+        AppResources["ColorBrushBackground"] = Surface(18);
+        AppResources["ColorBrushWhite"] = Surface(16);
+        foreach (var key in new[] { "ColorBrushGray6", "ColorBrushGray7", "ColorBrushGray8" })
+            AppResources[key] = Surface(16);
+    }
+
     // 主页面背景
     private static void RefreshBackground()
     {
-        if (Config.Preference.Background.BackgroundColorful)
-        {
-            var brush = new LinearGradientBrush
-            {
-                EndPoint = new Point(0.1, 1),
-                StartPoint = new Point(0.9, 0)
-            };
-
-            var hue = ThemeService.GetCurrentThemeArgs().Hue;
-            var hue1 = hue - 15;
-            var hue2 = hue + 15;
-            var tone = ThemeService.CurrentTone;
-            var darkLight = IsDarkMode ? 0.2d : 1d;
-            brush.GradientStops.Add(new GradientStop
-                { Offset = -0.1d, Color = LabColor.FromLch(0.84d * darkLight, tone.C5, hue1) });
-            brush.GradientStops.Add(new GradientStop
-                { Offset = 0.4d, Color = LabColor.FromLch(0.96d * darkLight, tone.C7, hue) });
-            brush.GradientStops.Add(new GradientStop
-                { Offset = 1.1d, Color = LabColor.FromLch(0.84d * darkLight, tone.C5, hue2) });
-            ModMain.frmMain.PanForm.Background = brush;
-        }
-        else
-        {
-            ModMain.frmMain.PanForm.Background = (Brush)System.Windows.Application.Current.Resources["ColorBrushBackground"];
-        }
-
-        ModMain.frmMain.PanForm.Background.Freeze();
+        ModMain.frmMain.PanForm.SetResourceReference(Panel.BackgroundProperty, "GlassWindow");
     }
 
     // 通用ContextMenu主题刷新

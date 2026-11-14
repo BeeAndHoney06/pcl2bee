@@ -250,6 +250,18 @@ public sealed partial class ThemeService
     {
         var cache = IsDarkMode ? DarkGrayCache : LightGrayCache;
         foreach (var c in cache) c.Apply();
+        // 透明玻璃上始终使用白色文字，不随浅色模式退回黑色。
+        var resources = Lifecycle.CurrentApplication.Resources;
+        var foregrounds = new byte[] { 255, 245, 235, 220, 200 };
+        for (var i = 0; i < foregrounds.Length; i++)
+        {
+            var value = foregrounds[i];
+            var color = System.Windows.Media.Color.FromRgb(value, value, value);
+            resources[$"ColorObjectGray{i + 1}"] = color;
+            resources[$"ColorBrushGray{i + 1}"] = new System.Windows.Media.SolidColorBrush(color);
+        }
+        resources["ColorBrushMemory"] = System.Windows.Media.Brushes.White;
+        resources["ColorBrushInfo"] = System.Windows.Media.Brushes.White;
     }
 
     /// <summary>
@@ -257,7 +269,24 @@ public sealed partial class ThemeService
     /// </summary>
     public static void ApplyColorResources()
     {
-        var colors = _CalculateColors(CurrentTone, GetCurrentThemeArgs());
-        foreach (var c in colors) c.Apply();
+        // 保留旧配置以兼容已有设置，界面只使用无彩色玻璃配色。
+        var resources = Lifecycle.CurrentApplication.Resources;
+        var values = new byte[] { 255, 255, 255, 245, 230, 110, 76, 54 };
+        for (var i = 0; i < values.Length; i++)
+        {
+            var value = values[i];
+            var alpha = i < 5 ? (byte)255 : (byte)(48 - (i - 5) * 12);
+            var color = System.Windows.Media.Color.FromArgb(alpha, value, value, value);
+            resources[$"ColorObject{i + 1}"] = color;
+            resources[$"ColorBrush{i + 1}"] = new System.Windows.Media.SolidColorBrush(color);
+        }
+        var neutral = (byte)235;
+        foreach (var suffix in new[] { "Bg0", "Bg1", "SemiTransparent" })
+        {
+            var alpha = suffix == "Bg0" ? (byte)110 : suffix == "Bg1" ? (byte)28 : (byte)1;
+            var color = System.Windows.Media.Color.FromArgb(alpha, neutral, neutral, neutral);
+            resources[$"ColorObject{suffix}"] = color;
+            resources[$"ColorBrush{suffix}"] = new System.Windows.Media.SolidColorBrush(color);
+        }
     }
 }

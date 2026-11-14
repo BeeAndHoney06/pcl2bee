@@ -35,50 +35,14 @@
                         <Grid Height="28" Margin="0,0,0,7">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" SharedSizeGroup="Name1" />
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="92" SharedSizeGroup="SubName" />
-                                <ColumnDefinition />
-                                <ColumnDefinition SharedSizeGroup="SubName" />
-                                <ColumnDefinition />
+                                <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{DynamicResource Setup.Ui.Theme.Title}" />
-                            <local:MyComboBox Grid.Column="1" x:Name="ComboDarkMode" Tag="UiDarkMode"
-                                              SelectionChanged="ComboChange">
+                            <TextBlock VerticalAlignment="Center" Text="{DynamicResource Setup.Ui.Theme.Title}" Margin="0,0,20,0" />
+                            <local:MyComboBox Grid.Column="1" x:Name="ComboDarkMode" Tag="UiDarkMode" SelectionChanged="ComboChange">
                                 <local:MyComboBoxItem Content="{DynamicResource Setup.Ui.Theme.Light}" />
                                 <local:MyComboBoxItem Content="{DynamicResource Setup.Ui.Theme.Dark}" />
-                                <local:MyComboBoxItem Content="{DynamicResource Setup.Ui.Theme.FollowSystem}" /> <!-- default -->
+                                <local:MyComboBoxItem Content="{DynamicResource Setup.Ui.Theme.FollowSystem}" />
                             </local:MyComboBox>
-                            <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Setup.Ui.Theme.LightColor}"/>
-                            <local:MyComboBox Grid.Column="3" x:Name="ComboLightColor" Tag="UiLightColor" ItemsSource="{Binding ThemeColors}" SelectionChanged="ThemeColor_Change"/>
-                            <TextBlock Grid.Column="4" VerticalAlignment="Center" HorizontalAlignment="Center" Text="{DynamicResource Setup.Ui.Theme.DarkColor}"/>
-                            <local:MyComboBox Grid.Column="5" x:Name="ComboDarkColor" Tag="UiDarkColor" ItemsSource="{Binding ThemeColors}" SelectionChanged="ThemeColor_Change"/>
-
-                        </Grid>
-                        <!-- 自定义主题颜色（主题选择“自定义”时显示） -->
-                        <Grid x:Name="PanCustomColor" Visibility="Collapsed" Margin="0,0,0,7">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" SharedSizeGroup="Name1" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="28" />
-                                <RowDefinition Height="9" />
-                                <RowDefinition Height="28" />
-                                <RowDefinition Height="9" />
-                                <RowDefinition Height="28" />
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
-                                       Text="{DynamicResource Setup.Ui.Theme.Custom.Hue}" />
-                            <local:MySlider Grid.Row="0" Grid.Column="1" x:Name="SliderCustomHue" Tag="UiCustomHue"
-                                            MaxValue="360" Change="CustomColor_Change" />
-                            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
-                                       Text="{DynamicResource Setup.Ui.Theme.Custom.Saturation}" />
-                            <local:MySlider Grid.Row="2" Grid.Column="1" x:Name="SliderCustomSat" Tag="UiCustomSat"
-                                            MaxValue="100" Change="CustomColor_Change" />
-                            <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left"
-                                       Text="{DynamicResource Setup.Ui.Theme.Custom.Lightness}" />
-                            <local:MySlider Grid.Row="4" Grid.Column="1" x:Name="SliderCustomLight" Tag="UiCustomLight"
-                                            MaxValue="100" Change="CustomColor_Change" />
                         </Grid>
                         <local:MyCheckBox Text="{DynamicResource Setup.Ui.Basic.ShowLogo}" Margin="-1,0,0,7" Height="22"
                                           x:Name="CheckLauncherLogo" Tag="UiLauncherLogo" Change="CheckBoxChange" />
@@ -194,8 +158,6 @@
                     <local:MyCheckBox Text="{DynamicResource Setup.Ui.Background.PauseVideo}" Margin="-1,0,0,8" Height="22"
                                       x:Name="CheckAutoPauseVideo" Tag="UiAutoPauseVideo" Change="CheckBoxChange"
                                       ToolTip="{DynamicResource Setup.Ui.Background.PauseVideo.ToolTip}" IsEnabled="True" />
-                    <local:MyCheckBox Text="{DynamicResource Setup.Ui.Background.ColorOverlay}" Margin="-1,0,0,8" Height="22" x:Name="CheckBackgroundColorful"
-                                      Tag="UiBackgroundColorful" Change="CheckBoxChange" />
                     <Grid Height="35" Margin="0,2,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" SharedSizeGroup="Button" />

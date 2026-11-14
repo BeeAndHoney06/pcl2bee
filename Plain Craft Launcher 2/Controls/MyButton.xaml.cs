@@ -194,7 +194,7 @@ public partial class MyButton
     {
         ModAnimation.AniStart(
             ModAnimation.AaColor(PanFore, BackgroundProperty,
-                _ColorType == ColorState.Red ? "ColorBrushRedBack" : "ColorBrush7", animationColorIn),
+                _ColorType == ColorState.Red ? "ColorBrushRedBack" : "GlassHover", animationColorIn),
             "MyButton Background " + Uuid);
     }
 
@@ -214,7 +214,7 @@ public partial class MyButton
     private void Button_MouseLeave()
     {
         ModAnimation.AniStart(
-            ModAnimation.AaColor(PanFore, BackgroundProperty, "ColorBrushHalfWhite", animationColorOut),
+            ModAnimation.AaColor(PanFore, BackgroundProperty, "GlassControl", animationColorOut),
             "MyButton Background " + Uuid);
         if (!isMouseDown)
             return;
