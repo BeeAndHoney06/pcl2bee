@@ -332,6 +332,22 @@
                     </x:Array>
                 </local:MyListItem.Buttons>
             </local:MyListItem>
+            <local:MyListItem x:Name="ItemServerPack" Type="RadioBox" IsScaleAnimationEnabled="False" Tag="22"
+                              Check="PageCheck"
+                              MinPaddingRight="35" Height="36" VerticalAlignment="Top"
+                              Title="{DynamicResource Download.Left.ServerPack}"
+                              LogoScale="0.95"
+                              SvgIcon="lucide/package-plus">
+                <local:MyListItem.Buttons>
+                    <x:Array Type="{x:Type local:MyIconButton}">
+                        <local:MyIconButton Tag="22" ToolTip="{DynamicResource Common.Action.Refresh}"
+                                            ToolTipService.Placement="Right" Click="RefreshButton_Click"
+                                            ToolTipService.InitialShowDelay="200" ToolTipService.VerticalOffset="-1"
+                                            LogoScale="0.85"
+                                            SvgIcon="lucide/refresh-cw" />
+                    </x:Array>
+                </local:MyListItem.Buttons>
+            </local:MyListItem>
         </StackPanel>
     </local:MyScrollViewer>
 </local:MyPageLeft>

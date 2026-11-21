@@ -1591,6 +1591,7 @@ public partial class FormMain
         ServerRemote = 2,
         DownloadServerSpigot = 20,
         DownloadServerPurpur = 21,
+        DownloadServerPack = 22,
 
         SetupLaunch = 0,
         SetupUI = 1,

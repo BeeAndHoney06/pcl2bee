@@ -188,6 +188,12 @@ public partial class MyRadioButton
         }
     } = ColorState.White; // 颜色类别
 
+    /// <summary>
+    ///     选中状态下的文字与图标颜色。
+    ///     选中后按钮背景会变为纯白，若继续使用白色文字会导致完全看不清，因此固定使用黑色。
+    /// </summary>
+    private static ModBase.MyColor SelectedForegroundColor => new(255d, 0d, 0d, 0d);
+
     public event CheckEventHandler? Check;
 
     /// <summary>
@@ -327,15 +333,15 @@ public partial class MyRadioButton
                     {
                         if (Checked)
                         {
-                            // 勾选
-                            var color3 = new ModBase.MyColor(ThemeManager.AppResources["ColorObject3"]);
+                            // 勾选：背景会变为纯白，文字与图标必须改为黑色，否则会与背景融为一体
+                            var selectedColor = SelectedForegroundColor;
                             ModAnimation.AniStart(
                                 new[]
                                 {
-                                    ModAnimation.AaColor(ShapeLogo, Shape.FillProperty, color3 - ShapeLogo.Fill,
+                                    ModAnimation.AaColor(ShapeLogo, Shape.FillProperty, selectedColor - ShapeLogo.Fill,
                                         animationTimeOfCheck),
                                     ModAnimation.AaColor(LabText, TextBlock.ForegroundProperty,
-                                        color3 - LabText.Foreground, animationTimeOfCheck)
+                                        selectedColor - LabText.Foreground, animationTimeOfCheck)
                                 }, "MyRadioButton Checked " + Uuid);
                             ModAnimation.AniStart(
                                 ModAnimation.AaColor(this, BackgroundProperty,
@@ -463,9 +469,10 @@ public partial class MyRadioButton
                     {
                         if (Checked)
                         {
+                            // 背景为纯白，文字与图标使用黑色以免看不清
                             Background = new ModBase.MyColor(255d, 255d, 255d);
-                            ShapeLogo.SetResourceReference(Shape.FillProperty, "ColorBrush3");
-                            LabText.SetResourceReference(TextBlock.ForegroundProperty, "ColorBrush3");
+                            ShapeLogo.Fill = SelectedForegroundColor;
+                            LabText.Foreground = SelectedForegroundColor;
                         }
                         else
                         {
@@ -478,11 +485,12 @@ public partial class MyRadioButton
                     }
                     case ColorState.Highlight:
                     {
+                        // 选中后背景为纯白，文字与图标使用黑色以免看不清
                         if (Checked)
                         {
                             SetResourceReference(BackgroundProperty, "ColorBrush3");
-                            ShapeLogo.Fill = new ModBase.MyColor(255d, 255d, 255d);
-                            LabText.Foreground = new ModBase.MyColor(255d, 255d, 255d);
+                            ShapeLogo.Fill = SelectedForegroundColor;
+                            LabText.Foreground = SelectedForegroundColor;
                         }
                         else
                         {

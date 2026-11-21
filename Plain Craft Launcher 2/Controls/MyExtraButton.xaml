@@ -38,7 +38,7 @@
             </Grid.RenderTransform>
             <Path x:Name="Path"
                   Stretch="Uniform"
-                  Fill="{DynamicResource ColorBrush8}" />
+                  Fill="#FF000000" />
             <svgIcon:SvgIcon x:Name="ShapeSvgIcon"
                          Stretch="Uniform"
                          Visibility="Collapsed"

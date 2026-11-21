@@ -29,13 +29,13 @@
                 </Grid.RenderTransform>
                 <Path x:Name="Path"
                       Stretch="Uniform"
-                      Fill="{DynamicResource ColorBrush8}" />
+                      Fill="#FF000000" />
                 <svgIcon:SvgIcon x:Name="ShapeSvgIcon"
                              Stretch="Uniform"
                              Visibility="Collapsed"
                              IconBrush="{Binding Fill, ElementName=Path}" />
             </Grid>
-            <TextBlock x:Name="LabText" VerticalAlignment="Center" Foreground="{DynamicResource ColorBrush8}"
+            <TextBlock x:Name="LabText" VerticalAlignment="Center" Foreground="#FF000000"
                        FontSize="16"
                        Margin="12,0,0,0.8" />
         </StackPanel>

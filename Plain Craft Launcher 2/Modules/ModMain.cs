@@ -55,6 +55,7 @@ public static class ModMain
     public static PageDownloadServer? frmDownloadServer;
     public static PageDownloadServer? frmDownloadServerSpigot;
     public static PageDownloadServer? frmDownloadServerPurpur;
+    public static PageDownloadServerPack? frmDownloadServerPack;
     public static PageAboutLeft? frmAboutLeft;
     public static PageAboutInfo? frmAboutInfo;
     public static PageAboutUpdate? frmAboutUpdate;

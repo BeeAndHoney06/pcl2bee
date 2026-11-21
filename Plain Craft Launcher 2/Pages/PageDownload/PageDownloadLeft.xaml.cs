@@ -194,6 +194,12 @@ public partial class PageDownloadLeft : IRefreshable
                 ItemServerPurpur.Checked = true;
                 break;
             }
+            case FormMain.PageSubType.DownloadServerPack:
+            {
+                if (ModMain.frmDownloadServerPack is not null) ModMain.frmDownloadServerPack.Reload();
+                ItemServerPack.Checked = true;
+                break;
+            }
             case FormMain.PageSubType.DownloadCompFavorites:
             {
                 if (ModMain.frmDownloadCompFavorites is not null)
@@ -243,6 +249,7 @@ public partial class PageDownloadLeft : IRefreshable
         ItemServer.Check += PageCheck;
         ItemServerSpigot.Check += PageCheck;
         ItemServerPurpur.Check += PageCheck;
+        ItemServerPack.Check += PageCheck;
 
         AnimatedControl = PanItem;
     }
@@ -381,6 +388,11 @@ public partial class PageDownloadLeft : IRefreshable
                 if (ModMain.frmDownloadServerPurpur is null)
                     ModMain.frmDownloadServerPurpur = new PageDownloadServer(ModServerDownload.ServerType.Purpur);
                 return ModMain.frmDownloadServerPurpur;
+            }
+            case FormMain.PageSubType.DownloadServerPack:
+            {
+                ModMain.frmDownloadServerPack ??= new PageDownloadServerPack();
+                return ModMain.frmDownloadServerPack;
             }
 
             default:
