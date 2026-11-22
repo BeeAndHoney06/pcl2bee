@@ -3783,6 +3783,8 @@
     <sys:String x:Key="Download.ServerPack.Versions.Title">Server versions</sys:String>
     <sys:String x:Key="Download.ServerPack.NoServerPack">This modpack does not provide server files.</sys:String>
     <sys:String x:Key="Download.ServerPack.File.Info">Game version {0} · {1}</sys:String>
+    <sys:String x:Key="Download.ServerPack.File.Fallback">Uses the modpack archive</sys:String>
+    <sys:String x:Key="Download.ServerPack.Task.InstallMods">Downloading mods from the modpack ({0} in total)…</sys:String>
     <sys:String x:Key="Download.ServerPack.ClickToDownload">Click to download</sys:String>
     <sys:String x:Key="Download.ServerPack.Task.Download">Download modpack</sys:String>
     <sys:String x:Key="Download.ServerPack.Task.Title">Download server modpack {0}</sys:String>

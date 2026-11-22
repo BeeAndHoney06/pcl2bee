@@ -3722,6 +3722,8 @@
     <sys:String x:Key="Download.ServerPack.Versions.Title">伺服器版本列表</sys:String>
     <sys:String x:Key="Download.ServerPack.NoServerPack">該整合包沒有提供伺服器檔案。</sys:String>
     <sys:String x:Key="Download.ServerPack.File.Info">遊戲版本 {0} · {1}</sys:String>
+    <sys:String x:Key="Download.ServerPack.File.Fallback">使用整合包本體</sys:String>
+    <sys:String x:Key="Download.ServerPack.Task.InstallMods">正在下載整合包中的 Mod（共 {0} 個）……</sys:String>
     <sys:String x:Key="Download.ServerPack.ClickToDownload">點擊下載</sys:String>
     <sys:String x:Key="Download.ServerPack.Task.Download">下載整合包</sys:String>
     <sys:String x:Key="Download.ServerPack.Task.Title">下載整合包伺服器 {0}</sys:String>

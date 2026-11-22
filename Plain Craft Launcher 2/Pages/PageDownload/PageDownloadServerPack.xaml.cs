@@ -261,6 +261,8 @@ public partial class PageDownloadServerPack
             ? Lang.Text("Download.ServerPack.Type.Modpack")
             : file.Loader;
         var info = Lang.Text("Download.ServerPack.File.Info", versionText, loaderText);
+        if (!file.IsServerPack)
+            info += " · " + Lang.Text("Download.ServerPack.File.Fallback");
         info += " · " + Lang.Text("Download.ServerPack.ClickToDownload");
         var item = new MyListItem
         {

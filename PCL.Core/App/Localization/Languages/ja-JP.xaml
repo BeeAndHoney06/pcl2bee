@@ -3724,6 +3724,8 @@
     <sys:String x:Key="Download.ServerPack.Versions.Title">サーバーバージョン一覧</sys:String>
     <sys:String x:Key="Download.ServerPack.NoServerPack">この MOD パックにはサーバー用ファイルがありません。</sys:String>
     <sys:String x:Key="Download.ServerPack.File.Info">ゲームバージョン {0} · {1}</sys:String>
+    <sys:String x:Key="Download.ServerPack.File.Fallback">MOD パック本体を使用</sys:String>
+    <sys:String x:Key="Download.ServerPack.Task.InstallMods">MOD パック内の MOD をダウンロードしています（計 {0} 個）……</sys:String>
     <sys:String x:Key="Download.ServerPack.ClickToDownload">クリックしてダウンロード</sys:String>
     <sys:String x:Key="Download.ServerPack.Task.Download">MOD パックをダウンロード</sys:String>
     <sys:String x:Key="Download.ServerPack.Task.Title">サーバーMODパック {0} をダウンロード</sys:String>

@@ -100,6 +100,19 @@ public static class ModServerPackDownload
         }
     }
 
+    private static bool GetBool(JsonNode? node, string key)
+    {
+        try
+        {
+            var value = node?[key];
+            return value is not null && value.ToObject<bool>();
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     /// <summary>将 CurseForge 的 ModLoaderType 转换为显示用的加载器名称。</summary>
     private static string LoaderNameFromCurseForge(long modLoader)
     {
@@ -257,23 +270,68 @@ public static class ModServerPackDownload
         }
 
         var result = new List<ServerPackFile>();
+        var seen = new HashSet<long>();
+        // 已经被当作服务端包使用的文件，不应再作为整合包本体重复出现
+        var usedServerPacks = new HashSet<long>();
+        // CurseForge 的服务端包是隐藏文件：官方接口需要 API Key，镜像通常不收录它们。
+        // 一旦某个服务端包解析失败，就不再对其余文件重复尝试，避免大量必然失败的请求拖慢加载。
+        var serverPackResolvable = true;
         foreach (var file in data)
         {
+            var fileId = GetLong(file, "id");
+            if (fileId <= 0 || !seen.Add(fileId) || usedServerPacks.Contains(fileId))
+                continue;
+
             var serverPackId = GetLong(file, "serverPackFileId");
-            if (serverPackId <= 0)
-                continue; // 该文件没有提供独立的服务端包
-            if (!byId.TryGetValue(serverPackId, out var serverFile))
+            if (serverPackId > 0 && serverPackResolvable)
             {
-                serverFile = FetchJson($"https://api.curseforge.com/v1/mods/{project.Id}/files/{serverPackId}")["data"]
-                    as JsonObject;
-                if (serverFile is null)
+                var serverFile = ResolveCurseForgeServerFile(project, byId, serverPackId, out var resolveFailed);
+                if (serverFile is not null)
+                {
+                    result.Add(BuildCurseForgeFile(project, serverFile, true));
+                    usedServerPacks.Add(serverPackId);
                     continue;
+                }
+
+                // 来源无法提供该服务端包，后续文件不再重复尝试
+                serverPackResolvable = false;
+                ModBase.Log(resolveFailed
+                    ? $"[ServerPack] {project.Name} 的服务端包 {serverPackId} 无法获取，将回退使用整合包本体"
+                    : $"[ServerPack] {project.Name} 未返回服务端包 {serverPackId} 的数据，将回退使用整合包本体");
             }
 
-            result.Add(BuildCurseForgeFile(project, serverFile, true));
+            // 回退：没有独立服务端包时直接使用整合包本体，安装时解析 manifest.json 下载其中的 Mod
+            result.Add(BuildCurseForgeFile(project, file, false));
         }
 
-        return result.OrderByDescending(file => file.ReleaseDate).ToList();
+        return result
+            .GroupBy(file => file.FileId)
+            .Select(group => group.OrderByDescending(file => file.IsServerPack).First())
+            .OrderByDescending(file => file.ReleaseDate)
+            .ToList();
+    }
+
+    /// <summary>
+    ///     获取 CurseForge 服务端包的文件信息。没有可用 API Key 或镜像未收录该隐藏文件时返回 null。
+    /// </summary>
+    /// <param name="resolveFailed">为 true 表示该来源无法提供任何服务端包，后续文件无需再尝试。</param>
+    private static JsonObject? ResolveCurseForgeServerFile(ServerPackProject project, Dictionary<long, JsonObject> byId,
+        long serverPackId, out bool resolveFailed)
+    {
+        resolveFailed = false;
+        if (byId.TryGetValue(serverPackId, out var cached))
+            return cached; // 服务端包也在文件列表中，直接复用
+        try
+        {
+            return FetchJson($"https://api.curseforge.com/v1/mods/{project.Id}/files/{serverPackId}")["data"]
+                as JsonObject;
+        }
+        catch (Exception ex)
+        {
+            ModBase.Log(ex, $"[ServerPack] 获取服务端包文件 {serverPackId} 失败", ModBase.LogLevel.Debug);
+            resolveFailed = true;
+            return null;
+        }
     }
 
     private static ServerPackFile BuildCurseForgeFile(ServerPackProject project, JsonObject file, bool isServerPack)
@@ -289,12 +347,7 @@ public static class ModServerPackDownload
         if (loader.Length == 0)
             loader = project.Loader;
 
-        var hash = "";
-        if (file["hashes"] is JsonArray hashes)
-        {
-            var sha1 = hashes.OfType<JsonObject>().FirstOrDefault(item => GetLong(item, "algo") == 1);
-            hash = sha1?["value"]?.ToString() ?? "";
-        }
+        var hash = GetCurseForgeHash(file);
 
         return new ServerPackFile
         {
@@ -310,6 +363,28 @@ public static class ModServerPackDownload
             ReleaseDate = ParseDate(GetString(file, "fileDate")),
             IsServerPack = isServerPack
         };
+    }
+
+    /// <summary>获取 CurseForge 文件的 SHA1 校验值，没有则返回空字符串。</summary>
+    private static string GetCurseForgeHash(JsonNode? file)
+    {
+        if (file?["hashes"] is not JsonArray hashes)
+            return "";
+        var sha1 = hashes.OfType<JsonObject>().FirstOrDefault(item => GetLong(item, "algo") == 1);
+        return sha1?["value"]?.ToString() ?? "";
+    }
+
+    /// <summary>
+    ///     通过 CurseForge 的批量文件接口获取文件信息。
+    ///     该接口不需要逐个请求，镜像源也完整支持，可用于解析整合包 manifest 中的 Mod。
+    /// </summary>
+    private static JsonArray FetchCurseForgeFileInfos(List<long> fileIds)
+    {
+        var ids = new JsonArray(fileIds.Select(id => (JsonNode?)JsonValue.Create(id)).ToArray());
+        var body = new JsonObject { ["fileIds"] = ids };
+        var json = ModDownload.DlModRequest<JsonObject>("https://api.curseforge.com/v1/mods/files", "POST",
+            body.ToJsonString(), "application/json", allowMirror: true);
+        return json["data"] as JsonArray ?? new JsonArray();
     }
 
     /// <summary>
@@ -521,10 +596,188 @@ public static class ModServerPackDownload
     {
         if (IsModrinthPack(archivePath))
             return ExtractModrinthPack(archivePath, folder);
+        // CurseForge 未提供服务端包时会回退到整合包本体，它是 CurseForge 标准的 manifest.json + overrides 结构，
+        // 需要按 manifest 自行下载其中的 Mod。
+        if (DetectCurseForgePack(archivePath, out var overridesPrefix, out var minecraft, out var manifestFiles))
+            return InstallCurseForgePack(archivePath, folder, overridesPrefix, minecraft, manifestFiles);
         // CurseForge 的服务端包是完整压缩包，直接整体解压
         ModBase.ExtractFile(archivePath, folder);
         FlattenSingleRoot(folder);
         return new PackInfo(file.GameVersion, file.Loader, "");
+    }
+
+    /// <summary>
+    ///     判断压缩包是否为 CurseForge 的整合包本体（manifest.json + overrides），而非开箱即用的服务端包。
+    ///     是的话输出 overrides 目录前缀与 manifest 内容。
+    /// </summary>
+    private static bool DetectCurseForgePack(string archivePath, out string overridesPrefix, out JsonObject minecraft,
+        out JsonArray files)
+    {
+        overridesPrefix = "";
+        minecraft = new JsonObject();
+        files = new JsonArray();
+        try
+        {
+            using var archive = ZipFile.OpenRead(archivePath);
+            var manifestEntry = archive.Entries.FirstOrDefault(entry =>
+                entry.FullName.Equals("manifest.json", StringComparison.OrdinalIgnoreCase) ||
+                entry.FullName.Count(c => c == '/') == 1 &&
+                entry.FullName.EndsWith("/manifest.json", StringComparison.OrdinalIgnoreCase));
+            if (manifestEntry is null)
+                return false;
+            // 已经包含 mods、libraries 或启动脚本的是可直接运行的整套服务端，整体解压即可
+            if (archive.Entries.Any(entry =>
+                    entry.FullName.StartsWith("mods/", StringComparison.OrdinalIgnoreCase) ||
+                    entry.FullName.StartsWith("libraries/", StringComparison.OrdinalIgnoreCase) ||
+                    entry.FullName.Equals("server.properties", StringComparison.OrdinalIgnoreCase) ||
+                    entry.FullName.Equals("eula.txt", StringComparison.OrdinalIgnoreCase) ||
+                    entry.FullName.Equals("run.bat", StringComparison.OrdinalIgnoreCase) ||
+                    entry.FullName.Equals("run.sh", StringComparison.OrdinalIgnoreCase)))
+                return false;
+
+            var manifest = ModBase.GetJson(ModBase.ReadFile(manifestEntry.Open())) as JsonObject;
+            if (manifest is null ||
+                manifest["minecraft"] is not JsonObject manifestMinecraft ||
+                manifest["files"] is not JsonArray manifestFiles)
+                return false;
+
+            var baseFolder = manifestEntry.FullName[..^"manifest.json".Length];
+            var overrides = GetString(manifest, "overrides").Replace('\\', '/').Trim();
+            if (overrides is "." or "./")
+                overrides = "";
+            else if (string.IsNullOrWhiteSpace(overrides))
+                overrides = "overrides"; // manifest 未指明时按惯例使用 overrides 文件夹
+            overridesPrefix = overrides.Length == 0 ? baseFolder : baseFolder + overrides.Trim('/') + "/";
+            minecraft = manifestMinecraft;
+            files = manifestFiles;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            ModBase.Log(ex, "[ServerPack] 解析整合包 manifest.json 失败，将按普通压缩包解压", ModBase.LogLevel.Debug);
+            return false;
+        }
+    }
+
+    /// <summary>
+    ///     安装 CurseForge 整合包本体：解压 overrides 目录，并按 manifest.json 下载其中的 Mod。
+    /// </summary>
+    private static PackInfo InstallCurseForgePack(string archivePath, string folder, string overridesPrefix,
+        JsonObject minecraft, JsonArray manifestFiles)
+    {
+        var gameVersion = GetString(minecraft, "version");
+        var (loader, loaderVersion) = ParseCurseForgeLoader(minecraft);
+        var root = Path.GetFullPath(folder);
+        var rootWithSeparator = root.EndsWith(Path.DirectorySeparatorChar)
+            ? root
+            : root + Path.DirectorySeparatorChar;
+        using (var archive = ZipFile.OpenRead(archivePath))
+        {
+            // 整合包本体中的 Mod 由 manifest.json 描述，压缩包里只有配置文件等 overrides 内容
+            ExtractOverrideDirectory(archive, folder, rootWithSeparator, overridesPrefix);
+        }
+
+        DownloadCurseForgeMods(manifestFiles, folder);
+        return new PackInfo(gameVersion, loader, loaderVersion);
+    }
+
+    /// <summary>从 manifest.json 的 minecraft.modLoaders 中解析加载器名称与版本。</summary>
+    private static (string Loader, string Version) ParseCurseForgeLoader(JsonObject minecraft)
+    {
+        var id = "";
+        if (minecraft["modLoaders"] is JsonArray loaders)
+        {
+            var target = loaders.OfType<JsonObject>().FirstOrDefault(item => GetBool(item, "primary")) ??
+                         loaders.OfType<JsonObject>().FirstOrDefault();
+            id = GetString(target, "id");
+        }
+
+        if (string.IsNullOrWhiteSpace(id))
+            return ("", "");
+        var index = id.IndexOf('-');
+        var name = (index > 0 ? id[..index] : id).ToLowerInvariant();
+        var version = index > 0 ? id[(index + 1)..] : "";
+        var loader = name switch
+        {
+            "forge" => "Forge",
+            "neoforge" => "NeoForge",
+            "fabric" => "Fabric",
+            "quilt" => "Quilt",
+            _ => ""
+        };
+        return (loader, version);
+    }
+
+    /// <summary>下载整合包 manifest.json 中列出的全部 Mod 到实例的 mods 文件夹。</summary>
+    private static void DownloadCurseForgeMods(JsonArray manifestFiles, string folder)
+    {
+        var fileIds = new List<long>();
+        foreach (var node in manifestFiles.OfType<JsonObject>())
+        {
+            var fileId = GetLong(node, "fileID");
+            if (fileId > 0 && !fileIds.Contains(fileId))
+                fileIds.Add(fileId);
+        }
+
+        if (fileIds.Count == 0)
+            return;
+        var modsFolder = Path.Combine(folder, "mods");
+        Directory.CreateDirectory(modsFolder);
+        ModBase.Log($"[ServerPack] 整合包共包含 {fileIds.Count} 个文件，开始下载其中的 Mod");
+        HintService.Hint(Lang.Text("Download.ServerPack.Task.InstallMods", fileIds.Count), HintType.Info);
+        var downloaded = 0;
+        var failed = 0;
+        foreach (var chunk in fileIds.Chunk(100))
+        {
+            JsonArray infos;
+            try
+            {
+                infos = FetchCurseForgeFileInfos(chunk.ToList());
+            }
+            catch (Exception ex)
+            {
+                ModBase.Log(ex, "[ServerPack] 获取整合包 Mod 下载信息失败", ModBase.LogLevel.Debug);
+                failed += chunk.Length;
+                continue;
+            }
+
+            foreach (var info in infos.OfType<JsonObject>())
+            {
+                var fileName = Path.GetFileName(SanitizeFileName(GetString(info, "fileName")));
+                if (string.IsNullOrWhiteSpace(fileName))
+                    continue;
+                if (!fileName.EndsWith(".jar", StringComparison.OrdinalIgnoreCase))
+                    continue; // 服务端只需要 Mod，跳过资源包与光影
+                var target = Path.Combine(modsFolder, fileName);
+                if (File.Exists(target))
+                {
+                    downloaded += 1;
+                    continue;
+                }
+
+                var urls = BuildCurseForgeUrls(GetLong(info, "id"), fileName, GetString(info, "downloadUrl"));
+                if (urls.Count == 0)
+                {
+                    failed += 1;
+                    continue;
+                }
+
+                try
+                {
+                    var hash = GetCurseForgeHash(info);
+                    ModNet.NetDownloadByLoader(urls, target,
+                        check: string.IsNullOrWhiteSpace(hash) ? null : new ModBase.FileChecker(hash: hash));
+                    downloaded += 1;
+                }
+                catch (Exception ex)
+                {
+                    failed += 1;
+                    ModBase.Log(ex, $"[ServerPack] 下载 Mod {fileName} 失败", ModBase.LogLevel.Debug);
+                }
+            }
+        }
+
+        ModBase.Log($"[ServerPack] 整合包 Mod 下载完成：成功 {downloaded} 个，失败 {failed} 个");
     }
 
     private static bool IsModrinthPack(string archivePath)

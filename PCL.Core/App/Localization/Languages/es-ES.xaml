@@ -3724,6 +3724,8 @@
     <sys:String x:Key="Download.ServerPack.Versions.Title">Versiones de servidor</sys:String>
     <sys:String x:Key="Download.ServerPack.NoServerPack">Este modpack no incluye archivos de servidor.</sys:String>
     <sys:String x:Key="Download.ServerPack.File.Info">Versión del juego {0} · {1}</sys:String>
+    <sys:String x:Key="Download.ServerPack.File.Fallback">Usa el archivo del modpack</sys:String>
+    <sys:String x:Key="Download.ServerPack.Task.InstallMods">Descargando los mods del modpack ({0} en total)…</sys:String>
     <sys:String x:Key="Download.ServerPack.ClickToDownload">Haz clic para descargar</sys:String>
     <sys:String x:Key="Download.ServerPack.Task.Download">Descargar modpack</sys:String>
     <sys:String x:Key="Download.ServerPack.Task.Title">Descargar modpack de servidor {0}</sys:String>
