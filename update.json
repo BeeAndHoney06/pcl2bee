@@ -1,7 +1,7 @@
 {
-  "version": "1.0.0",
-  "versionCode": 530,
-  "date": "2026-10-31",
-  "notes": "项目进入Beta阶段，从今以后HighPing64x不会继续开发项目，悼观！",
+  "version": "Beta 1.1.0",
+  "versionCode": 531,
+  "date": "2026-11-22",
+  "notes": "更新了MacOS UI 采用了部分MacOS操作逻辑，新增下载服务端整合包(ServerPack)的功能，更好看的液态玻璃UI。",
   "releaseUrl": "https://github.com/BeeAndHoney06/pcl2bee/releases/latest"
 }
